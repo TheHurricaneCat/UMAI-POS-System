@@ -1,0 +1,13 @@
+.trayHeader {
+    display: flex;
+    justify-content: space-between;
+    border: 2px solid rgb(255, 0, 225);
+}
+
+.trayContainer {
+    display: grid;
+    border: 2px solid rgb(17, 255, 0);
+    max-width: 100%;
+    column-gap: 1em;
+    row-gap: 0.1em;
+}

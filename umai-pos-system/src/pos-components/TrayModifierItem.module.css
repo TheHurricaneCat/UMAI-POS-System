@@ -1,0 +1,36 @@
+.modifierDetails {
+    display: grid;
+    grid-template-columns: 20% 30% 20% 10% 10% 10%; 
+    max-width: 100%;
+    max-height: 4em;
+    justify-content: center;
+}
+
+.modifierDetails > * {
+    height: 100%;
+    display: flex;
+    align-items: center; 
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    border: 1px solid black; /* Apply a common border style to all children */
+}
+
+.modifierQuantity {
+    justify-content: flex-end;
+}
+
+.modifierName {
+    justify-content: flex-start;
+}
+
+.modifierPrice {
+    justify-content: flex-end; 
+}
+
+.addButton, .subtractButton, .removeButton {
+    justify-content: flex-end;
+}
+
+.addButton button, .subtractButton button, .removeButton button {
+   height: 90%;
+}
