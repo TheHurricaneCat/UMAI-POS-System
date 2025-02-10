@@ -14,6 +14,5 @@
 ### Creating your own test react application:
 *Open your IDE's terminal and run the following commands. Make sure to run these on an empty folder/project:*
 1. `npm create vite@latest project_name_here --template`
-2.  Select `vanilla` using arrowkeys (skip this step if not being asked to)
-3.  Select `react`
-4.  Select `javascript`
+2.  Select `react` using arrowkeys (skip this step if not being asked to)
+3.  Select `javascript`
