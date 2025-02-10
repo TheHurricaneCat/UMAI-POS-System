@@ -1,0 +1,13 @@
+.rootContainer {
+    display: inline-block;
+    border: 2px solid black;
+    width: 5em;
+    height: 5em;
+ }
+ 
+ .detailsContainer {
+     display: block;
+     border: 2px solid rgb(208, 255, 0);
+     text-align: center;
+     overflow: hidden;
+ }
