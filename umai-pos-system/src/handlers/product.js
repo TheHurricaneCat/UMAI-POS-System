@@ -15,7 +15,7 @@ export const products = [
         name: "Cheese Fries",
         code: "P3",
         price: 100.00,
-        category: "Fries"
+        category: "Fries",
     },
     {
         name: "Chicken Burger",

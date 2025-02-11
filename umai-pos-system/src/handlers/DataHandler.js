@@ -1,3 +1,5 @@
+import ExcelJS from 'exceljs';
+
 export class Modifier {
   constructor(name, price, quantity) {
     this.name = name;
@@ -82,3 +84,27 @@ export function initProductList(products = []) {
     });
     return categories;
   }
+
+  //function to append new entries
+export async function appendEntry(filePath, newEntries) {
+  const fileBuffer = await fetch(filePath).then((res) => res.arrayBuffer());
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(fileBuffer);
+
+  const worksheet = workbook.getWorksheet(1);
+
+  const lastRow = worksheet.lastRow;
+
+  newEntries.forEach((entry) => {
+    worksheet.addRow(entry); // Add each new row
+  });
+
+  const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
+
+  const blob = new Blob([updatedExcelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'UpdatedExcelFile.xlsx';
+  link.click();
+}

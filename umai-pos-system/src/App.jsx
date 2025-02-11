@@ -29,6 +29,7 @@ function App() {
     handleModifierDeletion,
     setCurrentTray,
     currentProduct,
+    currentTotal,
     setCurrentProduct
   } = useTrayManager();
 
@@ -71,7 +72,7 @@ function App() {
           ))}
         </div>
         <div className="keypadViewer"> 
-          <KeypadContainer addNewTray={addNewTray}/>
+          <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal}/>
         </div>
       </div>
     </div>

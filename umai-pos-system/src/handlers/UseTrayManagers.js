@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tray, Product } from "/src/handlers/DataHandler";
 
 export default function useTrayManager() {
   const [tray, setTray] = useState([new Tray(0)]);
   const [currentTray, setCurrentTray] = useState(0);
   const [currentProduct, setCurrentProduct] = useState("");
+  const [currentTotal, setTotal] = useState(0);
+
+  const updateTotal = () => {
+    let total = 0;
+    tray.forEach(trayObject => {
+      trayObject.products.forEach(product => {
+        total += product.price * product.quantity;
+        product.modifiers.forEach(modifier => {
+          total += modifier.price * modifier.quantity;
+        });
+      });
+    });
+    setTotal(total);
+    return currentTotal;
+  }
+
+  useEffect(() => {
+    updateTotal();
+  }, [tray]);
 
   // Add a new tray
   const addNewTray = () => {
@@ -66,6 +85,18 @@ export default function useTrayManager() {
         return trayObject;
       })
     );
+  };
+
+  const handleProductDeletion = (productName) => {
+    setTray(prevTray => {
+      return prevTray.map(trayObject => {
+        if (trayObject.id === currentTray) {
+          const updatedProducts = trayObject.products.filter(product => product.name !== productName);
+          return { ...trayObject, products: updatedProducts };
+        }
+        return trayObject;
+      });
+    });
   };
 
   const addModifier = (modifier) => {
@@ -174,12 +205,14 @@ export default function useTrayManager() {
     addToTray,
     handleProductIncrement,
     handleProductDecrement,
+    handleProductDeletion,
     addModifier,
     handleModifierIncrement,
     handleModifierDecrement,
     handleModifierDeletion,
     setCurrentTray,
     currentProduct,
+    currentTotal,
     setCurrentProduct,
   };
 }
