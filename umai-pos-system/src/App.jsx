@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import {initProductList} from '/src/handlers/DataHandler'
+import {initProductList, appendEntry} from '/src/handlers/DataHandler'
 import {products, modifiers} from '/src/handlers/Product.js'
 import useTrayManager from '/src/handlers/UseTrayManagers.js'
 
@@ -72,7 +72,7 @@ function App() {
           ))}
         </div>
         <div className="keypadViewer"> 
-          <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal}/>
+          <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={appendEntry} tray={tray}/>
         </div>
       </div>
     </div>

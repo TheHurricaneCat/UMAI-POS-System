@@ -94,7 +94,14 @@ export const products = [
         code: "PR1",
         price: 150.00,
         category: "Promo",
-        package: "P1,P2,P3,P4"
+        content: "P1,P2,P3,P4"
+    },
+    {
+        name: "Promo 2",
+        code: "PR2",
+        price: 350.00,
+        category: "Promo",
+        content: "P1,P12,P9,P10,P1,P2"
     }
 ]
 

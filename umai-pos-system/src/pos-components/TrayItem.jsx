@@ -12,7 +12,7 @@ function TrayItem({
     handleModifierDeletion, 
     setCurrentProduct 
     }) {
-    const { name, price, quantity } = productContent;
+    const { name, price, quantity} = productContent;
 
     return (
         <div className={styles.rootContainer} onClick={(e) =>  {
@@ -44,6 +44,16 @@ function TrayItem({
             </div>
             <div className={styles.modifierContainer}> 
                 {productContent.modifiers.map((item, index) => (
+                <TrayModifierItem 
+                    key={index} 
+                    modifierContent={item} 
+
+                    handleModifierIncrement={handleModifierIncrement}
+                    handleModifierDecrement={handleModifierDecrement}
+                    handleModifierDeletion={handleModifierDeletion}
+                />
+                ))}
+                {productContent.type === "PROMO" && productContent.content.map((item, index) => (
                 <TrayModifierItem 
                     key={index} 
                     modifierContent={item} 

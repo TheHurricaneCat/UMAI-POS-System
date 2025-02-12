@@ -1,26 +1,14 @@
 import ExcelJS from 'exceljs';
 
+// class functions are useless
+// since react does not prefer having their objects to change (states)
+// So it wants to create a new object instead of changing the existing one
+
 export class Modifier {
   constructor(name, price, quantity) {
     this.name = name;
     this.price = price;
     this.quantity = quantity;
-  }
-}
-
-export class Product {
-  constructor(name, price, quantity, type, contents) {
-    this.name = name;
-    this.price = price;
-    this.quantity = quantity;
-    this.modifiers = [];
-    /* console.log("Before:" + type); //debug */
-    this.type = (type.search("PR") !== -1) ? "PROMO" : "PRODUCT";
-    /* console.log("After:" + this.type); //debug */
-    // example content = "P1,P2,P3,P4"
-    /* this.contents = contents.split(","); */
-
-    // reenable later ^^^
   }
 
   increaseQuantity() {
@@ -28,15 +16,42 @@ export class Product {
   }
 
   decreaseQuantity() {
+    if (this.quantity <= 1) return; 
     this.quantity -= 1;
   }
+}
 
-  addModifier(modifier) {
-    this.modifiers.push(modifier);
+
+export class Product {
+  constructor(name, price, quantity) {
+    this.name = name;
+    this.price = price;
+    this.quantity = quantity;
+    this.modifiers = [];
+    this.content = [];
+    this.type;/*
+    //console.log("After:" + this.type); //debug
+    // example content = "P1,P2,P3,P4"
+    if (this.type === "PROMO") {
+      this.content = content.split(",");
+      console.log("Content: " + this.content);
+    } */
   }
 
-  removeModifier(modifier) { 
-    this.modifiers = this.modifiers.filter((item) => item.name !== modifier.name);
+  setType(type) {
+    this.type = type;
+  }
+
+  addPromo(product) {
+    this.content.push(product);
+  }
+}
+
+export class PromoProduct {
+  constructor(name, quantity/* , limit */) {
+    this.name = name;
+    this.quantity = quantity;
+    //this.limit = limit;
   }
 }
 
@@ -71,14 +86,33 @@ export function initProductList(products = []) {
     products.forEach((product) => {
       // Find the category in the list
       let existingCategory = categories.find((category) => category.name === product.category);
-  
+      let productType = product.code.search("PR");
+      let productInstance = new Product(product.name, product.price, 1);
+      console.log(productInstance.name);
+      
+      if (productType !== -1) {
+        if ((productType !== -1)) {
+          let includedContent = product.content.split(",");
+          includedContent.forEach((code) => {
+              let promoProd = products.find((p) => p.code === code);
+              if (promoProd) {
+                  let promoInstance = new PromoProduct(promoProd.name, 1);
+                  productInstance.addPromo(promoInstance);
+                  productInstance.setType("PROMO");
+                  console.log("Promo: " + promoInstance.name);
+              }
+          });
+        }
+      }
+
       if (existingCategory) {
+        // Add included promo products with the product
         // Add the product to the existing category
-        existingCategory.addProduct(product);
+        existingCategory.addProduct(productInstance);
       } else {
         // Create a new category, add the product, and push to the list
         let newCategory = new Category(product.category);
-        newCategory.addProduct(product);
+        newCategory.addProduct(productInstance);
         categories.push(newCategory);
       }
     });

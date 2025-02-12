@@ -13,7 +13,13 @@ export default function useTrayManager() {
       trayObject.products.forEach(product => {
         total += product.price * product.quantity;
         product.modifiers.forEach(modifier => {
-          total += modifier.price * modifier.quantity;
+          if (modifier.price < 0) {
+            //discounted = t - td
+            total = total - (total * (-modifier.price * modifier.quantity));
+          } else {
+            total += modifier.price * modifier.quantity;
+          }
+          
         });
       });
     });
@@ -27,16 +33,17 @@ export default function useTrayManager() {
 
   // Add a new tray
   const addNewTray = () => {
-    setCurrentTray(prevKey => {
-      const newKey = prevKey + 1;
-      setTray(prevTrays => [...prevTrays, new Tray(newKey)]);
-      return newKey;
+    setTray(prevTrays => {
+      const newKey = prevTrays.length;
+      return [...prevTrays, new Tray(newKey)];
     });
+  
+    setCurrentTray(prev => prev + 1);
   };
 
   // Add product to tray
   const addToTray = (product) => {
-    let productInstance = new Product(product.name, product.price, 1, product.code, product.contents);
+    //let productInstance = new Product(product.name, product.price, 1, product.code, product.content);
     setTray(prevTray => 
       prevTray.map((trayObject, index) => {
         if (index === currentTray) {
@@ -45,7 +52,7 @@ export default function useTrayManager() {
             ? { ...trayObject, products: trayObject.products.map(item =>
                 item.name === product.name ? { ...item, quantity: item.quantity + 1 } : item
               ) }
-            : { ...trayObject, products: [...trayObject.products, productInstance] };
+            : { ...trayObject, products: [...trayObject.products, product] };
         }
         return trayObject;
       })
