@@ -42,28 +42,34 @@ function TrayItem({
                     <button onClick={() => handleProductDeletion(name)}> x </button>
                 </div>
             </div>
-            <div className={styles.modifierContainer}> 
-                {productContent.modifiers.map((item, index) => (
-                <TrayModifierItem 
-                    key={index} 
-                    modifierContent={item} 
+            <div> 
+                <div className={styles.modifierContainer}> 
+                    {productContent.modifiers.map((item, index) => (
+                    <TrayModifierItem 
+                        key={index} 
+                        modifierContent={item} 
 
-                    handleModifierIncrement={handleModifierIncrement}
-                    handleModifierDecrement={handleModifierDecrement}
-                    handleModifierDeletion={handleModifierDeletion}
-                />
-                ))}
-                {productContent.type === "PROMO" && productContent.content.map((item, index) => (
-                <TrayModifierItem 
-                    key={index} 
-                    modifierContent={item} 
+                        handleModifierIncrement={handleModifierIncrement}
+                        handleModifierDecrement={handleModifierDecrement}
+                        handleModifierDeletion={handleModifierDeletion}
+                    />
+                    ))}
+                </div>
+                {/* This is for promo products */}
+                <div className={styles.modifierContainer}> 
+                    {productContent.content.map((item, index) => (
+                    <TrayModifierItem 
+                        key={index} 
+                        modifierContent={item} 
 
-                    handleModifierIncrement={handleModifierIncrement}
-                    handleModifierDecrement={handleModifierDecrement}
-                    handleModifierDeletion={handleModifierDeletion}
-                />
-                ))}
+                        handleModifierIncrement={handleModifierIncrement}
+                        handleModifierDecrement={handleModifierDecrement}
+                        handleModifierDeletion={handleModifierDeletion}
+                    />
+                    ))}
+                </div>
             </div>
+            
         </div>
     );
 }
