@@ -1,5 +1,12 @@
 {
   "dependencies": {
     "exceljs": "^4.4.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "react-scripts": "^5.0.1",
+    "wait-on": "^8.0.2"
   }
 }

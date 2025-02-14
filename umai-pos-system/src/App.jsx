@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import './App.css'
-import {initProductList, appendEntry} from '/src/handlers/DataHandler'
-import {products, modifiers} from '/src/handlers/Product.js'
-import useTrayManager from '/src/handlers/UseTrayManagers.js'
+import {initProductList, appendEntry} from './handlers/DataHandler'
+import {products, modifiers} from './handlers/product.js'
+import useTrayManager from './handlers/UseTrayManagers.js'
 
-import ProductCard from '/src/pos-components/ProductCard.jsx'
+import ProductCard from './pos-components/ProductCard.jsx'
 import CategoryContainer from './pos-components/CategoryContainer'
-import TrayContainer from '/src/pos-components/TrayContainer.jsx'
-import KeypadContainer from '/src/pos-components/KeypadContainer.jsx'
+import TrayContainer from './pos-components/TrayContainer.jsx'
+import KeypadContainer from './pos-components/KeypadContainer.jsx'
 
 function App() {
   
