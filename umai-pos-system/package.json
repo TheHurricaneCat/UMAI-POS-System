@@ -4,7 +4,8 @@
   "version": "0.0.1",
   "description": "A POS system built with Electron and React.",
   "author": "UMAI",
-  "main": "electron.js",
+  "main": "main.js",
+  "homepage": "./",
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
@@ -12,7 +13,7 @@
     "start": "react-scripts start",
     "electron": "electron .",
     "dist": "electron-builder",
-    "build": "react-scripts build",
+    "build": "vite build",
     "start-electron": "npm run build && electron ."
   },
   "dependencies": {
@@ -44,6 +45,12 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "build": {
+    "files": [
+      "dist/**/*",
+      "main.js"
     ]
   }
 }
