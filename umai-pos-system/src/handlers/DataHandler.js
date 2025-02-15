@@ -120,25 +120,41 @@ export function initProductList(products = []) {
   }
 
   //function to append new entries
-export async function appendEntry(filePath, newEntries) {
-  const fileBuffer = await fetch(filePath).then((res) => res.arrayBuffer());
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(fileBuffer);
-
-  const worksheet = workbook.getWorksheet(1);
-
-  const lastRow = worksheet.lastRow;
-
-  newEntries.forEach((entry) => {
-    worksheet.addRow(entry); // Add each new row
-  });
-
-  const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
-
-  const blob = new Blob([updatedExcelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = 'UpdatedExcelFile.xlsx';
-  link.click();
-}
+  export async function appendEntry(filePath, newEntries) {
+    const fileBuffer = await fetch(filePath).then((res) => res.arrayBuffer());
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer);
+  
+    const worksheet = workbook.getWorksheet(1);
+  
+    newEntries.forEach((tray) => {
+      tray.products.forEach((product) => {
+        const productRow = [
+          product.quantity,
+          product.name,
+          product.price,
+          product.price * product.quantity,
+        ];
+        worksheet.addRow(productRow);
+  
+        product.modifiers.forEach((modifier) => {
+          const modifierRow = [
+            null,
+            modifier.quantity,
+            modifier.name,
+            `${modifier.price} > ${modifier.price * modifier.quantity}`,
+          ];
+          worksheet.addRow(modifierRow);
+        });
+      });
+    });
+  
+    const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
+  
+    const blob = new Blob([updatedExcelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'UpdatedExcelFile.xlsx';
+    link.click();
+  }

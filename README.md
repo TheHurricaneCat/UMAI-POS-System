@@ -7,9 +7,10 @@
 
 ### Running the application:
 *Open your IDE's terminal and run the following commands:*
-1. `cd directory_name.`
-2. `npm run dev.`
-3. `Copy the address into your browser.`
+1. *If running for the first time run* `npm install`
+2. `cd umai-pos-system` *"umai-pos-system"* is the directory name.
+3. `npm run dev`
+4. Copy the address into your browser. *Usually in the form of http://localhost:####/*
 
 ### Creating your own test react application:
 *Open your IDE's terminal and run the following commands. Make sure to run these on an empty folder/project:*
