@@ -41,6 +41,21 @@ export default function useTrayManager() {
     setCurrentTray(prev => prev + 1);
   };
 
+  const clearTray = () => {
+    setTray([new Tray(0)]);
+    setCurrentTray(0);
+    setCurrentProduct("");
+    setTotal(0);
+  }
+
+  const clearCurrentTray = () => {
+    setTray(prevTray =>
+      prevTray.map(trayObject =>
+        trayObject.id === currentTray ? { ...trayObject, products: [] } : trayObject
+      )
+    );
+  };
+
   // Add product to tray
   const addToTray = (product) => {
     //let productInstance = new Product(product.name, product.price, 1, product.code, product.content);
@@ -210,6 +225,8 @@ export default function useTrayManager() {
     currentTray,
     addNewTray,
     addToTray,
+    clearTray,
+    clearCurrentTray,
     handleProductIncrement,
     handleProductDecrement,
     handleProductDeletion,

@@ -20,6 +20,8 @@ function App() {
     currentTray,
     addNewTray,
     addToTray,
+    clearTray,
+    clearCurrentTray,
     handleProductIncrement,
     handleProductDecrement,
     handleProductDeletion,
@@ -40,39 +42,43 @@ function App() {
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
     <div className="primaryInterface">
-      <div className="productInterface"> 
-        <div className="productViewer"> 
-          {productList.map((category) => (
-            <CategoryContainer category={category} type="product" 
-            addToTray={addToTray}/>
-          ))}
+      <button> Start Session </button>
+      <button> End Session </button>
+      <div className="posInterface">
+        <div className="productInterface"> 
+          <div className="productViewer"> 
+            {productList.map((category) => (
+              <CategoryContainer category={category} type="product" 
+              addToTray={addToTray}/>
+            ))}
+          </div>
+          <div className="modifierViewer">
+            {modifierList.map((category) => (
+              <CategoryContainer category={category} type="modifier"
+              addModifier={addModifier}
+                />
+            ))}
+          </div>
         </div>
-        <div className="modifierViewer">
-          {modifierList.map((category) => (
-            <CategoryContainer category={category} type="modifier"
-            addModifier={addModifier}
-             />
-          ))}
-        </div>
-      </div>
-      <div className="trayInterface">
-        <div className="trayViewer">
-          {tray.map((content) => (
-                <TrayContainer content={content} 
-                handleProductIncrement={handleProductIncrement} 
-                handleProductDecrement={handleProductDecrement} 
-                handleProductDeletion={handleProductDeletion} 
-                
-                handleModifierIncrement={handleModifierIncrement} 
-                handleModifierDecrement={handleModifierDecrement} 
-                handleModifierDeletion={handleModifierDeletion}
-                
-                setCurrentTray={setCurrentTray}
-                setCurrentProduct={setCurrentProduct} />
-          ))}
-        </div>
-        <div className="keypadViewer"> 
-          <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={appendEntry} tray={tray}/>
+        <div className="trayInterface">
+          <div className="trayViewer">
+            {tray.map((content) => (
+                  <TrayContainer content={content} 
+                  handleProductIncrement={handleProductIncrement} 
+                  handleProductDecrement={handleProductDecrement} 
+                  handleProductDeletion={handleProductDeletion} 
+                  
+                  handleModifierIncrement={handleModifierIncrement} 
+                  handleModifierDecrement={handleModifierDecrement} 
+                  handleModifierDeletion={handleModifierDeletion}
+                  
+                  setCurrentTray={setCurrentTray}
+                  setCurrentProduct={setCurrentProduct} />
+            ))}
+          </div>
+          <div className="keypadViewer"> 
+            <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={appendEntry} tray={tray} clearTray={clearTray} clearCurrentTray={clearCurrentTray}/>
+          </div>
         </div>
       </div>
     </div>
