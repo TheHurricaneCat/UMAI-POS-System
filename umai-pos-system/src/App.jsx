@@ -8,7 +8,7 @@ import ProductCard from './pos-components/ProductCard.jsx'
 import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
-
+import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
 function App() {
   
   // IMPORTANT NOTE:
@@ -35,15 +35,24 @@ function App() {
     setCurrentProduct
   } = useTrayManager();
 
+  const handleSaveOrder = async () => {
+    const sessionDetails = getSessionDetails();
+    await appendEntry(tray, sessionDetails);
+    clearCurrentTray();
+  };
+
   let productList = initProductList(products);
   let modifierList = initProductList(modifiers);
+
+  const testEmployee = "TestEmployee2";
   
   return (
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
     <div className="primaryInterface">
-      <button> Start Session </button>
-      <button> End Session </button>
+      <button onClick={() => startSession(testEmployee)}> Start Session </button>
+      <button onClick={() => endSession(testEmployee)}> End Session </button>
+      <button onClick={() => saveExcelFile()}> Save Excel File </button>
       <div className="posInterface">
         <div className="productInterface"> 
           <div className="productViewer"> 
@@ -77,7 +86,7 @@ function App() {
             ))}
           </div>
           <div className="keypadViewer"> 
-            <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={appendEntry} tray={tray} clearTray={clearTray} clearCurrentTray={clearCurrentTray}/>
+            <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={handleSaveOrder} tray={tray} clearTray={clearTray} clearCurrentTray={clearCurrentTray}/>
           </div>
         </div>
       </div>

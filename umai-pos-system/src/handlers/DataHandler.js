@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-
+import { getSessionDetails } from './SessionHandler';
 // class functions are useless
 // since react does not prefer having their objects to change (states)
 // So it wants to create a new object instead of changing the existing one
@@ -151,6 +151,8 @@ export function initProductList(products = []) {
     await workbook.xlsx.load(fileBuffer);
   
     const worksheet = workbook.getWorksheet(1);
+    const sessionDetails = await getSessionDetails();
+    const sessionID = sessionDetails.token;
 
     // Find the last row in the worksheet
     
@@ -235,14 +237,14 @@ export function initProductList(products = []) {
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = () => {
-        localStorage.setItem("excelFile", reader.result);
+        localStorage.setItem(sessionID, reader.result);
         console.log("File saved to cache");
       };
   
       // Force download (if needed)
       const link = document.createElement("a");
       link.href = url;
-      link.download = "UpdatedExcelFile.xlsx";
+      link.download = sessionID.concat(".xlsx");
       link.click();
     }
   }
