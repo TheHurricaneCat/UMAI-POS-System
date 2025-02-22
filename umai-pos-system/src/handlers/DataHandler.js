@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import { getSessionDetails } from './SessionHandler';
 
+
 // class functions are useless
 // since react does not prefer having their objects to change (states)
 // So it wants to create a new object instead of changing the existing one
@@ -235,4 +236,3 @@ export class Tray {
     this.products = this.products.filter((item) => item.name !== product.name);
   }
 }
-

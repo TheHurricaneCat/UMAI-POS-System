@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+
 import {initProductList, appendEntry} from './handlers/DataHandler'
 import {products, modifiers} from './handlers/product.js'
 import useTrayManager from './handlers/UseTrayManagers.js'
@@ -14,7 +15,6 @@ function App() {
   // IMPORTANT NOTE:
   // The following code is meant for the POS system
   // Create new interfaces (i.e. new .jsx components) that will house the other interfaces 
-
   const {
     tray,
     currentTray,
@@ -46,7 +46,7 @@ function App() {
 
   const testEmployee = "TestEmployee2";
   
-  return (
+	return (
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
     <div className="primaryInterface">

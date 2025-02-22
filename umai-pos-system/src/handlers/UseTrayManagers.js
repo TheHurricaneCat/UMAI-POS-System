@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tray, Product } from "./DataHandler.js";
 
+
 export default function useTrayManager() {
   const [tray, setTray] = useState([new Tray(0)]);
   const [currentTray, setCurrentTray] = useState(0);
