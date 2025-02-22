@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Tray, Product } from "/src/handlers/DataHandler";
+import { Tray, Product } from "./DataHandler.js";
+
 
 export default function useTrayManager() {
   const [tray, setTray] = useState([new Tray(0)]);
@@ -39,6 +40,21 @@ export default function useTrayManager() {
     });
   
     setCurrentTray(prev => prev + 1);
+  };
+
+  const clearTray = () => {
+    setTray([new Tray(0)]);
+    setCurrentTray(0);
+    setCurrentProduct("");
+    setTotal(0);
+  }
+
+  const clearCurrentTray = () => {
+    setTray(prevTray =>
+      prevTray.map(trayObject =>
+        trayObject.id === currentTray ? { ...trayObject, products: [] } : trayObject
+      )
+    );
   };
 
   // Add product to tray
@@ -210,6 +226,8 @@ export default function useTrayManager() {
     currentTray,
     addNewTray,
     addToTray,
+    clearTray,
+    clearCurrentTray,
     handleProductIncrement,
     handleProductDecrement,
     handleProductDeletion,

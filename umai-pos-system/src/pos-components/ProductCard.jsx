@@ -1,5 +1,5 @@
 import styles from './ProductCard.module.css';
-import defaultImage from '/src/assets/0.png'
+import defaultImage from '../assets/0.png'
 
 function ProductCard({productClass, type, addToTray}) {
     

@@ -9,10 +9,15 @@
 }
 
 .primaryInterface {
+  /* display: grid;
+  grid-template-columns: 60% 40%; */
+  border: 1px solid rgb(255, 255, 255); 
+}
+
+.posInterface {
+  border: 2px solid blue;
   display: grid;
   grid-template-columns: 60% 40%;
-  border: 1px solid rgb(255, 255, 255);
-}
 
 .productListInterface {
   display: block;

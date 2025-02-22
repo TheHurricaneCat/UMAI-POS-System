@@ -1,8 +1,164 @@
 import ExcelJS from 'exceljs';
+import { getSessionDetails } from './SessionHandler';
+
 
 // class functions are useless
 // since react does not prefer having their objects to change (states)
 // So it wants to create a new object instead of changing the existing one
+
+export function initProductList(products = []) {
+  let categories = [];
+  products.forEach((product) => {
+    // Find the category in the list
+    let existingCategory = categories.find((category) => category.name === product.category);
+    let productType = product.code.search("PR");
+    let productInstance = new Product(product.name, product.price, 1);
+    
+    if (productType !== -1) {
+      if ((productType !== -1)) {
+        let includedContent = product.content.split(",");
+        includedContent.forEach((code) => {
+            let promoProd = products.find((p) => p.code === code);
+            if (promoProd) {
+                let promoInstance = new PromoProduct(promoProd.name, 1);
+                productInstance.addPromo(promoInstance);
+                productInstance.setType("PROMO");
+            }
+        });
+      }
+    }
+
+    if (existingCategory) {
+      // Add included promo products with the product
+      // Add the product to the existing category
+      existingCategory.addProduct(productInstance);
+    } else {
+      // Create a new category, add the product, and push to the list
+      let newCategory = new Category(product.category);
+      newCategory.addProduct(productInstance);
+      categories.push(newCategory);
+    }
+  });
+  return categories;
+}
+
+//check if current instance is in web or standalone
+function isElectron() {
+  console.log("Detecting Electron: " + window && window.process && window.process.type);
+  return window && window.process && window.process.type;
+}
+
+let filePathWeb = "/public/TestFile.xlsx";
+
+function fetchFromLocalStorage() {
+  const base64Data = localStorage.getItem('excelFile');
+  if (!base64Data) {
+    console.error('No cached data found... using default public data');
+    return fetch(filePathWeb).then((res) => res.arrayBuffer());
+  } else {
+    console.log('Using cached data');
+    const byteCharacters = atob(base64Data.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    console.log('Extracted .xlsx file from local storage:', byteArray);
+    return byteArray.buffer;
+  }
+}
+
+// Function to save the Excel file
+export async function appendEntry(newEntries) {
+  const fileBuffer = await fetchFromLocalStorage();
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(fileBuffer);
+
+  const worksheet = workbook.getWorksheet(1);
+  const sessionDetails = await getSessionDetails();
+  const sessionID = sessionDetails.token;
+
+  // Find the last row in the worksheet
+  
+  let lastInvoiceNumber = 0;
+  let lastInvoiceRow = null;
+  
+  try {
+    for (let i = worksheet.rowCount; i > 0; i--) {
+      const row = worksheet.getRow(i);
+      const invoiceCell = row.getCell(5).value;
+      if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
+        lastInvoiceRow = row;
+        const lastInvoiceParts = invoiceCell.split('-');
+        if (lastInvoiceParts.length === 2) {
+          lastInvoiceNumber = parseInt(lastInvoiceParts[1], 10);
+        }
+        break;
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+
+  console.log("Last Invoice Number: " + lastInvoiceNumber);
+
+  const today = new Date();
+  const datePart = `${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}${today.getFullYear()}`;
+  let invoiceNumber = lastInvoiceNumber;
+  
+  newEntries.forEach((tray) => {
+    invoiceNumber += 1;
+    const invoice = `${datePart}-${String(invoiceNumber).padStart(5, '0')}`;
+    tray.products.forEach((product) => {
+      const productRow = [
+        product.quantity,
+        product.name,
+        product.price,
+        product.price * product.quantity,
+        invoice,
+      ];
+      worksheet.addRow(productRow);
+
+      product.modifiers.forEach((modifier) => {
+        const modifierRow = [
+          null,
+          modifier.quantity,
+          modifier.name,
+          `${modifier.price} > ${modifier.price * modifier.quantity}`,
+        ];
+        worksheet.addRow(modifierRow);
+      });
+
+      product.content.forEach((content) => {
+        const contentRow = [
+          null,
+          content.quantity,
+          content.name,
+          `${content.price} > ${content.price * content.quantity}`,
+        ];
+        worksheet.addRow(contentRow);
+      });
+    });
+  });
+
+  const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
+    // Web mode: Save to cache (or download)
+    const blob = new Blob([updatedExcelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      localStorage.setItem(sessionID, reader.result);
+      console.log("File saved to cache");
+    };
+
+    // Force download (if needed)
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = sessionID.concat(".xlsx");
+    link.click();
+}
 
 export class Modifier {
   constructor(name, price, quantity) {
@@ -80,81 +236,3 @@ export class Tray {
     this.products = this.products.filter((item) => item.name !== product.name);
   }
 }
-
-export function initProductList(products = []) {
-    let categories = [];
-    products.forEach((product) => {
-      // Find the category in the list
-      let existingCategory = categories.find((category) => category.name === product.category);
-      let productType = product.code.search("PR");
-      let productInstance = new Product(product.name, product.price, 1);
-      console.log(productInstance.name);
-      
-      if (productType !== -1) {
-        if ((productType !== -1)) {
-          let includedContent = product.content.split(",");
-          includedContent.forEach((code) => {
-              let promoProd = products.find((p) => p.code === code);
-              if (promoProd) {
-                  let promoInstance = new PromoProduct(promoProd.name, 1);
-                  productInstance.addPromo(promoInstance);
-                  productInstance.setType("PROMO");
-                  console.log("Promo: " + promoInstance.name);
-              }
-          });
-        }
-      }
-
-      if (existingCategory) {
-        // Add included promo products with the product
-        // Add the product to the existing category
-        existingCategory.addProduct(productInstance);
-      } else {
-        // Create a new category, add the product, and push to the list
-        let newCategory = new Category(product.category);
-        newCategory.addProduct(productInstance);
-        categories.push(newCategory);
-      }
-    });
-    return categories;
-  }
-
-  //function to append new entries
-  export async function appendEntry(filePath, newEntries) {
-    const fileBuffer = await fetch(filePath).then((res) => res.arrayBuffer());
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(fileBuffer);
-  
-    const worksheet = workbook.getWorksheet(1);
-  
-    newEntries.forEach((tray) => {
-      tray.products.forEach((product) => {
-        const productRow = [
-          product.quantity,
-          product.name,
-          product.price,
-          product.price * product.quantity,
-        ];
-        worksheet.addRow(productRow);
-  
-        product.modifiers.forEach((modifier) => {
-          const modifierRow = [
-            null,
-            modifier.quantity,
-            modifier.name,
-            `${modifier.price} > ${modifier.price * modifier.quantity}`,
-          ];
-          worksheet.addRow(modifierRow);
-        });
-      });
-    });
-  
-    const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
-  
-    const blob = new Blob([updatedExcelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'UpdatedExcelFile.xlsx';
-    link.click();
-  }

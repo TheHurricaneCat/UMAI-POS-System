@@ -24,3 +24,4 @@
 2. `npm run build` (builds a standalone version of the application)
 3. `npm run dist` (packages the application into an executable)
 4. (Optional) `npx electron .` (if you want to test the standalone version without creating an executable, but make sure to run step 2 at each new change)
+

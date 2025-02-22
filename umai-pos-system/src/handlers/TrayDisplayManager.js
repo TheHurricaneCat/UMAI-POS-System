@@ -1,4 +1,4 @@
-import TrayContainer from "/src/pos-components/TrayContainer";
+import TrayContainer from "./pos-components/TrayContainer";
 
 export function TrayManager({ tray, handleProductIncrement, handleProductDecrement }) {
   return (
