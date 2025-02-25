@@ -1,0 +1,36 @@
+.statistics-container {
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+}
+
+.title {
+    text-align: center;
+    color: #333;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.charts-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.chart-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.legend span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+}

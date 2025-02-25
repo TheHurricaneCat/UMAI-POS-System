@@ -14,7 +14,7 @@ const firebaseConfig = {
   projectId: "catsup-cloud",
   storageBucket: "catsup-cloud.appspot.com",
   messagingSenderId: "393754765381",
-  appId: "1:393754765381:web:62348da02ab9f6de00db2c",
+  appId: "1:393754765381:web:62348da02ab9f6de00db2c",   
   measurementId: "G-M81ZDN0JPT"
 };
 
@@ -22,4 +22,5 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const firestore = getFirestore(app);
 export const storage = getStorage(app);
+export default app;
 //const analytics = getAnalytics(app);
