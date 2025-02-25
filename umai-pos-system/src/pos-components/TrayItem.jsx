@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import styles from './TrayItem.module.css';
 import defaultImage from '../assets/0.png'
 import TrayModifierItem from './TrayModifierItem.jsx';
@@ -10,14 +11,24 @@ function TrayItem({
     handleModifierIncrement, 
     handleModifierDecrement, 
     handleModifierDeletion, 
-    setCurrentProduct 
+    setCurrentProduct,
+    currentProduct
     }) {
     const { name, price, quantity} = productContent;
 
+    const isSelected = currentProduct === name;
+
+    useEffect(() => {
+        console.log("currentProduct:", currentProduct);
+        console.log("name:", name);
+        console.log("isSelected:", isSelected);
+    }, [currentProduct, name]);
+
     return (
-        <div className={styles.rootContainer} onClick={(e) =>  {
+        <div className={`${styles.rootContainer} ${isSelected ? styles.selected : ''}`} onClick={(e) =>  {
             e.stopPropagation();
-            setCurrentProduct(productContent.name)}
+            setCurrentProduct(name)
+        }
         }>
             <div className={styles.productDetails}> 
                 <div className={styles.productQuantity}>
@@ -43,7 +54,7 @@ function TrayItem({
                 </div>
             </div>
             <div> 
-                <div className={styles.modifierContainer}> 
+                <div className={`${styles.modifierContainer} ${isSelected ? styles.selected : ''}`}> 
                     {productContent.modifiers.map((item, index) => (
                     <TrayModifierItem 
                         key={index} 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 
 import {initProductList, appendEntry} from './handlers/DataHandler'
@@ -9,6 +9,7 @@ import ProductCard from './pos-components/ProductCard.jsx'
 import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
+import CategoryMenu from './pos-components/CategoryMenu.jsx';
 import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
 function App() {
   
@@ -32,7 +33,9 @@ function App() {
     setCurrentTray,
     currentProduct,
     currentTotal,
-    setCurrentProduct
+    setCurrentProduct,
+    handleScrollToCategory,
+    categoryRefs
   } = useTrayManager();
 
   const handleSaveOrder = async () => {
@@ -55,16 +58,30 @@ function App() {
       <button onClick={() => saveExcelFile()}> Save Excel File </button>
       <div className="posInterface">
         <div className="productInterface"> 
+          <CategoryMenu 
+            productList={productList} 
+            handleScrollToCategory={handleScrollToCategory}
+          />
           <div className="productViewer"> 
             {productList.map((category) => (
-              <CategoryContainer category={category} type="product" 
-              addToTray={addToTray}/>
+              <CategoryContainer 
+              category={category} 
+              type="product" 
+              addToTray={addToTray}
+              categoryRefs={categoryRefs}/>
             ))}
           </div>
+          <CategoryMenu 
+            productList={modifierList} 
+            handleScrollToCategory={handleScrollToCategory}
+          />
           <div className="modifierViewer">
             {modifierList.map((category) => (
-              <CategoryContainer category={category} type="modifier"
-              addModifier={addModifier}
+              <CategoryContainer 
+                category={category} 
+                type="modifier"
+                addModifier={addModifier}
+                categoryRefs={categoryRefs}
                 />
             ))}
           </div>
@@ -82,7 +99,12 @@ function App() {
                   handleModifierDeletion={handleModifierDeletion}
                   
                   setCurrentTray={setCurrentTray}
-                  setCurrentProduct={setCurrentProduct} />
+                  setCurrentProduct={setCurrentProduct}
+                  
+                  currentProduct={currentProduct}
+                  currentTray={currentTray}
+
+                  />
             ))}
           </div>
           <div className="keypadViewer"> 
