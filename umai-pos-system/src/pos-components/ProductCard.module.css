@@ -1,10 +1,12 @@
 
 .rootContainer {
    display: grid;
-   grid-template-columns: 5px auto;
+   grid-template-columns: auto;
    border: 2px solid black;
    width: 10em;
    height: 10em;
+   padding: 5px;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .rootContainer:hover {
@@ -13,20 +15,22 @@
     cursor: pointer;
   }
 
-.category {
+/* .category {
     background-color: rgb(148, 255, 127);
-}
+} */
 
 .detailsContainer {
     display: grid;
-    border: 2px solid gray;
+    /* border: 2px solid gray; */
     text-align: center;
     overflow: hidden;
+    font-size: 0.9em;
 }
 
 .imageContainer {
     display: flexbox;
-    border: 2px solid gray;
+    border-bottom: 1px solid rgb(154, 154, 154);
+    padding: 10px;
     text-align: center;
     overflow:hidden;
     max-width: 100%;

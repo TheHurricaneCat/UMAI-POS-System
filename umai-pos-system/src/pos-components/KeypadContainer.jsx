@@ -15,7 +15,7 @@ function KeyPadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray
                 <div className={styles.addTray}> <button onClick={addNewTray}> Add Tray</button> </div>
 
                 <div className={styles.saveOrder}> <button onClick={handleSaveOrder}> Save Order </button> </div>
-                <div className={styles.clearOrder}> <button> Clear Order </button> </div>
+                <div className={styles.clearOrder}> <button onClick={clearCurrentTray}> Clear Order </button> </div>
                 <div className={styles.clearTray}> <button onClick={clearTray}> Clear Tray </button> </div>
             </div>
         </>

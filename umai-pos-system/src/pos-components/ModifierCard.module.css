@@ -1,5 +1,5 @@
 .rootContainer {
-    display: inline-block;
+    display: block;
     border: 2px solid black;
     width: 5em;
     height: 5em;
@@ -10,4 +10,6 @@
      border: 2px solid rgb(208, 255, 0);
      text-align: center;
      overflow: hidden;
+     text-align: center;
+     height: 100%;
  }

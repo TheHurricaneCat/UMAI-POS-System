@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Tray, Product } from "./DataHandler.js";
 
 
@@ -7,6 +7,16 @@ export default function useTrayManager() {
   const [currentTray, setCurrentTray] = useState(0);
   const [currentProduct, setCurrentProduct] = useState("");
   const [currentTotal, setTotal] = useState(0);
+  const categoryRefs = useRef({});
+   
+  const handleScrollToCategory = (categoryName) => {
+    const categoryElement = categoryRefs.current[categoryName];
+    if (categoryElement) {
+      categoryElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      console.error(`Category "${categoryName}" not found in categoryRefs.`);
+    }
+  };
 
   const updateTotal = () => {
     let total = 0;
@@ -239,5 +249,7 @@ export default function useTrayManager() {
     currentProduct,
     currentTotal,
     setCurrentProduct,
+    handleScrollToCategory,
+    categoryRefs
   };
 }
