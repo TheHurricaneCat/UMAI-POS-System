@@ -13,18 +13,25 @@ function TrayContainer({
         handleModifierDecrement, 
         handleModifierDeletion, 
         setCurrentTray, 
-        setCurrentProduct
+        setCurrentProduct,
+        currentProduct,
+        currentTray
     }) {
     
     const selectProduct = (product) => {
         setCurrentProduct(product);
     }
+
+    const isSelected = currentTray === content.id;
     
     return (
         <>
-        <div className={styles.trayHeader}> 
+        <div className={`${styles.trayHeader} ${isSelected ? styles.selected : ''}`} 
+            onClick={() => setCurrentTray(content.id)}> 
+            
             <h2> Tray {content.id} </h2>
-            <button onClick={() => setCurrentTray(content.id)}> {/* {isSelected ? "Selected" : "Select"} */} Select </button> 
+            <div className={styles.indicator}> </div>
+
         </div>
         <div className={styles.trayContainer}> 
             {content.products.map((item, index) => (
@@ -42,6 +49,7 @@ function TrayContainer({
                 
                 selectProduct={selectProduct} 
                 setCurrentProduct={setCurrentProduct}
+                currentProduct={currentProduct}
                 />
             ))}
         </div>

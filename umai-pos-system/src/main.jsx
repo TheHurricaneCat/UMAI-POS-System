@@ -7,6 +7,6 @@ import Statistics from './statistics.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Login />
+    <Statistics />
   </StrictMode>,
 )

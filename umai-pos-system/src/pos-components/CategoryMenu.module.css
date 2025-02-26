@@ -1,0 +1,19 @@
+.rootContainer {
+  display: flex;
+}
+
+.category {
+    padding: 15px;
+    overflow: hidden;
+    background-color: #e3e3e3;
+    border: 2px solid rgb(255, 255, 255);
+    width: 100%;
+    display:flex;
+  }
+  
+.addButton, .subtractButton{
+  height: 4em; 
+  width: 15em;
+  /* color: white; */
+  /* border: 2px solid rgb(0, 0, 0);  */
+}

@@ -14,12 +14,8 @@ function TrayModifierItem({ modifierContent, handleModifierIncrement, handleModi
             <div className={styles.modifierPrice}>
                 <p>{price}</p>
             </div>
-            <div className={styles.addButton}>
-                <button onClick={() => handleModifierIncrement(name)}> + </button>
-            </div>
-            <div className={styles.subtractButton}>
-                <button onClick={() => handleModifierDecrement(name)}> - </button>
-            </div>
+            <div> </div>
+            <div> </div>
             <div className={styles.removeButton}>
                 <button onClick={() => handleModifierDeletion(name)}> x </button>
             </div>
