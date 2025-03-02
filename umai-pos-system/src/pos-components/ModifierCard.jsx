@@ -6,9 +6,12 @@ function ModifierCard({modifierClass, addModifier}) {
         <div className={styles.rootContainer} onClick={(e) =>  {
             e.stopPropagation();
             addModifier(modifierClass)}
-        }>
+        }>  
             <div className={styles.detailsContainer}>
                 <p> {modifierClass.name} </p>
+            </div>
+            <div className={styles.decorationHeader}> 
+                <p> + </p>
             </div>
         </div>
     )

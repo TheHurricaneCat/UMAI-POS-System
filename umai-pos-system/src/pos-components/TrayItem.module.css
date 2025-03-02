@@ -1,13 +1,24 @@
 .rootContainer {
+    transition: all 0.2s;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    background-color: rgb(241, 241, 241);
+    border: 1px solid rgb(115, 115, 115);
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.rootContainer:hover {
+    transform: scale(1.001);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 
 .productDetails {
     display: grid;
     grid-template-columns: 10% 10% 30% 20% 10% 10% 10%;
-    height: 5%;
+    /* height: 5%; */
     width: 100%;
     justify-content: space-between;
 }
@@ -16,7 +27,7 @@
     display: flex;
     align-items: center; 
     padding: 0.5em;
-    border: 1px solid black;
+    /* border: 1px solid black; */
 }
 
 .productQuantity {
@@ -41,15 +52,37 @@
     justify-content: center;
 }
 
+
 .addButton button, .subtractButton button, .removeButton button {
-    height: 90%; 
+    height: 65%; 
+    width: 100%;
+    color: white;
+    border: 2px solid rgb(0, 0, 0); 
  }
 
+ .addButton button {
+    background-color: rgb(105, 219, 100);
+}
+
+.subtractButton button {
+    background-color: rgb(238, 119, 100);
+}
+
+.removeButton button {
+    background-color: rgb(238, 119, 100);
+}
+
 .modifierContainer {
+    transition: all 0.2s;
     display: grid;
-    border: 2px solid rgb(255, 0, 0);
+    /* border: 2px solid rgb(255, 0, 0); */
+    background-color: rgb(231, 231, 231);
     max-width: 100%;
     column-gap: 1em;
     row-gap: 0.1em;
+}
+
+.selected {
+    background-color: rgb(103, 203, 216);
 }
 

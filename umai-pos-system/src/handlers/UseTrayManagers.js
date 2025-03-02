@@ -1,11 +1,22 @@
-import { useState, useEffect } from "react";
-import { Tray, Product } from "/src/handlers/DataHandler";
+import { useState, useEffect, useRef } from "react";
+import { Tray, Product } from "./DataHandler.js";
+
 
 export default function useTrayManager() {
   const [tray, setTray] = useState([new Tray(0)]);
   const [currentTray, setCurrentTray] = useState(0);
   const [currentProduct, setCurrentProduct] = useState("");
-  const [currentTotal, setTotal] = useState(0);
+  const [currentTotal, setTotal] = useState(0.00);
+  const categoryRefs = useRef({});
+   
+  const handleScrollToCategory = (categoryName) => {
+    const categoryElement = categoryRefs.current[categoryName];
+    if (categoryElement) {
+      categoryElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      console.error(`Category "${categoryName}" not found in categoryRefs.`);
+    }
+  };
 
   const updateTotal = () => {
     let total = 0;
@@ -39,6 +50,21 @@ export default function useTrayManager() {
     });
   
     setCurrentTray(prev => prev + 1);
+  };
+
+  const clearTray = () => {
+    setTray([new Tray(0)]);
+    setCurrentTray(0);
+    setCurrentProduct("");
+    setTotal(0);
+  }
+
+  const clearCurrentTray = () => {
+    setTray(prevTray =>
+      prevTray.map(trayObject =>
+        trayObject.id === currentTray ? { ...trayObject, products: [] } : trayObject
+      )
+    );
   };
 
   // Add product to tray
@@ -210,6 +236,8 @@ export default function useTrayManager() {
     currentTray,
     addNewTray,
     addToTray,
+    clearTray,
+    clearCurrentTray,
     handleProductIncrement,
     handleProductDecrement,
     handleProductDeletion,
@@ -221,5 +249,7 @@ export default function useTrayManager() {
     currentProduct,
     currentTotal,
     setCurrentProduct,
+    handleScrollToCategory,
+    categoryRefs
   };
 }

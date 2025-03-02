@@ -1,14 +1,32 @@
 .categoryHeader {
+    padding: 10px;
     display: flex;
     flex-direction: column;
+    border: 2px solid srgb(255, 226, 7);
+}
+
+.categoryHeaderBorder {
+    padding: 10px;
+    padding-left: 20px;
+    /* border: 2px solid rgb(0, 0, 0); */
+    border-radius: 10px 10px 0px 0px;
+    background-color: rgb(255, 255, 93);
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2); */
 }
 
 .productListContainer {
-    display: grid;
+    margin-top: -25px;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
     grid-template-columns: 20% 20% 20% 20%;
-    border: 2px solid violet;
+    border: 1px solid rgb(177, 177, 177);
+    border-top: 0px;
+    /* border-left: 30px solid rgba(255, 255, 93); */
+    border-radius: 0px 0px 10px 10px;
+    background-color: rgb(255, 255, 255);
     max-width: 100%;
-    justify-content: center;
+    /* justify-content: center; */
     column-gap: 1em;
     row-gap: 1em;
 }

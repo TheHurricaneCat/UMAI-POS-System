@@ -1,0 +1,92 @@
+.rootContainer {
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  background-color: rgb(231, 231, 231); 
+  border: 1px solid rgb(177, 177, 177);
+  margin-top: 5px;
+}
+
+.categoryContainer {
+  display: flex;
+  padding: 10px;
+  gap: 10px;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+}
+
+.categoryContainer::-webkit-scrollbar {
+  width: 10px;
+  height: 6px;
+}
+
+.categoryContainer::-webkit-scrollbar-thumb {
+  background: rgb(205, 205, 205); /* Color of scrollbar */
+  border-radius: 5px; /* Rounded edges */
+}
+
+.categoryButtons {
+  display: flex;
+  align-items: right;
+  gap: 10px;
+  padding: 15px;
+}
+
+.category:hover {
+  transition: all 0.1s;
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+  border: 2px solid rgb(223, 223, 223);
+  border-bottom: 1.5px solid rgb(65, 65, 65);
+  background-color: rgb(223, 223, 223);
+  cursor: pointer;
+} 
+
+.category:focus {
+  transition: all 0.1s;
+  /* transform: scale(1.05); */
+  /* box-shadow: 0 4px 8px rgba(0, s0, 0, 0.2); */
+  border: 2px solid rgb(65, 65, 65);
+  border-bottom: 2px solid rgb(0, 162, 255);
+  background-color: rgb(63, 63, 63);
+  color:rgb(255, 255, 255);
+  cursor: pointer;
+}
+
+.category {
+    padding: 15px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background-color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0);
+    border-bottom: 2px solid rgb(121, 121, 121);
+    width: 10em;
+    max-width: 10em;
+  }
+  
+.addButton:hover, .subtractButton:hover {
+  transition: all 0.5;
+  /* transform: scale(1.05); */
+  padding: 15px;
+  background-color: rgb(206, 206, 206);
+  border: 2px solid rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
+  height: 4em;
+  width: 4em;
+  /* color: white; */
+  /* border: 2px solid rgb(0, 0, 0);  */
+}
+
+.addButton, .subtractButton{
+  transition: all 0.5;
+  padding: 15px;
+  background-color: #ffffff;
+  border: 2px solid rgb(121, 121, 121);
+  border-radius: 15px;
+  height: 4em;
+  width: 4em;
+  /* color: white; */
+  /* border: 2px solid rgb(0, 0, 0);  */
+}
