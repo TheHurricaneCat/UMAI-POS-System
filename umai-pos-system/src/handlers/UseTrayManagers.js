@@ -6,7 +6,7 @@ export default function useTrayManager() {
   const [tray, setTray] = useState([new Tray(0)]);
   const [currentTray, setCurrentTray] = useState(0);
   const [currentProduct, setCurrentProduct] = useState("");
-  const [currentTotal, setTotal] = useState(0);
+  const [currentTotal, setTotal] = useState(0.00);
   const categoryRefs = useRef({});
    
   const handleScrollToCategory = (categoryName) => {

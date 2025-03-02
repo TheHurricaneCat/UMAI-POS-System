@@ -41,7 +41,7 @@ function TrayItem({
                     <h4>{name}</h4>
                 </div>
                 <div className={styles.productPrice}>
-                    <h4>{price}</h4>
+                    <h4>P{price.toFixed(2)}</h4>
                 </div>
                 <div className={styles.addButton}>
                     <button onClick={() => handleProductIncrement(name)}> + </button>
