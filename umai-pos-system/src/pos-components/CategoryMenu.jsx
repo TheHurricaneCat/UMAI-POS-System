@@ -5,17 +5,22 @@ function CategoryMenu({productList = [], handleScrollToCategory, categoryRefs}) 
     return (
         <>
             <div className={styles.rootContainer}>
-                {productList.map((category) => (
-                    <button 
-                        className={styles.category} 
-                        onClick={() => handleScrollToCategory(category.name)}
-                    > 
-                        {category.name} 
-                    </button>
-                ))}
-                <button className={styles.addButton}> + </button>
-                <button className={styles.subtractButton}> - </button>
+                <div className={styles.categoryContainer}> 
+                    {productList.map((category) => (
+                        <button 
+                            className={styles.category} 
+                            onClick={() => handleScrollToCategory(category.name)}
+                        > 
+                            {category.name} 
+                        </button>
+                    ))}
+                </div>
+                <div className={styles.categoryButtons}> 
+                    <button className={styles.addButton}> + </button>
+                    <button className={styles.subtractButton}> - </button>
+                </div>
             </div>
+            
         </>
     );
 }

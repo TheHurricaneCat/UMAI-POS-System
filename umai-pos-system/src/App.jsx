@@ -53,9 +53,14 @@ function App() {
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
     <div className="primaryInterface">
-      <button onClick={() => startSession(testEmployee)}> Start Session </button>
-      <button onClick={() => endSession(testEmployee)}> End Session </button>
-      <button onClick={() => saveExcelFile()}> Save Excel File </button>
+      <div className="logo1"> </div>
+      <div className="logo2"> </div>
+      <div className="logo3"> </div>
+      <div className="headerButtons"> 
+        <button onClick={() => startSession(testEmployee)}> Start Session </button>
+        <button onClick={() => endSession(testEmployee)}> End Session </button>
+        <button onClick={() => saveExcelFile()}> Save Excel File </button>
+      </div>
       <div className="posInterface">
         <div className="productInterface"> 
           <CategoryMenu 
@@ -63,12 +68,13 @@ function App() {
             handleScrollToCategory={handleScrollToCategory}
           />
           <div className="productViewer"> 
-            {productList.map((category) => (
+            {productList.map((category, index) => (
               <CategoryContainer 
               category={category} 
               type="product" 
               addToTray={addToTray}
-              categoryRefs={categoryRefs}/>
+              categoryRefs={categoryRefs}
+              index={index}/>
             ))}
           </div>
           <CategoryMenu 
@@ -76,17 +82,24 @@ function App() {
             handleScrollToCategory={handleScrollToCategory}
           />
           <div className="modifierViewer">
-            {modifierList.map((category) => (
+            {modifierList.map((category, index) => (
               <CategoryContainer 
                 category={category} 
                 type="modifier"
                 addModifier={addModifier}
                 categoryRefs={categoryRefs}
+                index={index}
                 />
             ))}
           </div>
         </div>
         <div className="trayInterface">
+          <div className="trayHeader"> 
+            <h4> Qty </h4>
+            <h4> Img </h4>
+            <h4> Item Name </h4>
+            <h4> Total Price </h4>
+          </div>
           <div className="trayViewer">
             {tray.map((content) => (
                   <TrayContainer content={content} 
@@ -108,7 +121,14 @@ function App() {
             ))}
           </div>
           <div className="keypadViewer"> 
-            <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={handleSaveOrder} tray={tray} clearTray={clearTray} clearCurrentTray={clearCurrentTray}/>
+            <KeypadContainer 
+              addNewTray={addNewTray} 
+              currentTotal={currentTotal} 
+              appendEntry={handleSaveOrder} 
+              tray={tray} 
+              clearTray={clearTray} 
+              clearCurrentTray={clearCurrentTray}
+              currentTray={currentTray}/>
           </div>
         </div>
       </div>
