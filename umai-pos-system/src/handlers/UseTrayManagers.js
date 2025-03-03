@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Tray, Product } from "./DataHandler.js";
+import { Tray, Product, Customer } from "./DataHandler.js";
 
 
 export default function useTrayManager() {
@@ -16,6 +16,29 @@ export default function useTrayManager() {
     } else {
       console.error(`Category "${categoryName}" not found in categoryRefs.`);
     }
+  };
+
+  const saveCustomerToTray = (trayId, customerData) => {
+    setTray(currentTrays => {
+      return currentTrays.map(t => {
+        if (t.id === trayId) {
+          // Create a new Customer instance
+          const customer = new Customer(
+            customerData.customerName,
+            customerData.address,
+            customerData.contactNumber,
+            customerData.paymentMethod
+          );
+          
+          // Create a new tray with the customer assigned
+          return {
+            ...t,
+            customer: customer
+          };
+        }
+        return t;
+      });
+    });
   };
 
   const updateTotal = () => {
@@ -250,6 +273,7 @@ export default function useTrayManager() {
     currentTotal,
     setCurrentProduct,
     handleScrollToCategory,
-    categoryRefs
+    categoryRefs,
+    saveCustomerToTray
   };
 }

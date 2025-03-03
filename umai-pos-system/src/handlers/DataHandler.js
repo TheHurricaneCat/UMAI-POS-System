@@ -109,6 +109,7 @@ export async function appendEntry(newEntries) {
   newEntries.forEach((tray) => {
     invoiceNumber += 1;
     const invoice = `${datePart}-${String(invoiceNumber).padStart(5, '0')}`;
+
     tray.products.forEach((product) => {
       const productRow = [
         product.quantity,
@@ -116,6 +117,10 @@ export async function appendEntry(newEntries) {
         product.price,
         product.price * product.quantity,
         invoice,
+        tray.customer.customerName,
+        tray.customer.address,
+        tray.customer.contactNumber,
+        tray.customer.paymentMethod,
       ];
       worksheet.addRow(productRow);
 
@@ -159,6 +164,7 @@ export async function appendEntry(newEntries) {
     link.download = sessionID.concat(".xlsx");
     link.click();
 }
+
 
 export class Modifier {
   constructor(name, price, quantity) {
@@ -226,6 +232,12 @@ export class Tray {
   constructor(id) {
     this.id = id;
     this.products = [];
+    this.customer = { // Default values as dashed lines
+      customerName: "-",
+      address: "-",
+      contactNumber: "-",
+      paymentMethod: "-"
+    };
   }
 
   addProduct(product) {
@@ -235,4 +247,20 @@ export class Tray {
   removeProduct(product) {
     this.products = this.products.filter((item) => item.name !== product.name);
   }
+
+  setCustomer(customer) {
+    this.customer = customer; // Store customer object inside the tray
+  }
 }
+
+export class Customer {
+  constructor(customerName, address, contactNumber, paymentMethod){
+    this.customerName = customerName;
+    this.address = address;
+    this.contactNumber = contactNumber;
+    this.paymentMethod = paymentMethod;
+  }
+}
+
+
+

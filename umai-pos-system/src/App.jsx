@@ -35,7 +35,8 @@ function App() {
     currentTotal,
     setCurrentProduct,
     handleScrollToCategory,
-    categoryRefs
+    categoryRefs,
+    saveCustomerToTray,  
   } = useTrayManager();
 
   const handleSaveOrder = async () => {
@@ -48,6 +49,7 @@ function App() {
   let modifierList = initProductList(modifiers);
 
   const testEmployee = "TestEmployee2";
+
   
 	return (
     // interfaces are invisible containers that hold the components
@@ -116,6 +118,7 @@ function App() {
                   
                   currentProduct={currentProduct}
                   currentTray={currentTray}
+                  saveCustomerToTray={saveCustomerToTray}
 
                   />
             ))}
