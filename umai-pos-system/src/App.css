@@ -15,38 +15,7 @@
 .primaryInterface {
   /* display: grid;
   grid-template-columns: 60% 40%; */
-  /* border: 1px solid rgb(255, 255, 255);  */
   padding: 10px;
-}
-
-.logo1 {
-  display: block;
-  /* border: 2px solid red; */
-  width: 30%;
-  height: 20px;
-  background-color: #ffe350;
-  position: absolute;
-  bottom: 1;
-}
-
-.logo2 {
-  display: block;
-  /* border: 2px solid red; */
-  width: 20%;
-  height: 20px;
-  background-color: #ffdb1d;
-  position: absolute;
-  bottom: 1;
-}
-
-.logo3 {
-  display: block;
-  /* border: 2px solid red; */
-  width: 10%;
-  height: 20px;
-  background-color: #12af14;
-  position: absolute;
-  bottom: 1;
 }
 
 .headerButtons {

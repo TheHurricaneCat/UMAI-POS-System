@@ -10,6 +10,8 @@ import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
 import CategoryMenu from './pos-components/CategoryMenu.jsx';
+import PopUp from './global-components/PopUp.jsx';
+
 import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
 function App() {
   
@@ -48,11 +50,16 @@ function App() {
   let modifierList = initProductList(modifiers);
 
   const testEmployee = "TestEmployee2";
+
+  const [buttonPopUp, setButtonPopUp] = useState(true);
   
 	return (
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
     <div className="primaryInterface">
+      
+      <PopUp trigger={buttonPopUp} setTrigger={setButtonPopUp} />
+      
       <div className="logo1"> </div>
       <div className="logo2"> </div>
       <div className="logo3"> </div>
