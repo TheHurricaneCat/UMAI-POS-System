@@ -1,12 +1,22 @@
 import { appendEntry } from '../handlers/DataHandler';
 import styles from './KeypadContainer.module.css';
 
-
-function KeyPadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray, clearCurrentTray, currentTray}) {
+function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray, clearCurrentTray, currentTray}) {
     const handleSaveOrder = async () => {
+        // Check if any tray is missing customer details
+        const traysWithoutCustomers = tray.filter(t => !t.customer || !t.customer.customerName);
+        
+        if (traysWithoutCustomers.length > 0) {
+            // Create an alert message listing all trays without customer details
+            const trayNumbers = traysWithoutCustomers.map(t => `Tray ${t.id}`).join(', ');
+            alert(`Please add customer details for ${trayNumbers} before saving the order.`);
+            return;
+        }
+        
+        // If all trays have customer details, proceed with saving the order
         await appendEntry(tray);
-        clearCurrentTray();
     }
+    
     return (
         <>
             <div className={styles.primaryContainer}>
@@ -22,4 +32,4 @@ function KeyPadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray
     );
 }
 
-export default KeyPadContainer
+export default KeypadContainer;

@@ -37,7 +37,8 @@ function App() {
     currentTotal,
     setCurrentProduct,
     handleScrollToCategory,
-    categoryRefs
+    categoryRefs,
+    saveCustomerToTray,  
   } = useTrayManager();
 
   const handleSaveOrder = async () => {
@@ -50,9 +51,9 @@ function App() {
   let modifierList = initProductList(modifiers);
 
   const testEmployee = "TestEmployee2";
-
-  const [buttonPopUp, setButtonPopUp] = useState(true);
   
+  const [buttonPopUp, setButtonPopUp] = useState(true);
+
 	return (
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
@@ -123,6 +124,7 @@ function App() {
                   
                   currentProduct={currentProduct}
                   currentTray={currentTray}
+                  saveCustomerToTray={saveCustomerToTray}
 
                   />
             ))}
