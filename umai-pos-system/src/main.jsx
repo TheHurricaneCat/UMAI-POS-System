@@ -8,5 +8,7 @@ import Statistics from './statistics.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
+    {/* <Statistics /> */}
+    {/* <Login /> */}
   </StrictMode>,
 )

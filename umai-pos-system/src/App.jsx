@@ -9,7 +9,8 @@ import ProductCard from './pos-components/ProductCard.jsx'
 import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
-import CategoryMenu from './pos-components/CategoryMenu.jsx';
+import CategoryMenu from './pos-components/CategoryMenu.jsx'
+
 import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
 function App() {
   
@@ -50,7 +51,6 @@ function App() {
 
   const testEmployee = "TestEmployee2";
 
-  
 	return (
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
