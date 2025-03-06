@@ -12,11 +12,13 @@ function TrayItem({
     handleModifierDecrement, 
     handleModifierDeletion, 
     setCurrentProduct,
-    currentProduct
+    currentProduct,
+    parentTray,
+    currentTray,
     }) {
     const { name, price, quantity} = productContent;
 
-    const isSelected = currentProduct === name;
+    const isSelected = currentProduct === name && currentTray === parentTray;
 
     useEffect(() => {
         console.log("currentProduct:", currentProduct);

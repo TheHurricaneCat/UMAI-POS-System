@@ -79,6 +79,8 @@ function TrayContainer({
                 selectProduct={selectProduct} 
                 setCurrentProduct={setCurrentProduct}
                 currentProduct={currentProduct}
+                currentTray={currentTray}
+                parentTray={content.id}
                 />
             ))}
         </div>
