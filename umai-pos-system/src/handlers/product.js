@@ -2,7 +2,7 @@ export const products = [
     {
         name: "Cheeseburger",
         code: "P1",
-        price: 100.00,
+        price: 100.50,
         category: "Burger"
     }, 
     {
@@ -102,7 +102,36 @@ export const products = [
         price: 350.00,
         category: "Promo",
         content: "P1,P12,P9,P10,P1,P2"
+    },
+    {
+        name: "Promo 2",
+        code: "PR2",
+        price: 350.00,
+        category: "Category 1",
+        content: "P1,P12,P9,P10,P1,P2"
+    },
+    {
+        name: "Promo 2",
+        code: "PR2",
+        price: 350.00,
+        category: "Category 2",
+        content: "P1,P12,P9,P10,P1,P2"
+    },
+    {
+        name: "Promo 2",
+        code: "PR2",
+        price: 350.00,
+        category: "Category 4",
+        content: "P1,P12,P9,P10,P1,P2"
+    },
+    {
+        name: "Promo 2",
+        code: "PR2",
+        price: 350.00,
+        category: "Category 5",
+        content: "P1,P12,P9,P10,P1,P2"
     }
+    
 ]
 
 export const modifiers = [

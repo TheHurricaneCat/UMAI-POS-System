@@ -3,8 +3,16 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    background-color: rgb(231, 231, 231);
-    border: 1px solid black;
+    background-color: rgb(241, 241, 241);
+    border: 1px solid rgb(115, 115, 115);
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.rootContainer:hover {
+    transform: scale(1.001);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
 }
 
 .productDetails {

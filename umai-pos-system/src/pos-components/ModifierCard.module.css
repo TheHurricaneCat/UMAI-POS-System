@@ -1,15 +1,39 @@
 .rootContainer {
-    display: block;
+    display: flex;  
+    align-items: center; /* Center items vertically */
+    justify-content: space-between; /* Space between text and the plus icon */
     border: 2px solid black;
+    border-radius: 10px;
     width: 5em;
     height: 5em;
- }
- 
- .detailsContainer {
-     display: block;
-     border: 2px solid rgb(208, 255, 0);
-     text-align: center;
-     overflow: hidden;
-     text-align: center;
-     height: 100%;
- }
+    text-align: center;
+    padding: 0 10px;
+    position: relative;
+    cursor: pointer;
+}
+
+.rootContainer:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.detailsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    /* border: 2px solid rgb(208, 255, 0); */
+    width: 100%; 
+    height: 100%;
+    text-align: center;
+}
+
+.decorationHeader {
+    position: absolute;
+    font-size: 1em;
+    font-weight: bold;
+    color: black;
+    margin-left: 8px;
+    top: -20px;
+    right: 5px;
+}

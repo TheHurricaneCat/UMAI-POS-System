@@ -2,67 +2,143 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  transform: scale(0.9);
+  transform-origin: top left;
+  width: 111.11%; 
 
   /* color-scheme: dark; */
   /* color: rgba(255, 255, 255, 0.87); */
   /* background-color: #242424; */
+  overflow: hidden;
 }
 
 .primaryInterface {
   /* display: grid;
   grid-template-columns: 60% 40%; */
-  border: 1px solid rgb(255, 255, 255); 
+  /* border: 1px solid rgb(255, 255, 255);  */
+  padding: 10px;
+}
+
+.logo1 {
+  display: block;
+  /* border: 2px solid red; */
+  width: 30%;
+  height: 20px;
+  background-color: #ffe350;
+  position: absolute;
+  bottom: 1;
+}
+
+.logo2 {
+  display: block;
+  /* border: 2px solid red; */
+  width: 20%;
+  height: 20px;
+  background-color: #ffdb1d;
+  position: absolute;
+  bottom: 1;
+}
+
+.logo3 {
+  display: block;
+  /* border: 2px solid red; */
+  width: 10%;
+  height: 20px;
+  background-color: #12af14;
+  position: absolute;
+  bottom: 1;
+}
+
+.headerButtons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .posInterface {
-  border: 2px solid blue;
+  /* border: 2px solid blue; */
   display: grid;
   grid-template-columns: 60% 40%;
 }
 
 .productListInterface {
   display: block;
-  border: 2px solid red;
+  /* border: 2px solid red; */
 }
 
 .productViewer {
   display: block;
-  border: 2px solid violet;
+  border: 1px solid rgb(177, 177, 177);
   max-width: 100%;
-  height: 23.5em;
+  height: 23.3em;
   overflow: scroll;
   overflow-x: hidden;
   justify-content: center;
+  background-color: rgba(255, 255, 255, 0.762);
 }
 
 .modifierViewer {
   display: block;
-  border: 2px solid violet;
+  border: 1px solid rgb(177, 177, 177);
   max-width: 100%;
-  height: 13.5em;
+  height: 13em;
   overflow: scroll;
   overflow-x: hidden;
   justify-content: center;
+  background-color: rgba(255, 255, 255, 0.762);
 }
+
+
 
 .trayInterface {
   display: block;
-  border: 2px solid green;
+  padding-left: 10px;
+  /* border: 2px solid green; */
+  /* border: 2px solid #000000; */
 }
+
+.trayHeader {
+  display: grid;
+  grid-template-columns: 10% 10% 40% 20%;
+  border: 1px solid rgb(169, 169, 169);
+  border-bottom: 0px;
+  background-color: rgb(231, 231, 231);   
+  padding-left: 15px;
+  margin-top: 5px;
+  width: 96.1%;
+}
+
+.trayHeader * {
+/*   margin-left: 5px;
+  margin-right: 5px;
+  border-right: 1px solid rgb(169, 169, 169);
+  border-left: 1px solid rgb(169, 169, 169); */
+}
+
 
 .trayViewer {
   transition: all 0.4s;
   display: flex;
   flex-direction: column;
-  border: 2px solid rgb(255, 251, 0);
   height: 30em;
   overflow: scroll;
   overflow-x: hidden;
 }
 
+.productViewer::-webkit-scrollbar, .modifierViewer::-webkit-scrollbar, .trayViewer::-webkit-scrollbar {
+  width: 10px;
+  height: 6px;
+}
+
+.productViewer::-webkit-scrollbar-thumb, .modifierViewer::-webkit-scrollbar-thumb, .trayViewer::-webkit-scrollbar-thumb {
+  background: rgb(205, 205, 205); /* Color of scrollbar */
+  border-radius: 5px; /* Rounded edges */
+}
+
 .keypadViewer {
   display: flex;
-  border: 2px solid rgb(255, 251, 0);
-  height: 13.5em;
+  /* border: 2px solid rgb(255, 251, 0); */
+  height: 14.5em;
   justify-content: center;
 }
