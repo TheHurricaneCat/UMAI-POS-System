@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import firebaseApp from "../firebase";
 import * as XLSX from 'xlsx';
@@ -14,6 +15,7 @@ const StatisticsPage = () => {
     const [yearlySales, setYearlySales] = useState([]);
     const [paymentData, setPaymentData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchExcelData();
@@ -75,6 +77,13 @@ const StatisticsPage = () => {
 
     return (
         <div className="statistics-container">
+          <div className="statistics-header">
+            <h1>Statistics</h1>
+            <div className="button-group">
+                <button onClick={() => navigate('/')} className="nav-button pos">POS</button>
+                <button onClick={() => navigate('/inventory')} className="nav-button inventory">Inventory</button>
+            </div>
+          </div>
             <h1 className="title">Sales & Inventory Statistics</h1>
             <button onClick={fetchExcelData}>Refresh Data</button>
             {loading ? <p>Loading...</p> : (

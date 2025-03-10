@@ -14,12 +14,15 @@
     "electron": "electron .",
     "dist": "electron-builder",
     "build": "vite build",
-    "start-electron": "npm run build && electron ."
+    "start-electron": "npm run build && electron .",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"npm run dev\" \"electron .\"",
+    "electron:build": "npm run build && electron ."
   },
   "dependencies": {
     "firebase": "^11.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.3.0",
     "recharts": "^2.15.1",
     "umai-pos-system": "file:",
     "xlsx": "^0.18.5"
@@ -29,6 +32,8 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "electron": "34.2.0",
     "electron-builder": "^25.1.8",
     "eslint": "^9.19.0",

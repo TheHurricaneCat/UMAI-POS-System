@@ -1,0 +1,323 @@
+/* Main Container */
+.inventory-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header Styles */
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* Navigation Buttons */
+.nav-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.nav-button.pos {
+    background-color: #4CAF50;
+}
+
+.nav-button.pos:hover {
+    background-color: #45a049;
+}
+
+.nav-button.statistics {
+    background-color: #2196F3;
+}
+
+.nav-button.statistics:hover {
+    background-color: #1976D2;
+}
+
+/* Control Section */
+.inventory-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.control-group {
+    display: flex;
+    gap: 6px;
+}
+
+.control-button {
+    padding: 5px 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.control-button:hover {
+    background-color: #f0f0f0;
+}
+
+/* Stock Status */
+.stock-status {
+    padding: 8px 12px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.status {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+.status.normal {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Main Content Layout */
+.inventory-content-container {
+    flex: 1;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.main-content-layout {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+}
+
+/* Products and Ingredients Section */
+.products-ingredients-section {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Stock Levels Section */
+.stock-levels-section {
+    width: 280px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.stock-levels-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.stock-levels-section::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.stock-levels-section::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.stock-levels-section::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Stock Levels Card */
+.stock-levels-card {
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 10px;
+    flex: 1; /* Changed from min-height */
+    overflow-y: auto;
+}
+
+.ingredients-list {
+    margin-top: 10px;
+    height: calc(100% - 40px); /* Adjusted to take remaining space */
+    overflow-y: auto;
+}
+
+.ingredient-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.status-indicator {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+}
+
+.status-indicator.high {
+    background-color: #4CAF50;
+}
+
+.status-indicator.medium {
+    background-color: #FFA726;
+}
+
+.status-indicator.low {
+    background-color: #EF5350;
+}
+
+/* Stock Levels Buttons */
+.stock-levels-buttons {
+    margin-top: auto; /* Changed to push buttons to bottom */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.stock-button {
+    padding: 8px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.2s ease;
+}
+
+.stock-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Section Headers */
+.content-section {
+    margin-bottom: 20px;
+}
+
+.content-section h2 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+/* Card Grid */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 5px;
+}
+
+/* Card Styles */
+.product-card,
+.ingredient-card {
+    background-color: #f8f8f8;
+    padding: 12px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.product-card:hover,
+.ingredient-card:hover {
+    transform: translateY(-2px);
+}
+
+.product-card h3,
+.ingredient-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.product-card p,
+.ingredient-card p {
+    margin: 4px 0;
+    font-size: 13px;
+    color: #666;
+}
+
+.product-card button {
+    margin-top: 8px;
+    padding: 4px 8px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.product-card button:hover {
+    background-color: #1976D2;
+}
+
+/* Custom Scrollbars */
+.products-ingredients-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.products-ingredients-section::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.products-ingredients-section::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.products-ingredients-section::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.ingredients-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ingredients-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.ingredients-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.ingredients-list::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
