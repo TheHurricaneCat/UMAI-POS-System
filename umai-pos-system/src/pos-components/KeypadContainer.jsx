@@ -1,24 +1,50 @@
+import { useState, useRef, useEffect } from 'react'
 import { appendEntry } from '../handlers/DataHandler';
 import styles from './KeypadContainer.module.css';
+import PopUp from '../global-components/PopUp.jsx';
 
 function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray, clearCurrentTray, currentTray}) {
-    const handleSaveOrder = async () => {
-        // Check if any tray is missing customer details
-        const traysWithoutCustomers = tray.filter(t => !t.customer || !t.customer.customerName);
+    const [buttonPopUp, setButtonPopUp] = useState(false);
+    const [confirm, setConfirm] = useState(false);
+    
+    useEffect(() => {
+        const handleConfirmation = async () => {
+            if (confirm) {
+                // User clicked "Save" in the popup
+                const traysWithoutCustomers = tray.filter(t => !t.customer || !t.customer.customerName);
+                
+                if (traysWithoutCustomers.length > 0) {
+                    // Create an alert message listing all trays without customer details
+                    const trayNumbers = traysWithoutCustomers.map(t => `Tray ${t.id}`).join(', ');
+                    alert(`Please add customer details for ${trayNumbers} before saving the order.`);
+                    return;
+                }
+                
+                // If all trays have customer details, proceed with saving the order
+                await appendEntry(tray);
+                
+                // Reset confirm state
+                setConfirm(false);
+            }
+        };
         
-        if (traysWithoutCustomers.length > 0) {
-            // Create an alert message listing all trays without customer details
-            const trayNumbers = traysWithoutCustomers.map(t => `Tray ${t.id}`).join(', ');
-            alert(`Please add customer details for ${trayNumbers} before saving the order.`);
-            return;
-        }
-        
-        // If all trays have customer details, proceed with saving the order
-        await appendEntry(tray);
-    }
+        handleConfirmation();
+    }, [confirm, tray, appendEntry]);
+
+    const handleSaveOrder = () => {
+        // Show the popup and wait for user confirmation
+        setButtonPopUp(true);
+    };
     
     return (
         <>
+            <PopUp 
+                text={"Save current order?"} 
+                trigger={buttonPopUp} 
+                setTrigger={setButtonPopUp} 
+                confirm={confirm}
+                setConfirm={setConfirm}
+            />
             <div className={styles.primaryContainer}>
                 <div className={styles.traySummary}> <h3> Tray {currentTray} Summary </h3> </div>
                 <div className={styles.totalMoney}> <h3> Total: P{currentTotal.toFixed(2)} </h3> </div>
@@ -28,6 +54,7 @@ function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray
                 <div className={styles.clearOrder}> <button onClick={clearCurrentTray}> Clear Order </button> </div>
                 <div className={styles.clearTray}> <button onClick={clearTray}> Clear Tray </button> </div>
             </div>
+            
         </>
     );
 }

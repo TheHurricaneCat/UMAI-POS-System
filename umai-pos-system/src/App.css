@@ -15,38 +15,7 @@
 .primaryInterface {
   /* display: grid;
   grid-template-columns: 60% 40%; */
-  /* border: 1px solid rgb(255, 255, 255);  */
   padding: 10px;
-}
-
-.logo1 {
-  display: block;
-  /* border: 2px solid red; */
-  width: 30%;
-  height: 20px;
-  background-color: #ffe350;
-  position: absolute;
-  bottom: 1;
-}
-
-.logo2 {
-  display: block;
-  /* border: 2px solid red; */
-  width: 20%;
-  height: 20px;
-  background-color: #ffdb1d;
-  position: absolute;
-  bottom: 1;
-}
-
-.logo3 {
-  display: block;
-  /* border: 2px solid red; */
-  width: 10%;
-  height: 20px;
-  background-color: #12af14;
-  position: absolute;
-  bottom: 1;
 }
 
 .headerButtons {
@@ -59,6 +28,7 @@
 .posInterface {
   /* border: 2px solid blue; */
   display: grid;
+  height: calc(100vh - 100px);
   grid-template-columns: 60% 40%;
 }
 
@@ -71,7 +41,7 @@
   display: block;
   border: 1px solid rgb(177, 177, 177);
   max-width: 100%;
-  height: 23.3em;
+  height: calc(45vh - 20px);
   overflow: scroll;
   overflow-x: hidden;
   justify-content: center;
@@ -82,7 +52,7 @@
   display: block;
   border: 1px solid rgb(177, 177, 177);
   max-width: 100%;
-  height: 13em;
+  height: calc(25vh - 20px);
   overflow: scroll;
   overflow-x: hidden;
   justify-content: center;
@@ -121,7 +91,7 @@
   transition: all 0.4s;
   display: flex;
   flex-direction: column;
-  height: 30em;
+  height: calc(60vh - 20px);
   overflow: scroll;
   overflow-x: hidden;
 }
@@ -139,6 +109,94 @@
 .keypadViewer {
   display: flex;
   /* border: 2px solid rgb(255, 251, 0); */
-  height: 14.5em;
+  height: calc(30vh - 20px);
   justify-content: center;
+}
+
+.statistics-button {
+  background-color: #2196F3;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.statistics-button:hover {
+  background-color: #1976D2;
+}
+
+.headerButtons {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.headerButtons {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.header-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.session-start {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.session-start:hover {
+  background-color: #45a049;
+}
+
+.session-end {
+  background-color: #f44336;
+  color: white;
+}
+
+.session-end:hover {
+  background-color: #d32f2f;
+}
+
+.excel {
+  background-color: #FF9800;
+  color: white;
+}
+
+.excel:hover {
+  background-color: #F57C00;
+}
+
+.inventory {
+  background-color: #2196F3;
+  color: white;
+}
+
+.inventory:hover {
+  background-color: #1976D2;
+}
+
+.statistics {
+  background-color: #9C27B0;
+  color: white;
+}
+
+.statistics:hover {
+  background-color: #7B1FA2;
 }

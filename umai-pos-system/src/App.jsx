@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom';
 import './App.css'
 
 import {initProductList, appendEntry} from './handlers/DataHandler'
@@ -9,22 +10,26 @@ import ProductCard from './pos-components/ProductCard.jsx'
 import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
-import CategoryMenu from './pos-components/CategoryMenu.jsx';
-import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
-function App() {
+import CategoryMenu from './pos-components/CategoryMenu.jsx'
+import Inventory from './inventory-components/Inventory.jsx'
+
   
+
+import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
+  function App() {
+ 
   // IMPORTANT NOTE:
-  // The following code is meant for the POS system
-  // Create new interfaces (i.e. new .jsx components) that will house the other interfaces 
+// The following code is meant for the POS system
+// Create new interfaces (i.e. new .jsx components) that will house the other interfaces 
   const {
     tray,
     currentTray,
-    addNewTray,
+addNewTray,
     addToTray,
-    clearTray,
+clearTray,
     clearCurrentTray,
     handleProductIncrement,
-    handleProductDecrement,
+handleProductDecrement,
     handleProductDeletion,
     addModifier,
     handleModifierIncrement,
@@ -39,6 +44,8 @@ function App() {
     saveCustomerToTray,  
   } = useTrayManager();
 
+  const navigate = useNavigate();
+
   const handleSaveOrder = async () => {
     const sessionDetails = getSessionDetails();
     await appendEntry(tray, sessionDetails);
@@ -50,7 +57,6 @@ function App() {
 
   const testEmployee = "TestEmployee2";
 
-  
 	return (
     // interfaces are invisible containers that hold the components
     // viewers are containers that displays a list of components (e.g. products, modifiers, trays)
@@ -59,9 +65,21 @@ function App() {
       <div className="logo2"> </div>
       <div className="logo3"> </div>
       <div className="headerButtons"> 
-        <button onClick={() => startSession(testEmployee)}> Start Session </button>
-        <button onClick={() => endSession(testEmployee)}> End Session </button>
-        <button onClick={() => saveExcelFile()}> Save Excel File </button>
+      <button className="header-button session-start" onClick={() => startSession(testEmployee)}>
+          Start Session
+        </button>
+        <button className="header-button session-end" onClick={() => endSession(testEmployee)}>
+          End Session
+        </button>
+        <button className="header-button excel" onClick={() => saveExcelFile()}>
+          Save Excel
+        </button>
+        <button className="header-button inventory" onClick={() => navigate('/inventory')}>
+          Inventory
+        </button>
+        <button className="header-button statistics" onClick={() => navigate('/statistics')}>
+          Statistics
+        </button>
       </div>
       <div className="posInterface">
         <div className="productInterface"> 
