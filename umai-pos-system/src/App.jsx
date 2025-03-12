@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 import {initProductList, appendEntry} from './handlers/DataHandler'
@@ -10,6 +10,7 @@ import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
 import CategoryMenu from './pos-components/CategoryMenu.jsx'
+import PopUp from './global-components/PopUp.jsx';
 
 import { startSession, getSessionDetails, endSession, saveExcelFile } from './handlers/SessionHandler';
 function App() {
@@ -40,11 +41,38 @@ function App() {
     saveCustomerToTray,  
   } = useTrayManager();
 
+  const [startSessionPopup, setStartSessionPopup] = useState(false);
+  const [endSessionPopup, setEndSessionPopup] = useState(false);
+  const [restoreSessionPopup, setRestoreSessionPopup] = useState(false);
+  const [confirm, setConfirm] = useState(false);
+
+  const handleStartSession = async () => {
+    // IMPORTANT CHANGE HERE VVVVVVVVV
+    const result = await startSession(testEmployee); // change the return to specific values for greater user feedback
+    /* console.log("Start Session Result:", await startSession(testEmployee)); */
+    if (result) {
+      setStartSessionPopup(true); 
+    } else {
+      setRestoreSessionPopup(true);
+    }
+  };
+
+  const handleEndSession = async () => {
+    const result = await endSession(testEmployee);
+    setEndSessionPopup(true);
+  };
+
   const handleSaveOrder = async () => {
     const sessionDetails = getSessionDetails();
     await appendEntry(tray, sessionDetails);
     clearCurrentTray();
   };
+
+  useEffect(() => {
+    console.log("Start Session Popup:", startSessionPopup);
+    console.log("End Session Popup:", endSessionPopup);
+    console.log("Restore Session Popup:", restoreSessionPopup);
+  }, [startSessionPopup, endSessionPopup, restoreSessionPopup]);
 
   let productList = initProductList(products);
   let modifierList = initProductList(modifiers);
@@ -59,10 +87,38 @@ function App() {
       <div className="logo2"> </div>
       <div className="logo3"> </div>
       <div className="headerButtons"> 
-        <button onClick={() => startSession(testEmployee)}> Start Session </button>
-        <button onClick={() => endSession(testEmployee)}> End Session </button>
+        <button onClick={handleStartSession}> Start Session </button>
+        <button onClick={handleEndSession}> End Session </button>
         <button onClick={() => saveExcelFile()}> Save Excel File </button>
       </div>
+      <PopUp 
+          text={"A new session has started, welcome " + testEmployee}
+          button1={"Confirm"}
+          button2={"Exit"} 
+          trigger={startSessionPopup} 
+          setTrigger={setStartSessionPopup} 
+          confirm={confirm}
+          setConfirm={setConfirm}
+      />
+
+      <PopUp 
+          text={"Current session has ended"} 
+          button1={"Confirm"}
+          button2={"Exit"} 
+          trigger={endSessionPopup} 
+          setTrigger={setEndSessionPopup} 
+          confirm={confirm}
+          setConfirm={setConfirm}
+      />
+      <PopUp 
+          text={"A session for " + testEmployee + " is already active. Session has been restored."} 
+          button1={"Confirm"}
+          button2={"Exit"} 
+          trigger={restoreSessionPopup} 
+          setTrigger={setRestoreSessionPopup} 
+          confirm={confirm}
+          setConfirm={setConfirm}
+      />
       <div className="posInterface">
         <div className="productInterface"> 
           <CategoryMenu 

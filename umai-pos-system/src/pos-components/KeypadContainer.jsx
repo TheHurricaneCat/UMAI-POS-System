@@ -40,6 +40,8 @@ function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray
         <>
             <PopUp 
                 text={"Save current order?"} 
+                button={"Save"}
+                button2={"Cancel"}
                 trigger={buttonPopUp} 
                 setTrigger={setButtonPopUp} 
                 confirm={confirm}
