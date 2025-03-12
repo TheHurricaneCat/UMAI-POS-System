@@ -1,6 +1,6 @@
 import styles from './PopUp.module.css';
 
-function PopUp({text, trigger, setTrigger, confirm, setConfirm}) {
+function PopUp({text, button1, button2, trigger, setTrigger, confirm, setConfirm}) {
     
     const handleConfirm = () => {
         setConfirm(true);  // Set confirm to true when Save is clicked
@@ -16,8 +16,8 @@ function PopUp({text, trigger, setTrigger, confirm, setConfirm}) {
             <div className={styles.popupInner}>
                 <h1> {text} </h1>
                 <div className={styles.buttonContainer}> 
-                    <button className={styles.saveButton} onClick={handleConfirm}> Save </button>
-                    <button className={styles.cancelButton} onClick={handleCancel}> Cancel </button>
+                    <button className={styles.saveButton} onClick={handleConfirm}> {button1} </button>
+                    <button className={styles.cancelButton} onClick={handleCancel}> {button2} </button>
                 </div>
                 
             </div>

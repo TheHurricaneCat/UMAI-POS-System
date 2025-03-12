@@ -15,7 +15,7 @@ export async function startSession(employeeId) {
   const isActive = await checkActiveSession(employeeId);
   if (isActive) {
     console.log("An active session already exists for this employee.");
-    return;
+    return false;
   }
   
   const token = uuidv4();
@@ -41,6 +41,8 @@ export async function startSession(employeeId) {
   } catch (error) {
     console.error("Error saving session details to Firestore:", error);
   }
+
+  return true;
 }
 
 export async function checkActiveSession(employeeId) {
