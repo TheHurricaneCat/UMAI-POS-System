@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
-import firebaseApp from "../firebase";
+import { useNavigate } from 'react-router-dom';
+import {firebaseApp} from "/firebase.js";
 import * as XLSX from 'xlsx';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import './statistics.css';

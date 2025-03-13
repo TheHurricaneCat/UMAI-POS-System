@@ -9,6 +9,13 @@ import Inventory from './inventory-components/Inventory.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
+    <HashRouter>  {/* Changed from BrowserRouter */}
+       <Routes>
+         <Route path="/" element={<App />} />
+         <Route path="/login" element={<Login />} />
+         <Route path="/statistics" element={<Statistics />} />
+         <Route path="/inventory" element={<Inventory />} />
+       </Routes>
+     </HashRouter>
+   </StrictMode>,
 )
