@@ -138,7 +138,7 @@ export async function saveExcelFile() {
   }
 }
 
-async function downloadExcelFile(token) {
+export async function downloadExcelFile(token) {
   const storageRef = ref(storage, `${token}.xlsx`);
   try {
     const url = await getDownloadURL(storageRef);
