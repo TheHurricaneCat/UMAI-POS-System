@@ -122,14 +122,14 @@ export async function saveExcelFile() {
     console.error("No active session found");
     return;
   }
-  const base64Data = localStorage.getItem(sessionDetails.token);
+  const base64Data = localStorage.getItem(`session_${sessionDetails.token}`);
   
   if (!base64Data) {
     console.error("No Excel file data found in local storage");
     return;
   }
 
-  const storageRef = ref(storage, `${sessionDetails.token}.xlsx`);
+  const storageRef = ref(storage, `session_${sessionDetails.token}.xlsx`);
   try {
     await uploadString(storageRef, base64Data, 'data_url');
     console.log("Excel file saved to Firebase Storage");
@@ -139,7 +139,7 @@ export async function saveExcelFile() {
 }
 
 export async function downloadExcelFile(token) {
-  const storageRef = ref(storage, `${token}.xlsx`);
+  const storageRef = ref(storage, `session_${token}.xlsx`);
   try {
     const url = await getDownloadURL(storageRef);
     const response = await fetch(url);
@@ -147,7 +147,7 @@ export async function downloadExcelFile(token) {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = () => {
-      localStorage.setItem(token, reader.result);
+      localStorage.setItem(`session_${token}`, reader.result);
       console.log("Excel file downloaded and saved to local storage");
     };
   } catch (error) {

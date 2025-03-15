@@ -5,6 +5,7 @@ import PopUp from '../global-components/PopUp.jsx';
 
 function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray, clearCurrentTray, currentTray}) {
     const [buttonPopUp, setButtonPopUp] = useState(false);
+    const [emptyTrayPopup, setEmptyTrayPopup] = useState(false);
     const [confirm, setConfirm] = useState(false);
     
     useEffect(() => {
@@ -32,8 +33,20 @@ function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray
     }, [confirm, tray, appendEntry]);
 
     const handleSaveOrder = () => {
-        // Show the popup and wait for user confirmation
-        setButtonPopUp(true);
+        const currentTrayObj = tray.find(t => t.id === currentTray);
+        const hasItems = currentTrayObj && 
+                        currentTrayObj.products && 
+                        currentTrayObj.products.length > 0;
+        
+        if (!hasItems) {
+            // Show the empty tray popup
+            setEmptyTrayPopup(true);
+            return;
+        } else {
+            // Show the save order popup
+            setButtonPopUp(true);
+        }
+        
     };
     
     return (
@@ -46,6 +59,15 @@ function KeypadContainer({addNewTray, currentTotal, appendEntry, tray, clearTray
                 setTrigger={setButtonPopUp} 
                 confirm={confirm}
                 setConfirm={setConfirm}
+            />
+            <PopUp 
+                text={"No items in tray. Add items to save order."} 
+                button1={"Ok"}
+                button2={"Cancel"}
+                trigger={emptyTrayPopup} 
+                setTrigger={setEmptyTrayPopup} 
+                confirm={false}
+                setConfirm={() => {}}
             />
             <div className={styles.primaryContainer}>
                 <div className={styles.traySummary}> <h3> Tray {currentTray} Summary </h3> </div>
