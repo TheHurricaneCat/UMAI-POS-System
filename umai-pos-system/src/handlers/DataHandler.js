@@ -1,10 +1,34 @@
 import ExcelJS from 'exceljs';
 import { getSessionDetails } from './SessionHandler';
+import { firestore } from '/firebase.js';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 
 
 // class functions are useless
 // since react does not prefer having their objects to change (states)
 // So it wants to create a new object instead of changing the existing one
+
+
+export async function fetchSessionItems(collectionName, sessionToken) {
+  try {
+    console.log(`Attempting to fetch ${collectionName} with sessionToken:`, sessionToken);
+    const collectionRef = collection(firestore, collectionName);
+    const q = query(collectionRef, where('sessionToken', '==', sessionToken));
+    const querySnapshot = await getDocs(q);
+    
+    const items = [];
+    querySnapshot.forEach((doc) => {
+      items.push({ id: doc.id, ...doc.data() });
+    });
+
+    console.log(`Fetched ${items.length} ${collectionName}:`, items);
+    return items;
+  } catch (error) {
+    console.error(`Error fetching ${collectionName}:`, error);
+    return [];
+  }
+}
+
 
 export function initProductList(products = []) {
   let categories = [];
