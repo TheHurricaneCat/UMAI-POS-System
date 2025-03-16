@@ -6,6 +6,7 @@ import email_icon from './account-components/email.png';
 import password_icon from './account-components/password.png';
 import { loginUser, signupUser } from "../firebase";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [action, setAction] = useState("Login");
@@ -16,6 +17,7 @@ const Login = () => {
     const [errorMessage, setErrorMessage] = useState("");
 
     const db = getFirestore();
+    const navigate = useNavigate();
 
     const handleSubmit = async () => {
         try {
@@ -25,8 +27,10 @@ const Login = () => {
                 const userData = userDoc.data();
                 if (userData.role === "admin") {
                     alert("Admin Login Successful!");
+                    navigate('/account');
                 } else {
                     alert("Employee Login Successful!");
+                    navigate('/app');
                 }
                 setEmail("");
                 setPassword("");

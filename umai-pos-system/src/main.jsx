@@ -13,10 +13,10 @@ createRoot(document.getElementById('root')).render(
     <HashRouter>  {/* Changed from BrowserRouter */}
        <Routes>
          <Route path="/" element={<Login />} />
+         <Route path="/account" element={<AccountPage />} />
          <Route path="/App" element={<App />} />
          <Route path="/statistics" element={<Statistics />} />
          <Route path="/inventory" element={<Inventory />} />
-         <Route path="/account" element={<AccountPage />} />
        </Routes>
      </HashRouter>
    </StrictMode>,
