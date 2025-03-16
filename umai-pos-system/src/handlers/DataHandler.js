@@ -1,5 +1,5 @@
 import ExcelJS from 'exceljs';
-import { getSessionDetails } from './SessionHandler';
+import { getSessionDetails, saveExcelFile } from './SessionHandler';
 import { firestore } from '/firebase.js';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
@@ -72,13 +72,19 @@ function isElectron() {
   return window && window.process && window.process.type;
 }
 
-let filePathWeb = "/public/TestFile.xlsx";
-
-function fetchFromLocalStorage() {
-  const base64Data = localStorage.getItem('excelFile');
+export async function fetchFromLocalStorage(token) {
+  console.log("Fetching Excel file from local storage with token:", token);
+  const base64Data = localStorage.getItem(token);
   if (!base64Data) {
-    console.error('No cached data found... using default public data');
-    return fetch(filePathWeb).then((res) => res.arrayBuffer());
+    const filePathWeb = "/TestFile.xlsx";
+      console.log("Fetching Excel template from:", filePathWeb);
+      const response = await fetch(filePathWeb);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Excel file: ${response.status} ${response.statusText}`);
+      }
+      console.log('Data has been fetched');
+      return await response.arrayBuffer();
   } else {
     console.log('Using cached data');
     const byteCharacters = atob(base64Data.split(',')[1]);
@@ -94,99 +100,252 @@ function fetchFromLocalStorage() {
 
 // Function to save the Excel file
 export async function appendEntry(newEntries) {
-  const fileBuffer = await fetchFromLocalStorage();
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(fileBuffer);
-
-  const worksheet = workbook.getWorksheet(1);
-  const sessionDetails = await getSessionDetails();
-  const sessionID = sessionDetails.token;
-
-  // Find the last row in the worksheet
-  
-  let lastInvoiceNumber = 0;
-  let lastInvoiceRow = null;
-  
-  try {
-    for (let i = worksheet.rowCount; i > 0; i--) {
-      const row = worksheet.getRow(i);
-      const invoiceCell = row.getCell(5).value;
-      if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
-        lastInvoiceRow = row;
-        const lastInvoiceParts = invoiceCell.split('-');
-        if (lastInvoiceParts.length === 2) {
-          lastInvoiceNumber = parseInt(lastInvoiceParts[1], 10);
-        }
-        break;
-      }
-    }
-  } catch (error) {
-    console.error(error);
+  // Check if there are any entries to append
+  if (!newEntries || newEntries.length === 0) {
+    console.warn("No entries to append to Excel file");
+    return false;
   }
 
-  console.log("Last Invoice Number: " + lastInvoiceNumber);
+  // Check if any trays have products
+  const hasProducts = newEntries.some(tray => tray.products && tray.products.length > 0);
+  if (!hasProducts) {
+    console.warn("No products found in any trays, skipping Excel update");
+    return false;
+  }
 
-  const today = new Date();
-  const datePart = `${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}${today.getFullYear()}`;
-  let invoiceNumber = lastInvoiceNumber;
-  
-  newEntries.forEach((tray) => {
-    invoiceNumber += 1;
-    const invoice = `${datePart}-${String(invoiceNumber).padStart(5, '0')}`;
+  try {
+    const sessionDetails = await getSessionDetails();
+    console.log("Session details: [NEW]", sessionDetails);
 
-    tray.products.forEach((product) => {
-      const productRow = [
-        product.quantity,
-        product.name,
-        product.price,
-        product.price * product.quantity,
-        invoice,
-        tray.customer.customerName,
-        tray.customer.address,
-        tray.customer.contactNumber,
-        tray.customer.paymentMethod,
-      ];
-      worksheet.addRow(productRow);
+    const sessionID = `session_${sessionDetails.token}`;
+    console.log("Session ID:", sessionID);
+    const cashierName = sessionDetails?.employeeID || "Unknown";
+    
+    const fileBuffer = await fetchFromLocalStorage(sessionID);
+    const workbook = new ExcelJS.Workbook();
+    
+    
+    
+    await workbook.xlsx.load(fileBuffer);
 
-      product.modifiers.forEach((modifier) => {
-        const modifierRow = [
-          null,
-          modifier.quantity,
-          modifier.name,
-          `${modifier.price} > ${modifier.price * modifier.quantity}`,
+    const worksheet = workbook.getWorksheet(1);
+    if (!worksheet) {
+      console.error("No worksheet found in Excel file");
+      return false;
+    }
+    
+
+    // Find the last invoice number
+    let lastInvoiceNumber = 0;
+    let lastInvoiceRow = null;
+    
+    try {
+      for (let i = worksheet.rowCount; i > 0; i--) {
+        const row = worksheet.getRow(i);
+        const invoiceCell = row.getCell(1).value; // Assuming invoice number is in column 1
+        if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
+          lastInvoiceRow = row;
+          const lastInvoiceParts = invoiceCell.split('-');
+          if (lastInvoiceParts.length === 2) {
+            lastInvoiceNumber = parseInt(lastInvoiceParts[1], 10);
+          }
+          break;
+        }
+      }
+    } catch (error) {
+      console.error("Error finding last invoice:", error);
+    }
+
+    console.log("Last Invoice Number:", lastInvoiceNumber);
+
+    // Generate the date part for the invoice
+    const today = new Date();
+    const datePart = `${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}${today.getFullYear()}`;
+    let invoiceNumber = lastInvoiceNumber;
+    
+    // Format the current date and time
+    const dateTime = today.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+    
+    // Flag to track if any rows were added
+    let rowsAdded = false;
+    
+    // Process each tray (order)
+    newEntries.forEach((tray) => {
+      // Skip empty trays
+      if (!tray.products || tray.products.length === 0) {
+        console.log("Skipping empty tray");
+        return;
+      }
+
+      invoiceNumber += 1;
+      const invoice = `${datePart}-${String(invoiceNumber).padStart(5, '0')}`;
+      const orderType = "Dine-in"; // Default value, could be parameterized later
+      const defaultTax = 0.12; // 12% tax
+
+      // Process each product in the tray
+      tray.products.forEach((product) => {
+        // Skip invalid products
+        if (!product || !product.name) {
+          console.log("Skipping invalid product");
+          return;
+        }
+        
+        // Calculate the product's subtotal
+        const productSubtotal = product.price * product.quantity;
+        
+        // Find the highest discount rate from modifiers (if any)
+        let highestDiscount = 0;
+        if (product.modifiers && product.modifiers.length > 0) {
+          product.modifiers.forEach(modifier => {
+            if (modifier && modifier.price < 0) {
+              const discountRate = -modifier.price * modifier.quantity;
+              highestDiscount = Math.max(highestDiscount, discountRate);
+            }
+          });
+        }
+        
+        // Calculate the discount amount
+        const discountAmount = productSubtotal * highestDiscount;
+        
+        // Calculate tax and grand total
+        const preTaxAmount = productSubtotal - discountAmount;
+        const taxAmount = preTaxAmount * defaultTax;
+        const grandTotal = preTaxAmount + taxAmount;
+        
+        // Create the row with the column format
+        const productRow = [
+          invoice,                               // Invoice number
+          dateTime,                              // Date & time
+          cashierName,                           // Cashier name
+          orderType,                             // Order type
+          product.name,                          // Product name
+          product.code || "-",                   // Product code
+          product.category || "-",               // Category
+          product.quantity,                      // Qty sold
+          product.price,                         // Unit price
+          highestDiscount ? (highestDiscount * 100).toFixed(2) + "%" : "0%", // Discount
+          (defaultTax * 100).toFixed(0) + "%",   // Tax (default 12%)
+          grandTotal.toFixed(2),                 // Grand total
+          tray.customer?.paymentMethod || "-",   // Payment method
+          tray.customer?.customerName || "-",    // Customer name
         ];
-        worksheet.addRow(modifierRow);
-      });
+        
+        worksheet.addRow(productRow);
+        rowsAdded = true;
 
-      product.content.forEach((content) => {
-        const contentRow = [
-          null,
-          content.quantity,
-          content.name,
-          `${content.price} > ${content.price * content.quantity}`,
-        ];
-        worksheet.addRow(contentRow);
+        // Add modifier information in nested rows if needed
+        if (product.modifiers && product.modifiers.length > 0) {
+          product.modifiers.forEach((modifier) => {
+            if (!modifier || !modifier.name) return;
+            
+            // Format can be adjusted as needed - here we're adding indented modifier info
+            const modifierRow = [
+              "",                                // No invoice number for modifier rows
+              "",                                // No date/time
+              "",                                // No cashier
+              "",                                // No order type
+              `${modifier.name}`,           // Indent modifier name
+              "",                                // No product code
+              "Modifier",                        // Category
+              modifier.quantity,                 // Qty
+              modifier.price,                    // Unit price
+              "",                                // No additional discount
+              "",                                // No additional tax
+              (modifier.price * modifier.quantity).toFixed(2), // Subtotal
+              "",                                // No payment method
+              "",                                // No customer name
+            ];
+            
+            worksheet.addRow(modifierRow);
+            rowsAdded = true;
+          });
+        }
+
+        // Add promo product information if it's a promo
+        if (product.content && product.content.length > 0) {
+          product.content.forEach((content) => {
+            if (!content) return;
+            
+            const contentRow = [
+              "",                                // No invoice number for content rows
+              "",                                // No date/time
+              "",                                // No cashier
+              "",                                // No order type
+              `  ↳ ${content.name || "Included Item"}`, // Indent included item name
+              "",                                // No product code
+              "Included Item",                   // Category
+              content.quantity || 1,            // Qty
+              content.price || "0.00",           // Unit price (likely 0 for included items)
+              "",                                // No additional discount
+              "",                                // No additional tax
+              "0.00",                            // Typically 0 for included items
+              "",                                // No payment method
+              "",                                // No customer name
+            ];
+            
+            worksheet.addRow(modifierRow);
+            rowsAdded = true;
+          });
+        }
       });
     });
-  });
 
-  const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
+    // If no rows were added, return false
+    if (!rowsAdded) {
+      console.warn("No rows were added to the Excel file");
+      return false;
+    }
+
+    // Save the updated workbook
+    const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
+    
     // Web mode: Save to cache (or download)
     const blob = new Blob([updatedExcelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const url = URL.createObjectURL(blob);
 
     const reader = new FileReader();
     reader.readAsDataURL(blob);
-    reader.onloadend = () => {
-      localStorage.setItem(sessionID, reader.result);
-      console.log("File saved to cache");
-    };
-
-    // Force download (if needed)
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = sessionID.concat(".xlsx");
-    link.click();
+    
+    // Return a promise to ensure we wait for the file to be saved
+    return new Promise((resolve, reject) => {
+      reader.onloadend = () => {
+        try {
+          localStorage.setItem(sessionID, reader.result);
+          console.log("File saved to cache with session ID:", sessionID);
+          
+          saveExcelFile();
+          console.log("Excel file saved to Firebase Storage");
+          
+          // Force download (optional - can be configured based on parameter)
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = sessionID + ".xlsx";
+          link.click();
+          
+          resolve(true); // Successfully saved
+        } catch (error) {
+          console.error("Error saving file to localStorage:", error);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = (error) => {
+        console.error("Error reading file data:", error);
+        reject(error);
+      };
+    });
+  } catch (error) {
+    console.error("Error in appendEntry:", error);
+    return false;
+  }
 }
 
 

@@ -6,6 +6,8 @@ import * as XLSX from 'xlsx';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import './statistics.css';
 
+import { getSessionDetails, downloadExcelFile } from './handlers/SessionHandler';
+
 const COLORS = ['#3498db', '#f1c40f', '#8e44ad'];
 
 const StatisticsPage = () => {
@@ -25,7 +27,7 @@ const StatisticsPage = () => {
         setLoading(true);
 
         try {
-            const sessionDetails = await getSessionDetails();
+            /* const sessionDetails = await getSessionDetails();
             if (!sessionDetails || !sessionDetails.token) {
                 console.error("No active session or token found.");
                 setLoading(false);
@@ -36,11 +38,14 @@ const StatisticsPage = () => {
             const base64Data = localStorage.getItem(sessionDetails.token);
             if (!base64Data) {
                 console.log("No Excel file found in local storage, downloading from Firebase...");
-                await downloadExcelFile(sessionDetails.token); // Download and store it locally
-            }
+                 // Download and store it locally
+                console.log("Excel file downloaded and saved to local storage");
+            } */
+
+            await downloadExcelFile("SAMPLEDATA");
 
             // Read file from local storage
-            const storedFile = localStorage.getItem(sessionDetails.token);
+            const storedFile = localStorage.getItem("SAMPLEDATA.xlsx");
             if (storedFile) {
                 const byteCharacters = atob(storedFile.split(',')[1]);
                 const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));

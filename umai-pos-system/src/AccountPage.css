@@ -1,0 +1,52 @@
+.account-page {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.account-page h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sessions-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.sessions-table th, .sessions-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.sessions-table th {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+.sessions-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.sessions-table tr:hover {
+    background-color: #ddd;
+}
+
+.download-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.download-btn:hover {
+    background-color: #45a049;
+}

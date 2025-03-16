@@ -42,24 +42,41 @@ export default function useTrayManager() {
   };
 
   const updateTotal = () => {
-    let total = 0;
+    let subtotal = 0;
+    let highestDiscountRate = 0;
+    
     tray.forEach(trayObject => {
       trayObject.products.forEach(product => {
-        total += product.price * product.quantity;
+        subtotal += product.price * product.quantity;
+
         product.modifiers.forEach(modifier => {
-          if (modifier.price < 0) {
-            //discounted = t - td
-            total = total - (total * (-modifier.price * modifier.quantity));
+ 
+          if (modifier.price < 0 || modifier.category === "Discount") {
+
+            const discountRate = -modifier.price * modifier.quantity;
+            highestDiscountRate = Math.max(highestDiscountRate, discountRate);
           } else {
-            total += modifier.price * modifier.quantity;
+
+            subtotal += modifier.price * modifier.quantity;
           }
-          
         });
       });
     });
-    setTotal(total);
-    return currentTotal;
-  }
+    
+    // Apply the highest discount to the subtotal
+    let finalTotal = subtotal;
+    if (highestDiscountRate > 0) {
+      // Apply the highest discount
+      const discountAmount = subtotal * highestDiscountRate;
+      finalTotal = subtotal - discountAmount;
+    }
+    
+    // Round to 2 decimal places for currency
+    finalTotal = Math.round(finalTotal * 100) / 100;
+    
+    setTotal(finalTotal);
+    return finalTotal;
+  };
 
   useEffect(() => {
     updateTotal();
