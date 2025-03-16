@@ -167,6 +167,7 @@ import { startSession, getSessionDetails, endSession, saveExcelFile } from './ha
                 addModifier={addModifier}
                 categoryRefs={categoryRefs}
                 index={index}
+                currentProduct={currentProduct}
                 />
             ))}
           </div>
