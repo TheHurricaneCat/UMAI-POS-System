@@ -6,6 +6,7 @@ import { app } from '../firebase'; // Adjust the path to your firebase.js file *
 import { firestore, storage } from '/firebase.js'
 import { collection, query, where, getDocs, addDoc, updateDoc, setDoc, doc } from '@firebase/firestore';
 import { ref, uploadString, getDownloadURL } from '@firebase/storage';
+import { products, modifiers, ingredients } from './product.js';
 
 let sessionToken = null;
 
@@ -40,6 +41,59 @@ export async function startSession(employeeId) {
     console.log("Document updated with ID:", docRef.id);
   } catch (error) {
     console.error("Error saving session details to Firestore:", error);
+  }
+
+  const productsRef = collection(firestore, 'Products');
+  for (const product of products) {
+    try {
+      const productDoc = await addDoc(productsRef, {
+        sessionToken: token,
+        name: product.name,
+        code: product.code,
+        price: product.price,
+        category: product.category,
+        stockNumber: product.stockNumber
+      });
+      console.log(`Added product ${product.name} with ID: ${productDoc.id}`);
+    } catch (error) {
+      console.error(`Error adding product ${product.name}:`, error);
+    }
+  }
+
+  const modifiersRef = collection(firestore, 'Modifiers');
+  const sauceModifiers = modifiers.filter(mod => mod.category === "Sauce");
+
+  for (const modifier of sauceModifiers) {
+    try {
+      const modifierDoc = await addDoc(modifiersRef, {
+        sessionToken: token,
+        name: modifier.name,
+        code: modifier.code,
+        price: modifier.price,
+        category: modifier.category,
+        stockNumber: modifier.stockNumber
+      });
+      console.log(`Added modifier ${modifier.name} with ID: ${modifierDoc.id}`);
+    } catch (error) {
+      console.error(`Error adding modifier ${modifier.name}:`, error);
+    }
+  }
+
+  const ingredientsRef = collection(firestore, 'Ingredients');
+  for (const ingredient of ingredients) {
+    try {
+      const ingredientDoc = await addDoc(ingredientsRef, {
+        sessionToken: token,
+        name: ingredient.name,
+        code: ingredient.code,
+        price: ingredient.price,
+        category: ingredient.category,
+        stockNumber: ingredient.stockNumber
+      });
+      console.log(`Added ingredient ${ingredient.name} with ID: ${ingredientDoc.id}`);
+    } catch (error) {
+      console.error(`Error adding ingredient ${ingredient.name}:`, error);
+    }
   }
 
   return true;
@@ -81,12 +135,22 @@ export async function checkActiveSession(employeeId) {
   return false;
 }
 
-export async function getSessionDetails() {
-  // attempt local check
-  const sessionDetails = JSON.parse(localStorage.getItem('sessionDetails'));
-  console.log("Active Session Found in localStorage:", sessionDetails);
-  if (sessionDetails) {
-    return sessionDetails;
+export function getSessionDetails() {
+  const sessionDetails = localStorage.getItem('sessionDetails');
+  console.log("Raw session details from localStorage:", sessionDetails);
+  
+  if (!sessionDetails) {
+    console.log("No session details found in localStorage");
+    return null;
+  }
+
+  try {
+    const parsedDetails = JSON.parse(sessionDetails);
+    console.log("Parsed session details:", parsedDetails);
+    return parsedDetails;
+  } catch (error) {
+    console.error("Error parsing session details:", error);
+    return null;
   }
 }
 
