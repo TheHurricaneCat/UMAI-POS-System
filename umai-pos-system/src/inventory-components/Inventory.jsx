@@ -223,7 +223,7 @@ function Inventory() {
           <div className="inventory-header">
             <h1>Inventory Management</h1>
             <div className="button-group">
-              <button onClick={() => navigate('/')} className="nav-button pos">POS</button>
+              <button onClick={() => navigate('/app')} className="nav-button pos">POS</button>
               <button onClick={() => navigate('/statistics')} className="nav-button inventory">Statistics</button>
             </div>
           </div>

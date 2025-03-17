@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import './statistics.css';
 import * as XLSX from 'xlsx';
+import { storage } from "../firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 
 const COLORS = ['#3498db', '#f1c40f', '#8e44ad'];
 
@@ -22,8 +24,10 @@ const StatisticsPage = () => {
     const fetchExcelData = async () => {
         setLoading(true);
         try {
-            // Fetch the Excel file from the correct path
-            const response = await fetch('SAMPLEDATA.xlsx');
+            const fileRef = ref(storage, 'SAMPLEDATA.xlsx');
+            const url = await getDownloadURL(fileRef);
+
+            const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -66,12 +70,14 @@ const StatisticsPage = () => {
         data.forEach(entry => {
             if (!entry['Date & Time'] || !entry['Grand Total']) return;
 
-            const [date] = entry['Date & Time'].split(' ');
-            const [year, month, day] = date.split('-');
+            const [date, time] = entry['Date & Time'].split(' ');
+            const [day, month, year] = date.split('/');
             const amount = parseFloat(entry['Grand Total'] || 0);
-            const paymentMethod = entry['Payment Method'] || 'Other';
+            const paymentMethod = entry['Payment'] || 'Other';
 
-            dailySummary[date] = (dailySummary[date] || 0) + amount;
+            const formattedDate = `${year}-${month}-${day}`;
+
+            dailySummary[formattedDate] = (dailySummary[formattedDate] || 0) + amount;
             monthlySummary[`${year}-${month}`] = (monthlySummary[`${year}-${month}`] || 0) + amount;
             yearlySummary[year] = (yearlySummary[year] || 0) + amount;
             paymentSummary[paymentMethod] = (paymentSummary[paymentMethod] || 0) + amount;
@@ -93,7 +99,7 @@ const StatisticsPage = () => {
             <div className="statistics-header">
                 <h1>Statistics</h1>
                 <div className="button-group">
-                    <button onClick={() => navigate('/')} className="nav-button pos">POS</button>
+                    <button onClick={() => navigate('/app')} className="nav-button pos">POS</button>
                     <button onClick={() => navigate('/inventory')} className="nav-button inventory">Inventory</button>
                 </div>
             </div>
