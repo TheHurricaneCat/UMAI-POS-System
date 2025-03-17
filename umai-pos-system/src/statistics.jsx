@@ -70,14 +70,12 @@ const StatisticsPage = () => {
         data.forEach(entry => {
             if (!entry['Date & Time'] || !entry['Grand Total']) return;
 
-            const [date, time] = entry['Date & Time'].split(' ');
-            const [day, month, year] = date.split('/');
+            const [date] = entry['Date & Time'].split(' ');
+            const [year, month, day] = date.split('-');
             const amount = parseFloat(entry['Grand Total'] || 0);
-            const paymentMethod = entry['Payment'] || 'Other';
+            const paymentMethod = entry['Payment Method'] || 'Other';
 
-            const formattedDate = `${year}-${month}-${day}`;
-
-            dailySummary[formattedDate] = (dailySummary[formattedDate] || 0) + amount;
+            dailySummary[date] = (dailySummary[date] || 0) + amount;
             monthlySummary[`${year}-${month}`] = (monthlySummary[`${year}-${month}`] || 0) + amount;
             yearlySummary[year] = (yearlySummary[year] || 0) + amount;
             paymentSummary[paymentMethod] = (paymentSummary[paymentMethod] || 0) + amount;
@@ -217,7 +215,12 @@ const StatisticsPage = () => {
                 </div>
             </div>
         </div>
+        
     );
+
+    
 };
+
+
 
 export default StatisticsPage;

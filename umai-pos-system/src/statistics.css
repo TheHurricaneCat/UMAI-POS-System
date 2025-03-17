@@ -1,10 +1,73 @@
+:root {
+    /* New color palette - warm beige with accents */
+    --beige-50: #fdf8f6;
+    --beige-100: #f2e8e5;
+    --beige-200: #eaddd7;
+    --beige-300: #e0cec7;
+    --beige-400: #d2bab0;
+    --beige-500: #bfa094;
+    --beige-600: #a18072;
+    --beige-700: #977669;
+    --beige-800: #846358;
+    --beige-900: #43302b;
+    --sage-green: #64a064;
+    --sage-green-dark: #418541;
+    --muted-blue: #72808e;
+    --muted-blue-dark: #44596b;
+    --body: #fff6e8;   
+    --inventory-container: #f2f2f2;
+    --make-button: #5c97ae;
+    --edit-button: #daae6c;
+    --make-button-hover: #426c7d;
+    --edit-button-hover: #ae8b57;
+
+    /* Accent colors - soft pastels */
+    --accent-sage: #94a3b8;
+    --accent-sage-dark: #7c8ba1;
+    --accent-rose: #e11d48;
+    --accent-rose-light: #fecdd3;
+    --accent-sky: #7dd3fc;
+    --accent-sky-dark: #38bdf8;
+    --accent-mint: #86efac;
+    --accent-mint-dark: #4ade80;
+    
+    /* Status colors - muted tones */
+    --status-high: #86efac;
+    --status-medium: #fcd34d;
+    --status-low: #fca5a5;
+    --status-critical: #f87171;
+    
+    /* UI colors */
+    --bg-main: var(--beige-50);
+    --bg-card: #ffffff;
+    --bg-sidebar: var(--beige-900);
+    --text-primary: var(--beige-900);
+    --text-secondary: var(--beige-700);
+    --border-light: var(--beige-200);
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(67, 48, 43, 0.05);
+    --shadow-md: 0 4px 6px rgba(67, 48, 43, 0.07);
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--beige-600) 0%, var(--beige-700) 100%);
+    --gradient-success: linear-gradient(135deg, var(--accent-mint) 0%, var(--accent-mint-dark) 100%);
+}
+
+html, body {
+    background-color: var(--body);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
 /* Container for the entire page */
 .statistics-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
     padding: 20px;
-    background-color: #f4f4f4;
+    background-color: var(--bg-main);
     border-radius: 10px;
     height: 100vh; /* Full viewport height */
     overflow-y: auto; /* Enable vertical scrolling */
@@ -16,8 +79,77 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    background-color: #f5f5f5;
-    border-bottom: 1px solid #ddd;
+    background: linear-gradient(135deg, var(--beige-700) 0%, var(--beige-800) 100%);
+    color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(67, 48, 43, 0.15);
+}
+
+.statistics-header h1 {
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+}
+
+/* Navigation Buttons */
+.nav-button {
+    border: none;
+    padding: 10px 24px;
+    border-radius: 50px;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(67, 48, 43, 0.15);
+}
+
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(255, 255, 255, 0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.nav-button:hover::before {
+    opacity: 1;
+}
+
+.nav-button.pos {
+    background-color: var(--accent-mint);
+}
+
+.nav-button.pos:hover {
+    background-color: var(--accent-mint-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(134, 239, 172, 0.3);
+}
+
+.nav-button.statistics {
+    background-color: var(--accent-mint);
+}
+
+.nav-button.statistics:hover {
+    background-color: var(--accent-mint-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(134, 239, 172, 0.3);
+}
+
+.nav-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(67, 48, 43, 0.1);
 }
 
 /* Main Content Section */
@@ -35,10 +167,10 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background-color: #ffffff;
+    background-color: var(--bg-card);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .report-buttons {
@@ -46,9 +178,9 @@
     flex-direction: column;
     gap: 10px;
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: var(--beige-100);
     border-radius: 5px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
 }
 
 .report-buttons h2 {
@@ -71,53 +203,19 @@
 }
 
 .report-buttons .generate-report {
-    background-color: #4CAF50;
+    background-color: var(--make-button);
 }
 
 .report-buttons .generate-report:hover {
-    background-color: #45a049;
+    background-color: var(--make-button-hover);
 }
 
 .report-buttons .print-report {
-    background-color: #2196F3;
+    background-color: var(--edit-button);
 }
 
 .report-buttons .print-report:hover {
-    background-color: #1976D2;
-}
-
-.statistics-buttons button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: white;
-}
-
-.statistics-buttons button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.statistics-buttons .generate-graphs {
-    background-color: #4CAF50;
-}
-
-.statistics-buttons .generate-graphs:hover {
-    background-color: #45a049;
-}
-
-.statistics-buttons .generate-reports {
-    background-color: #2196F3;
-}
-
-.statistics-buttons .generate-reports:hover {
-    background-color: #1976D2;
+    background-color: var(--edit-button-hover);
 }
 
 /* Second Column: Graphs */
@@ -126,17 +224,17 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    background-color: #ffffff;
+    background-color: var(--bg-card);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .chart-box {
-    background: white;
+    background: var(--bg-card);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 /* Third Column: Reports */
@@ -145,10 +243,10 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background-color: #ffffff;
+    background-color: var(--bg-card);
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .statistics-reports h2 {
@@ -159,12 +257,12 @@
 
 .statistics-reports p {
     font-size: 14px;
-    color: #555;
+    color: var(--text-secondary);
 }
 
 .title {
     text-align: center;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .button-group {
@@ -205,17 +303,64 @@
 }
 
 .nav-button.pos {
-    background-color: #4CAF50;
+    background-color: var(--accent-mint);
 }
 
 .nav-button.pos:hover {
-    background-color: #45a049;
+    background-color: var(--accent-mint-dark);
 }
 
 .nav-button.inventory {
-    background-color: #2196F3;
+    background-color: var(--accent-mint);
 }
 
 .nav-button.inventory:hover {
-    background-color: #1976D2;
+    background-color: var(--accent-mint-dark);
+}
+
+/* Header Section */
+.statistics-header {
+    display: flex;
+    justify-content: center; /* Center align the header buttons */
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #f5f5f5; /* Light gray background */
+    border-bottom: 1px solid #ddd; /* Subtle border */
+}
+
+.statistics-header h1 {
+    color: #333; /* Darker text color */
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Button Group */
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+/* Generate Report Button */
+.report-buttons .generate-report {
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.report-buttons .generate-report:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Remove Print Report Button Styles */
+.report-buttons .print-report {
+    display: none; /* Hide the print report button */
 }
