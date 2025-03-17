@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
-import { logoutUser } from "../firebase"; // Import logoutUser function
+import { logoutUser } from "../firebase";
 import './AccountPage.css';
 
 const AccountPage = () => {
