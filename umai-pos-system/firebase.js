@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCLVKs5SzXiDv5Qp2wSHe_0e9w4jhWmg1A",
@@ -38,6 +38,15 @@ export const signupUser = async (email, password, name, role) => {
       role: role,
     });
     return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Function for user logout
+export const logoutUser = async () => {
+  try {
+    await signOut(auth);
   } catch (error) {
     throw error;
   }
