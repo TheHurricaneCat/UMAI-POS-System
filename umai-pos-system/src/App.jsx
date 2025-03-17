@@ -103,6 +103,9 @@ function App() {
             <button className="header-button statistics" onClick={() => navigate('/statistics')}>
               Statistics
             </button>
+            <button className="header-button account" onClick={() => navigate('/account')}>
+              Account Page
+            </button>
           </>
         )}
       </div>
