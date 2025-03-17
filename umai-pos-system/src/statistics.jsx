@@ -24,23 +24,32 @@ const StatisticsPage = () => {
     const fetchExcelData = async () => {
         setLoading(true);
         try {
-            const fileRef = ref(storage, 'SAMPLEDATA.xlsx');
-            const url = await getDownloadURL(fileRef);
+            const inventoryFileRef = ref(storage, 'InventoryData.xlsx');
+            const salesFileRef = ref(storage, 'SalesData.xlsx');
 
-            const response = await fetch(url);
-            if (!response.ok) {
+            const inventoryUrl = await getDownloadURL(inventoryFileRef);
+            const salesUrl = await getDownloadURL(salesFileRef);
+
+            const inventoryResponse = await fetch(inventoryUrl);
+            const salesResponse = await fetch(salesUrl);
+
+            if (!inventoryResponse.ok || !salesResponse.ok) {
                 throw new Error('Network response was not ok');
             }
-            const arrayBuffer = await response.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+            const inventoryArrayBuffer = await inventoryResponse.arrayBuffer();
+            const salesArrayBuffer = await salesResponse.arrayBuffer();
+
+            const inventoryWorkbook = XLSX.read(inventoryArrayBuffer, { type: 'array' });
+            const salesWorkbook = XLSX.read(salesArrayBuffer, { type: 'array' });
 
             // Check if the sheets exist
-            if (!workbook.Sheets['Inventory'] || !workbook.Sheets['Cashier']) {
-                throw new Error('Required sheets not found in the Excel file');
+            if (!inventoryWorkbook.SheetNames.includes('INVENTORY') || !salesWorkbook.SheetNames.includes('CASHIER')) {
+                throw new Error('Required sheets not found in the Excel files');
             }
 
-            const inventorySheet = XLSX.utils.sheet_to_json(workbook.Sheets['Inventory']);
-            const cashierSheet = XLSX.utils.sheet_to_json(workbook.Sheets['Cashier']);
+            const inventorySheet = XLSX.utils.sheet_to_json(inventoryWorkbook.Sheets['INVENTORY']);
+            const cashierSheet = XLSX.utils.sheet_to_json(salesWorkbook.Sheets['CASHIER']);
 
             processInventoryData(inventorySheet);
             processSalesData(cashierSheet);
@@ -70,8 +79,29 @@ const StatisticsPage = () => {
         data.forEach(entry => {
             if (!entry['Date & Time'] || !entry['Grand Total']) return;
 
-            const [date, time] = entry['Date & Time'].split(' ');
+            let dateTime = entry['Date & Time'];
+            if (typeof dateTime === 'number') {
+                const dateObj = XLSX.SSF.parse_date_code(dateTime);
+                dateTime = `${dateObj.d}/${dateObj.m}/${dateObj.y} ${dateObj.H}:${dateObj.M}:${dateObj.S}`;
+            }
+
+            if (typeof dateTime !== 'string') {
+                console.warn('Invalid Date & Time format:', dateTime);
+                return;
+            }
+
+            const [date, time] = dateTime.split(' ');
+            if (!date || !time) {
+                console.warn('Invalid Date & Time format:', dateTime);
+                return;
+            }
+
             const [day, month, year] = date.split('/');
+            if (!day || !month || !year) {
+                console.warn('Invalid Date format:', date);
+                return;
+            }
+
             const amount = parseFloat(entry['Grand Total'] || 0);
             const paymentMethod = entry['Payment'] || 'Other';
 
