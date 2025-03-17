@@ -3,7 +3,7 @@ import ProductCard from './ProductCard.jsx';
 import ModifierCard from './ModifierCard.jsx';
 import { Category } from '../handlers/DataHandler.js';
 
-function CategoryContainer({category, type, addToTray, addModifier, categoryRefs, index}) {
+function CategoryContainer({category, type, addToTray, addModifier, categoryRefs, index, currentProduct}) {
     const colors = ["#FFDE59", "#3DCDC4", "#4766C2"];
     const backgroundColor = colors[index % colors.length];
     
@@ -47,7 +47,8 @@ function CategoryContainer({category, type, addToTray, addModifier, categoryRefs
                 > 
                     {category.products.map((product) => (
                         <ModifierCard modifierClass={product}
-                        addModifier={addModifier} />
+                        addModifier={addModifier}
+                        currentProduct={currentProduct} />
                     ))}
                 </div>
             </div>

@@ -51,7 +51,7 @@
     margin: 0px 30px;
 }
 
-.input input{
+.input input, .input select {
     height: 50px;
     width: 400px;
     background: transparent;
@@ -59,6 +59,22 @@
     outline: none;
     color: #797979;
     font-size: 19px;
+}
+
+.role-select {
+    height: 50px;
+    width: 400px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #797979;
+    font-size: 19px;
+    padding-right: 10px;
+}
+
+.role-label {
+    margin-right: 10px;
+    padding-left: 15px;
 }
 
 .forgot-password{
