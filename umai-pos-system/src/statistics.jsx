@@ -79,35 +79,12 @@ const StatisticsPage = () => {
         data.forEach(entry => {
             if (!entry['Date & Time'] || !entry['Grand Total']) return;
 
-            let dateTime = entry['Date & Time'];
-            if (typeof dateTime === 'number') {
-                const dateObj = XLSX.SSF.parse_date_code(dateTime);
-                dateTime = `${dateObj.d}/${dateObj.m}/${dateObj.y} ${dateObj.H}:${dateObj.M}:${dateObj.S}`;
-            }
-
-            if (typeof dateTime !== 'string') {
-                console.warn('Invalid Date & Time format:', dateTime);
-                return;
-            }
-
-            const [date, time] = dateTime.split(' ');
-            if (!date || !time) {
-                console.warn('Invalid Date & Time format:', dateTime);
-                return;
-            }
-
+            const [date, time] = entry['Date & Time'].split(' ');
             const [day, month, year] = date.split('/');
-            if (!day || !month || !year) {
-                console.warn('Invalid Date format:', date);
-                return;
-            }
-
             const amount = parseFloat(entry['Grand Total'] || 0);
-            const paymentMethod = entry['Payment'] || 'Other';
+            const paymentMethod = entry['Payment Method'] || 'Other';
 
-            const formattedDate = `${year}-${month}-${day}`;
-
-            dailySummary[formattedDate] = (dailySummary[formattedDate] || 0) + amount;
+            dailySummary[date] = (dailySummary[date] || 0) + amount;
             monthlySummary[`${year}-${month}`] = (monthlySummary[`${year}-${month}`] || 0) + amount;
             yearlySummary[year] = (yearlySummary[year] || 0) + amount;
             paymentSummary[paymentMethod] = (paymentSummary[paymentMethod] || 0) + amount;
@@ -247,7 +224,12 @@ const StatisticsPage = () => {
                 </div>
             </div>
         </div>
+        
     );
+
+    
 };
+
+
 
 export default StatisticsPage;

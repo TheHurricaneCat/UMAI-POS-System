@@ -310,12 +310,8 @@ html, body {
     background-color: var(--accent-mint-dark);
 }
 
-.nav-button.inventory {
-    background-color: var(--accent-mint);
-}
-
-.nav-button.inventory:hover {
-    background-color: var(--accent-mint-dark);
+.nav-button.inventory { 
+       background-color: var(--accent-mint-dark);
 }
 
 /* Header Section */
@@ -333,8 +329,8 @@ html, body {
     color: #333; /* Darker text color */
     font-size: 24px;
     font-weight: 600;
-}
 
+}
 /* Button Group */
 .button-group {
     display: flex;
@@ -343,7 +339,7 @@ html, body {
 
 /* Generate Report Button */
 .report-buttons .generate-report {
-    background-color: #619a4f; /* Green background */
+    background-color: #4CAF50; /* Green background */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -357,7 +353,7 @@ html, body {
 }
 
 .report-buttons .generate-report:hover {
-    background-color: #493168; /* Darker green on hover */
+    background-color: #45a049; /* Darker green on hover */
 }
 
 /* Remove Print Report Button Styles */
