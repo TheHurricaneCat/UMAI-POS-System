@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import './Login.css';
 
 import person_icon from './account-components/person.png';
@@ -7,6 +7,7 @@ import password_icon from './account-components/password.png';
 import { loginUser, signupUser } from "../firebase";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from './UserContext';
 
 const Login = () => {
     const [action, setAction] = useState("Login");
@@ -18,6 +19,7 @@ const Login = () => {
 
     const db = getFirestore();
     const navigate = useNavigate();
+    const { setUserRole } = useContext(UserContext);
 
     const handleSubmit = async () => {
         try {
@@ -25,6 +27,7 @@ const Login = () => {
                 const user = await loginUser(email, password);
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 const userData = userDoc.data();
+                setUserRole(userData.role); 
                 if (userData.role === "admin") {
                     alert("Admin Login Successful!");
                     navigate('/account');

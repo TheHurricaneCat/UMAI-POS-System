@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
+import { useState, useRef, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './App.css';
 
-import { initProductList, appendEntry } from "./handlers/DataHandler";
-import { products, modifiers } from "./handlers/product.js";
-import useTrayManager from "./handlers/UseTrayManagers.js";
+import { initProductList, appendEntry } from './handlers/DataHandler';
+import { products, modifiers } from './handlers/product.js';
+import useTrayManager from './handlers/UseTrayManagers.js';
 
 import ProductCard from "./pos-components/ProductCard.jsx";
 import CategoryContainer from "./pos-components/CategoryContainer";
@@ -13,8 +16,17 @@ import KeypadContainer from "./pos-components/KeypadContainer.jsx";
 import CategoryMenu from "./pos-components/CategoryMenu.jsx";
 import PopUp from "./global-components/PopUp.jsx";
 import Inventory from "./inventory-components/Inventory.jsx";
+import ProductCard from './pos-components/ProductCard.jsx';
+import CategoryContainer from './pos-components/CategoryContainer';
+import TrayContainer from './pos-components/TrayContainer.jsx';
+import KeypadContainer from './pos-components/KeypadContainer.jsx';
+import CategoryMenu from './pos-components/CategoryMenu.jsx';
+import PopUp from './global-components/PopUp.jsx';
+import Inventory from './inventory-components/Inventory.jsx';
 
 import { startSession, getSessionDetails, endSession, saveExcelFile } from "./handlers/SessionHandler";
+
+
 
 function App() {
   const {
@@ -44,10 +56,12 @@ function App() {
   const [endSessionPopup, setEndSessionPopup] = useState(false);
   const [restoreSessionPopup, setRestoreSessionPopup] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const { userRole } = useContext(UserContext);
 
   const handleStartSession = async () => {
     const result = await startSession(testEmployee);
     if (result) {
+      setStartSessionPopup(true);
       setStartSessionPopup(true);
     } else {
       setRestoreSessionPopup(true);
@@ -58,6 +72,7 @@ function App() {
     await endSession(testEmployee);
     setEndSessionPopup(true);
   };
+
 
   const navigate = useNavigate();
 
@@ -97,68 +112,124 @@ function App() {
         <button className="header-button excel" onClick={() => saveExcelFile()}>
           Save Excel
         </button>
-        <button className="header-button inventory" onClick={() => navigate("/inventory")}>
-          Inventory
-        </button>
-        <button className="header-button statistics" onClick={() => navigate("/statistics")}>
-          Statistics
-        </button>
+        {userRole === "admin" && (
+          <>
+            <button className="header-button inventory" onClick={() => navigate("/inventory")}>
+              Inventory
+            </button>
+            <button className="header-button statistics" onClick={() => navigate("/statistics")}>
+              Statistics
+            </button>
+          </>
+        )}
         <button className="header-button product-viewer" onClick={() => navigate("/productViewer")}>
           Product Viewer
         </button>
       </div>
+      <PopUp
+        text={"A new session has started, welcome " + testEmployee}
+        button1={"Confirm"}
+        button2={"Exit"}
+        trigger={startSessionPopup}
+        setTrigger={setStartSessionPopup}
+        confirm={confirm}
+        setConfirm={setConfirm}
+      />
 
-      {/* Popups */}
-      <PopUp text={`A new session has started, welcome ${testEmployee}`} button1="Confirm" button2="Exit" trigger={startSessionPopup} setTrigger={setStartSessionPopup} confirm={confirm} setConfirm={setConfirm} />
-      <PopUp text="Current session has ended" button1="Confirm" button2="Exit" trigger={endSessionPopup} setTrigger={setEndSessionPopup} confirm={confirm} setConfirm={setConfirm} />
-      <PopUp text={`A session for ${testEmployee} is already active. Session has been restored.`} button1="Confirm" button2="Exit" trigger={restoreSessionPopup} setTrigger={setRestoreSessionPopup} confirm={confirm} setConfirm={setConfirm} />
-
-      {/* POS Interface */}
+      <PopUp
+        text={"Current session has ended"}
+        button1={"Confirm"}
+        button2={"Exit"}
+        trigger={endSessionPopup}
+        setTrigger={setEndSessionPopup}
+        confirm={confirm}
+        setConfirm={setConfirm}
+      />
+      <PopUp
+        text={"A session for " + testEmployee + " is already active. Session has been restored."}
+        button1={"Confirm"}
+        button2={"Exit"}
+        trigger={restoreSessionPopup}
+        setTrigger={setRestoreSessionPopup}
+        confirm={confirm}
+        setConfirm={setConfirm}
+      />
       <div className="posInterface">
         <div className="productInterface">
-          {/* Product Viewer */}
-          <div className="viewer-container">
-            <h2>Products</h2>
-            <CategoryMenu productList={productList} handleScrollToCategory={handleScrollToCategory} />
-            <div className="productViewer">
-              {productList.map((category, index) => (
-                <CategoryContainer key={index} category={category} type="product" addToTray={addToTray} categoryRefs={categoryRefs} index={index} />
-              ))}
-            </div>
+          <CategoryMenu
+            productList={productList}
+            handleScrollToCategory={handleScrollToCategory}
+          />
+          <div className="productViewer">
+            {productList.map((category, index) => (
+              <CategoryContainer
+                category={category}
+                type="product"
+                addToTray={addToTray}
+                categoryRefs={categoryRefs}
+                index={index}
+              />
+            ))}
           </div>
-
-          {/* Modifier Viewer */}
-          <div className="viewer-container">
-            <h2>Modifiers</h2>
-            <CategoryMenu productList={modifierList} handleScrollToCategory={handleScrollToCategory} />
-            <div className="modifierViewer">
-              {modifierList.map((category, index) => (
-                <CategoryContainer key={index} category={category} type="modifier" addModifier={addModifier} categoryRefs={categoryRefs} index={index} currentProduct={currentProduct} />
-              ))}
-            </div>
+          <CategoryMenu
+            productList={modifierList}
+            handleScrollToCategory={handleScrollToCategory}
+          />
+          <div className="modifierViewer">
+            {modifierList.map((category, index) => (
+              <CategoryContainer
+                category={category}
+                type="modifier"
+                addModifier={addModifier}
+                categoryRefs={categoryRefs}
+                index={index}
+                currentProduct={currentProduct}
+              />
+            ))}
           </div>
         </div>
 
         {/* Tray Interface */}
         <div className="trayInterface">
           <div className="trayHeader">
-            <h4>Qty</h4>
-            <h4>Img</h4>
-            <h4>Item Name</h4>
-            <h4>Total Price</h4>
+            <h4> Qty </h4>
+            <h4> Img </h4>
+            <h4> Item Name </h4>
+            <h4> Total Price </h4>
           </div>
           <div className="trayViewer">
-            {tray.map((content, index) => (
-              <TrayContainer key={index} content={content} handleProductIncrement={handleProductIncrement} handleProductDecrement={handleProductDecrement} handleProductDeletion={handleProductDeletion} handleModifierIncrement={handleModifierIncrement} handleModifierDecrement={handleModifierDecrement} handleModifierDeletion={handleModifierDeletion} setCurrentTray={setCurrentTray} setCurrentProduct={setCurrentProduct} currentProduct={currentProduct} currentTray={currentTray} saveCustomerToTray={saveCustomerToTray} />
+            {tray.map((content) => (
+              <TrayContainer
+                content={content}
+                handleProductIncrement={handleProductIncrement}
+                handleProductDecrement={handleProductDecrement}
+                handleProductDeletion={handleProductDeletion}
+                handleModifierIncrement={handleModifierIncrement}
+                handleModifierDecrement={handleModifierDecrement}
+                handleModifierDeletion={handleModifierDeletion}
+                setCurrentTray={setCurrentTray}
+                setCurrentProduct={setCurrentProduct}
+                currentProduct={currentProduct}
+                currentTray={currentTray}
+                saveCustomerToTray={saveCustomerToTray}
+              />
             ))}
           </div>
           <div className="keypadViewer">
-            <KeypadContainer addNewTray={addNewTray} currentTotal={currentTotal} appendEntry={handleSaveOrder} tray={tray} clearTray={clearTray} clearCurrentTray={clearCurrentTray} currentTray={currentTray} />
+            <KeypadContainer
+              addNewTray={addNewTray}
+              currentTotal={currentTotal}
+              appendEntry={handleSaveOrder}
+              tray={tray}
+              clearTray={clearTray}
+              clearCurrentTray={clearCurrentTray}
+              currentTray={currentTray}
+            />
           </div>
         </div>
       </div>
     </div>
   );
-}
+  }
 
 export default App;
