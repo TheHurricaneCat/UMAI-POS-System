@@ -7,6 +7,7 @@ import Login from './Login.jsx'
 import Statistics from './statistics.jsx'
 import Inventory from './inventory-components/Inventory.jsx'
 import AccountPage from './AccountPage.jsx'
+import ProductViewer from './productViewer-components/productViewer.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
          <Route path="/App" element={<App />} />
          <Route path="/statistics" element={<Statistics />} />
          <Route path="/inventory" element={<Inventory />} />
+         <Route path="/productViewer" element={<ProductViewer />} />
        </Routes>
      </HashRouter>
    </StrictMode>,
