@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
-import {firebaseApp} from "/firebase.js";
-import * as XLSX from 'xlsx';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import './statistics.css';
-
-import { getSessionDetails, downloadExcelFile } from './handlers/SessionHandler';
+import * as XLSX from 'xlsx';
 
 const COLORS = ['#3498db', '#f1c40f', '#8e44ad'];
 
 const StatisticsPage = () => {
-    const [inventoryData, setInventoryData] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [dailySales, setDailySales] = useState([]);
     const [monthlySales, setMonthlySales] = useState([]);
     const [yearlySales, setYearlySales] = useState([]);
+    const [inventoryData, setInventoryData] = useState([]);
     const [paymentData, setPaymentData] = useState([]);
-    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -25,63 +21,43 @@ const StatisticsPage = () => {
 
     const fetchExcelData = async () => {
         setLoading(true);
-
         try {
-            /* const sessionDetails = await getSessionDetails();
-            if (!sessionDetails || !sessionDetails.token) {
-                console.error("No active session or token found.");
-                setLoading(false);
-                return;
+            // Fetch the Excel file from the correct path
+            const response = await fetch('SAMPLEDATA.xlsx');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const arrayBuffer = await response.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+            // Check if the sheets exist
+            if (!workbook.Sheets['Inventory'] || !workbook.Sheets['Cashier']) {
+                throw new Error('Required sheets not found in the Excel file');
             }
 
-            // Get file data from local storage
-            const base64Data = localStorage.getItem(sessionDetails.token);
-            if (!base64Data) {
-                console.log("No Excel file found in local storage, downloading from Firebase...");
-                 // Download and store it locally
-                console.log("Excel file downloaded and saved to local storage");
-            } */
+            const inventorySheet = XLSX.utils.sheet_to_json(workbook.Sheets['Inventory']);
+            const cashierSheet = XLSX.utils.sheet_to_json(workbook.Sheets['Cashier']);
 
-            await downloadExcelFile("SAMPLEDATA");
-
-            // Read file from local storage
-            const storedFile = localStorage.getItem("SAMPLEDATA.xlsx");
-            if (storedFile) {
-                const byteCharacters = atob(storedFile.split(',')[1]);
-                const byteNumbers = new Array(byteCharacters.length).fill(0).map((_, i) => byteCharacters.charCodeAt(i));
-                const byteArray = new Uint8Array(byteNumbers);
-
-                const workbook = XLSX.read(byteArray, { type: 'array' });
-
-                console.log("Workbook sheets:", workbook.SheetNames);
-
-                const inventorySheet = workbook.Sheets['INVENTORY']
-                    ? XLSX.utils.sheet_to_json(workbook.Sheets['INVENTORY'])
-                    : [];
-
-                const cashierSheet = workbook.Sheets['CASHIER']
-                    ? XLSX.utils.sheet_to_json(workbook.Sheets['CASHIER'])
-                    : [];
-
-                processInventoryData(inventorySheet);
-                processSalesData(cashierSheet);
-            }
+            processInventoryData(inventorySheet);
+            processSalesData(cashierSheet);
         } catch (error) {
             console.error('Error fetching Excel data:', error);
         }
-
         setLoading(false);
     };
 
     const processInventoryData = (data) => {
+        console.log("Raw inventory data:", data); // Debugging log
         const formattedData = data.map(item => ({
             item: item['Item Name'],
             stock: item['Quantity'] || 0
         }));
+        console.log("Processed inventory data:", formattedData); // Debugging log
         setInventoryData(formattedData);
     };
 
     const processSalesData = (data) => {
+        console.log("Raw sales data:", data); // Debugging log
         const dailySummary = {};
         const monthlySummary = {};
         const yearlySummary = {};
@@ -101,6 +77,11 @@ const StatisticsPage = () => {
             paymentSummary[paymentMethod] = (paymentSummary[paymentMethod] || 0) + amount;
         });
 
+        console.log("Processed daily sales:", dailySummary); // Debugging log
+        console.log("Processed monthly sales:", monthlySummary); // Debugging log
+        console.log("Processed yearly sales:", yearlySummary); // Debugging log
+        console.log("Processed payment data:", paymentSummary); // Debugging log
+
         setDailySales(Object.keys(dailySummary).map(date => ({ date, amount: dailySummary[date] })));
         setMonthlySales(Object.keys(monthlySummary).map(date => ({ date, amount: monthlySummary[date] })));
         setYearlySales(Object.keys(yearlySummary).map(date => ({ date, amount: yearlySummary[date] })));
@@ -109,20 +90,41 @@ const StatisticsPage = () => {
 
     return (
         <div className="statistics-container">
-          <div className="statistics-header">
-            <h1>Statistics</h1>
-            <div className="button-group">
-                <button onClick={() => navigate('/')} className="nav-button pos">POS</button>
-                <button onClick={() => navigate('/inventory')} className="nav-button inventory">Inventory</button>
+            <div className="statistics-header">
+                <h1>Statistics</h1>
+                <div className="button-group">
+                    <button onClick={() => navigate('/')} className="nav-button pos">POS</button>
+                    <button onClick={() => navigate('/inventory')} className="nav-button inventory">Inventory</button>
+                </div>
             </div>
-          </div>
-            <h1 className="title">Sales & Inventory Statistics</h1>
-            <button onClick={fetchExcelData}>Refresh Data</button>
-            {loading ? (
-                <p>Loading...</p>
-            ) : (
-                <>
-                    {/* Daily Sales */}
+
+            <div className="statistics-content">
+                {/* First Column: Buttons */}
+                <div className="statistics-buttons">
+                    <div className="report-buttons">
+                        <h2>Daily Sales Report</h2>
+                        <button className="generate-report">Generate Report</button>
+                        <button className="print-report">Print Report</button>
+                    </div>
+                    <div className="report-buttons">
+                        <h2>Monthly Sales Report</h2>
+                        <button className="generate-report">Generate Report</button>
+                        <button className="print-report">Print Report</button>
+                    </div>
+                    <div className="report-buttons">
+                        <h2>Yearly Sales Report</h2>
+                        <button className="generate-report">Generate Report</button>
+                        <button className="print-report">Print Report</button>
+                    </div>
+                    <div className="report-buttons">
+                        <h2>Quarterly Sales Report</h2>
+                        <button className="generate-report">Generate Report</button>
+                        <button className="print-report">Print Report</button>
+                    </div>
+                </div>
+
+                {/* Second Column: Graphs */}
+                <div className="statistics-graphs">
                     <div className="chart-box">
                         <h2>Sales per Day</h2>
                         <ResponsiveContainer width="100%" height={300}>
@@ -137,7 +139,6 @@ const StatisticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Monthly Sales */}
                     <div className="chart-box">
                         <h2>Sales per Month</h2>
                         <ResponsiveContainer width="100%" height={300}>
@@ -152,7 +153,6 @@ const StatisticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Yearly Sales */}
                     <div className="chart-box">
                         <h2>Sales per Year</h2>
                         <ResponsiveContainer width="100%" height={300}>
@@ -167,7 +167,6 @@ const StatisticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Inventory */}
                     <div className="chart-box">
                         <h2>Inventory Status</h2>
                         <ResponsiveContainer width="100%" height={300}>
@@ -182,7 +181,6 @@ const StatisticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Payment Methods */}
                     <div className="chart-box">
                         <h2>Payment Modes</h2>
                         <ResponsiveContainer width="100%" height={300}>
@@ -204,8 +202,14 @@ const StatisticsPage = () => {
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
-                </>
-            )}
+                </div>
+
+                {/* Third Column: Reports */}
+                <div className="statistics-reports">
+                    <h2>Reports</h2>
+                    <p>No reports available yet.</p>
+                </div>
+            </div>
         </div>
     );
 };
