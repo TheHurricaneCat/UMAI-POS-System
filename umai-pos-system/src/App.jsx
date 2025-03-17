@@ -1,9 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "./App.css";
-import { useState, useRef, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './App.css';
 
 import { initProductList, appendEntry } from './handlers/DataHandler';
 import { products, modifiers } from './handlers/product.js';
@@ -16,17 +13,9 @@ import KeypadContainer from "./pos-components/KeypadContainer.jsx";
 import CategoryMenu from "./pos-components/CategoryMenu.jsx";
 import PopUp from "./global-components/PopUp.jsx";
 import Inventory from "./inventory-components/Inventory.jsx";
-import ProductCard from './pos-components/ProductCard.jsx';
-import CategoryContainer from './pos-components/CategoryContainer';
-import TrayContainer from './pos-components/TrayContainer.jsx';
-import KeypadContainer from './pos-components/KeypadContainer.jsx';
-import CategoryMenu from './pos-components/CategoryMenu.jsx';
-import PopUp from './global-components/PopUp.jsx';
-import Inventory from './inventory-components/Inventory.jsx';
 
 import { startSession, getSessionDetails, endSession, saveExcelFile } from "./handlers/SessionHandler";
-
-
+import { UserContext } from './UserContext'; // Import UserContext
 
 function App() {
   const {
@@ -56,12 +45,11 @@ function App() {
   const [endSessionPopup, setEndSessionPopup] = useState(false);
   const [restoreSessionPopup, setRestoreSessionPopup] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const { userRole } = useContext(UserContext);
+  const { userRole } = useContext(UserContext); // Use UserContext
 
   const handleStartSession = async () => {
     const result = await startSession(testEmployee);
     if (result) {
-      setStartSessionPopup(true);
       setStartSessionPopup(true);
     } else {
       setRestoreSessionPopup(true);
@@ -72,7 +60,6 @@ function App() {
     await endSession(testEmployee);
     setEndSessionPopup(true);
   };
-
 
   const navigate = useNavigate();
 
@@ -95,13 +82,9 @@ function App() {
 
   return (
     <div className="primaryInterface">
-      <div className="logo-container">
-        <div className="logo1"></div>
-        <div className="logo2"></div>
-        <div className="logo3"></div>
-      </div>
-
-      {/* Header Buttons */}
+      <div className="logo1"> </div>
+      <div className="logo2"> </div>
+      <div className="logo3"> </div>
       <div className="headerButtons">
         <button className="header-button session-start" onClick={handleStartSession}>
           Start Session
@@ -114,10 +97,10 @@ function App() {
         </button>
         {userRole === "admin" && (
           <>
-            <button className="header-button inventory" onClick={() => navigate("/inventory")}>
+            <button className="header-button inventory" onClick={() => navigate('/inventory')}>
               Inventory
             </button>
-            <button className="header-button statistics" onClick={() => navigate("/statistics")}>
+            <button className="header-button statistics" onClick={() => navigate('/statistics')}>
               Statistics
             </button>
             <button className="header-button account" onClick={() => navigate('/account')}>
@@ -125,9 +108,6 @@ function App() {
             </button>
           </>
         )}
-        <button className="header-button product-viewer" onClick={() => navigate("/productViewer")}>
-          Product Viewer
-        </button>
       </div>
       <PopUp
         text={"A new session has started, welcome " + testEmployee}
@@ -191,8 +171,6 @@ function App() {
             ))}
           </div>
         </div>
-
-        {/* Tray Interface */}
         <div className="trayInterface">
           <div className="trayHeader">
             <h4> Qty </h4>
@@ -233,6 +211,6 @@ function App() {
       </div>
     </div>
   );
-  }
+}
 
 export default App;

@@ -103,7 +103,7 @@ const StatisticsPage = () => {
             }
 
             const amount = parseFloat(entry['Grand Total'] || 0);
-            const paymentMethod = entry['Payment'] || 'Other';
+            const paymentMethod = entry['Payment Method'] || 'Other';
 
             const formattedDate = `${year}-${month}-${day}`;
 
