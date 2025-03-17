@@ -1,11 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './ProductCard.module.css';
 import defaultImage from '../assets/0.png';
 import { firestore } from '/firebase.js';
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import { getSessionDetails } from '../handlers/SessionHandler';
 
 function ProductCard({productClass, type, addToTray}) {
+    const [imageUrl, setImageUrl] = useState(defaultImage);
+
+    useEffect(() => {
+        const fetchImage = async () => {
+            const storage = getStorage();
+            const imageRef = ref(storage, `${productClass.name}.png`);
+            try {
+                const url = await getDownloadURL(imageRef);
+                setImageUrl(url);
+            } catch (error) {
+                console.error("Error fetching image:", error);
+                setImageUrl(defaultImage);
+            }
+        };
+
+        fetchImage();
+    }, [productClass.code]);
+  
     const [isUpdating, setIsUpdating] = useState(false);
 
     const updateProductStock = async (productName) => {
@@ -75,7 +94,7 @@ function ProductCard({productClass, type, addToTray}) {
             <div className={styles.category}> </div>
             <div className={styles.detailsContainer}>
                 <div className={styles.imageContainer}>
-                    <img src={defaultImage} alt="Product Image" />
+                    <img src={imageUrl} alt="Product Image" />
                 </div>
                 <p> {productClass.name} </p>
             </div>

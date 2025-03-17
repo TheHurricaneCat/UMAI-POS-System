@@ -76,17 +76,16 @@ html, body {
 /* Header Section */
 .statistics-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Space between the title and buttons */
     align-items: center;
+    gap: 10px;
     padding: 15px;
-    background: linear-gradient(135deg, var(--beige-700) 0%, var(--beige-800) 100%);
-    color: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(67, 48, 43, 0.15);
+    background-color: #43302b; /* Brown background */
+    border-bottom: 1px solid #ddd; /* Subtle border */
 }
 
 .statistics-header h1 {
-    color: white;
+    color: white; /* Change text color to white */
     font-size: 24px;
     font-weight: 600;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -94,7 +93,8 @@ html, body {
 
 .button-group {
     display: flex;
-    gap: 15px;
+    gap: 10px;
+    margin-left: auto; /* Push the buttons to the right-most side */
 }
 
 /* Navigation Buttons */
@@ -128,11 +128,11 @@ html, body {
 }
 
 .nav-button.pos {
-    background-color: var(--accent-mint);
+    background-color: #FFA500; /* Orange */
 }
 
 .nav-button.pos:hover {
-    background-color: var(--accent-mint-dark);
+    background-color: #FF8C00; /* Darker Orange */
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(134, 239, 172, 0.3);
 }
@@ -303,38 +303,43 @@ html, body {
 }
 
 .nav-button.pos {
-    background-color: var(--accent-mint);
+    background-color: #FFA500; /* Orange */
 }
 
 .nav-button.pos:hover {
-    background-color: var(--accent-mint-dark);
+    background-color: #FF8C00; /* Darker Orange */
 }
 
 .nav-button.inventory { 
-       background-color: var(--accent-mint-dark);
+    background-color: #1E90FF; /* Blue */
+}
+
+.nav-button.inventory:hover {
+    background-color: #1C86EE; /* Darker Blue */
 }
 
 /* Header Section */
 .statistics-header {
     display: flex;
-    justify-content: center; /* Center align the header buttons */
+    justify-content: space-between; /* Space between the title and buttons */
     align-items: center;
     gap: 10px;
     padding: 15px;
-    background-color: #f5f5f5; /* Light gray background */
+    background-color: #846358; /* Brown background */
     border-bottom: 1px solid #ddd; /* Subtle border */
 }
 
 .statistics-header h1 {
-    color: #333; /* Darker text color */
+    color: white; /* Change text color to white */
     font-size: 24px;
     font-weight: 600;
-
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 /* Button Group */
 .button-group {
     display: flex;
     gap: 10px;
+    margin-left: auto; /* Push the buttons to the right-most side */
 }
 
 /* Generate Report Button */
