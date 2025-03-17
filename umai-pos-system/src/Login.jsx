@@ -8,6 +8,7 @@ import { loginUser, signupUser } from "../firebase";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from './UserContext';
+import { startSession } from './handlers/SessionHandler';
 
 const Login = () => {
     const [action, setAction] = useState("Login");
@@ -35,6 +36,7 @@ const Login = () => {
                     alert("Employee Login Successful!");
                     navigate('/app');
                 }
+                await startSession(email);
                 setEmail("");
                 setPassword("");
                 setName("");
