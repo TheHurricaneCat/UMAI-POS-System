@@ -1,0 +1,298 @@
+.primaryContainer {
+    position: relative;
+}
+
+.primaryNonFocused {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.4),
+        rgba(0, 0, 0, 0.4) 10px,
+        rgba(0, 0, 0, 0.3) 10px,
+        rgba(0, 0, 0, 0.3) 20px
+    );
+    animation: fade 0.2s ease-in-out;
+}
+
+
+.trayHeader, 
+.trayContainer {
+    position: relative; 
+}
+
+/* .trayHeader, .trayContainer {
+    position: relative;
+} */
+
+.trayHeader {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    border-bottom: 0px;
+    border-top: 0;
+    background-color: #f5f5f5;
+    padding: 2vh 3vh;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.trayHeader:hover {
+    background-color: #f0f0f0;
+}
+
+.trayHeader h2 {
+    font-size: 1.4vw;
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+}
+
+.indicator {
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    height: clamp(10px, 1vw, 16px);
+    width: clamp(10px, 1vw, 16px);
+    margin-left: 12px;
+    border: 2px solid #aaa;
+    background-color: transparent;
+}
+
+.selected .indicator {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+
+.trayContainer {
+    display: grid;
+    max-width: 100%;
+    column-gap: 1vh;
+    row-gap: 0.2em;
+    padding: 2px;
+    background-color: #f5f5f5;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+}
+
+.trayContainer:empty {
+    padding: 0px;
+}
+
+.trayContainer:empty .primaryNonFocused {
+    padding: 0px;
+}
+
+/* Customer section styling */
+.customerSection {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;
+    flex: 1;
+}
+
+.customerInfo {
+    display: flex;
+    align-items: center;
+    background-color: #f0f8ff;
+    border-radius: 20px;
+    padding: 0.95vh 1.2vh;
+    /* padding: 5px 10px; */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.customerInfo span {
+    font-size: 2vh;
+    color: #333;
+    margin-right: 0.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: clamp(80px, 30vw, 150px);
+}
+
+.addCustomerBtn,
+.editCustomerBtn {
+    background-color: #5c6bc0;
+    color: white;
+    border: none;
+    border-radius: 18px;
+    padding: 1vh 2vh;
+    font-size: 1.5vh;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    white-space: nowrap;
+}
+
+.addCustomerBtn {
+    background-color: #5c6bc0;
+}
+
+.editCustomerBtn {
+    background-color: #78909c;
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.addCustomerBtn:hover,
+.editCustomerBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 5px rgba(0,0,0,0.15);
+}
+
+.addCustomerBtn:hover {
+    background-color: #3f51b5;
+}
+
+.editCustomerBtn:hover {
+    background-color: #607d8b;
+}
+
+.addCustomerBtn:active,
+.editCustomerBtn:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Modal styling */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+.modalContent {
+    background: #ffffff;
+    width: clamp(280px, 85vw, 400px);
+    max-width: 90%;
+    padding: clamp(16px, 0.1px, 24px);
+    border-radius: clamp(6px, 1.5vw, 12px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modalContent h3 {
+    margin-top: 0;
+    font-size: clamp(16px, 0.1vw, 18px);
+    color: #333;
+    text-align: center;
+    margin-bottom: clamp(15px, 3vh, 20px);
+    font-weight: 600;
+}
+
+.formGroup {
+    margin-bottom: clamp(12px, 2vh, 16px);
+}
+
+.formGroup label {
+    display: block;
+    font-size: clamp(12px, 0.5vw, 14px);
+    font-weight: 500;
+    color: #555;
+    margin-bottom: clamp(4px, 1vh, 6px);
+}
+
+.formGroup input,
+.formGroup select {
+    width: 100%;
+    padding: clamp(8px, 1vh, 10px);
+    border: 1px solid #ddd;
+    border-radius: clamp(4px, 1vw, 6px);
+    font-size: clamp(12px, 3vw, 14px);
+    transition: border 0.2s ease;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+    outline: none;
+    border-color: #5c6bc0;
+    box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+    background-color: #fff;
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: clamp(16px, 3vh, 24px);
+}
+
+.saveButton {
+    background-color: #5c6bc0;
+    color: white;
+    padding: clamp(8px, 1vw, 10px) clamp(12px, 3vw, 16px);
+    border: none;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    font-size: clamp(12px, 3vw, 14px);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    margin-right: clamp(5px, 2vw, 10px);
+    min-width: clamp(80px, 20vw, 120px);
+}
+
+.cancelButton {
+    background-color: #f5f5f5;
+    color: #333;
+    padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px);
+    border: 1px solid #ddd;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    font-size: clamp(12px, 3vw, 14px);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    margin-left: clamp(5px, 2vw, 10px);
+    min-width: clamp(80px, 20vw, 120px);
+}
+
+.saveButton:hover {
+    background-color: #3f51b5;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.cancelButton:hover {
+    background-color: #e0e0e0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

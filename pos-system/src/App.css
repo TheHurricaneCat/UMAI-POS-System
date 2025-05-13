@@ -1,0 +1,334 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  /* 0.9 */
+  /* transform: scale(0.9); 
+  transform-origin: top left;
+  width: 111.11%; */
+  /* background-color: #3a3344;
+
+  /* color-scheme: dark; */
+  /* color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
+  /* overflow: hidden; */
+  /* overflow: hidden; */
+  height: 100%;
+  padding: 0;
+  /* border: 2px solid rgb(54, 173, 117); */
+}
+
+.primaryInterface {
+  /* display: grid;
+  grid-template-columns: 60% 40%; */
+  /* padding: 10px; */
+  /* border: 2px solid rgb(250, 1, 250); */
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.navigationViewer {
+  padding: 15px;
+  /* border: 2px solid rgb(255, 238, 0); */
+  background-image: linear-gradient(#3a3344, #423951);
+  z-index: 9999;
+}
+
+.popUpInterface {
+  z-index: 9999;
+}
+
+
+.posInterface {
+ /*  border: 2px solid blue; */
+  display: grid;
+  grid-template-columns: 60% 40%;
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.productListInterface {
+  /* display: grid;
+  grid-template-rows: 10% 40% 10% 40%; */
+  
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+.productCategoryInterface { 
+  display: grid;
+  grid-template-columns: 25% 75%;
+  /* height: calc(54vh - 20px); */
+  overflow: hidden;
+  flex: 2;
+}
+
+.modifierCategoryInterface { 
+  display: grid;
+  grid-template-columns: 25% 75%;
+  /* height: calc(29vh - 20px); */
+  overflow: hidden;
+  flex: 1;
+}
+
+.categoryViewer { 
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  /* z-index: 0; */ /* Removed z-index */
+}
+
+.productViewer, .modifierViewer {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 0px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-width: 100%;
+  height: 100%;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid rgb(177, 177, 177);
+  background-color: rgba(232, 232, 232, 0.762);
+  
+  box-shadow: 6px 5px 5px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  /* z-index: 1; */ /* Removed z-index */
+}
+
+.productViewer::after, .modifierViewer::after {
+  content: "";
+  display: block;
+  height: 10px;
+  flex-shrink: 0; 
+}
+
+.trayInterface {
+  /* z-index: 0; */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+  /* padding-left: 3px; */
+  /* border: 2px solid green; */
+  /* border: 2px solid #000000; */
+}
+
+.trayHeader {
+  display: grid;
+  grid-template-columns: 11% 12% 40% 20%;
+  /* border: 1px solid rgb(255, 0, 0); */
+  border-bottom: 0px;
+  background-color: #3a3344;   
+  border-left: 1px solid #585858;
+  padding-left: 15px;
+  /* margin-top: 5px; */
+  height: min(67px, 10vh);
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.trayHeader * {
+/*   margin-left: 5px;
+  margin-right: 5px;
+  border-right: 1px solid rgb(169, 169, 169);
+  border-left: 1px solid rgb(169, 169, 169); */
+  color: white;
+  font-size: 1.25vw;
+}
+
+
+.trayViewer {
+  transition: all 0.4s;
+  display: flex;
+  flex-direction: column;
+  flex: 3.5;
+  overflow: scroll;
+  overflow-x: hidden;
+  background-color: rgb(212, 212, 212); 
+  margin-right: -5px;
+}
+
+.productViewer::-webkit-scrollbar, .modifierViewer::-webkit-scrollbar, .trayViewer::-webkit-scrollbar {
+  width: 5px;
+  height: 6px;
+}
+
+.productViewer::-webkit-scrollbar-thumb, .modifierViewer::-webkit-scrollbar-thumb, .trayViewer::-webkit-scrollbar-thumb {
+  background: rgb(113, 113, 113); /* Color of scrollbar */
+  border-radius: 5px; /* Rounded edges */
+}
+
+.keypadViewer {
+  display: flex;
+  /* padding: 10px; */  
+  flex: 2;
+  overflow: hidden;
+  background-color: rgb(212, 212, 212); 
+  /* border: 2px solid rgb(255, 251, 0); */
+  justify-content: center;
+}
+
+.statistics-button {
+  background-color: #2196F3;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.statistics-button:hover {
+  background-color: #1976D2;
+}
+
+/* .headerButtons {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+}
+
+.headerButtons {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+} */
+
+.header-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 1vw;
+  font-weight: 600;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.session-start {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.session-start:hover {
+  background-color: #45a049;
+}
+
+.session-end {
+  background-color: #f44336;
+  color: white;
+}
+
+.session-end:hover {
+  background-color: #d32f2f;
+}
+
+.excel {
+  background-color: #FF9800;
+  color: white;
+}
+
+.excel:hover {
+  background-color: #F57C00;
+}
+
+.inventory {
+  background-color: #2196F3;
+  color: white;
+}
+
+.inventory:hover {
+  background-color: #1976D2;
+}
+
+.statistics {
+  background-color: #9C27B0;
+  color: white;
+}
+
+.statistics:hover {
+  background-color: #7B1FA2;
+}
+
+/* Orientation Enforcer */
+.orientation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #423951;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.5s ease forwards;
+  color: white;
+  text-align: center;
+  backdrop-filter: blur(5px);
+}
+
+.orientation-message {
+  font-size: clamp(16px, 5vw, 24px);
+  font-weight: 500;
+  margin-bottom: 2rem;
+  max-width: 80%;
+}
+
+.rotate-icon {
+  width: clamp(60px, 20vw, 120px);
+  height: clamp(60px, 20vw, 120px);
+  animation: rotateDevice 2s infinite ease-in-out;
+}
+
+@keyframes rotateDevice {
+  0% {
+    transform: rotate(-90deg);
+  }
+  20% {
+    transform: rotate(0deg);
+  }
+  80% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  .orientation-overlay {
+    display: none;
+  }
+}

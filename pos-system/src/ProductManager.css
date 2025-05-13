@@ -1,0 +1,407 @@
+.primaryContainer {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.tableContainer {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 10px;
+}
+
+.account-page h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.redirect-btn, .logout-btn, .add-btn {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
+
+.refresh-btn {
+    background-color: #ce7be7;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+    margin-right: 10px;
+}
+
+.redirect-btn:hover, .logout-btn:hover {
+    background-color: #1976D2;
+}
+
+.productTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+
+.productTable th, .productTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.productTable th {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+.productTable tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.productTable tr:hover {
+    background-color: #ddd;
+}
+
+.download-btn {
+    padding: 5px 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.download-btn:hover {
+    background-color: #218838;
+}
+
+.error-message {
+    color: red;
+    font-size: 16px;
+}
+
+/* Form Modal Styles */
+.form-modal {
+    position: fixed;
+    display: flex;
+    top: 0;
+    left: 0;
+    /* transform: translate(-50%, -50%); */
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 100%;
+    height: 100vh;
+    max-width: 500px;
+    z-index: 1000;
+    padding: 20px;
+    overflow-y: auto;
+    backdrop-filter: blur(3px);
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.form-group input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 100%;
+}
+
+.form-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.form-actions button[type="button"] {
+    background-color: #f44336;
+    color: white;
+}
+
+.form-actions button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.upload-progress {
+    margin-top: 5px;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+.upload-progress span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-size: 12px;
+}
+
+/* Table container styles */
+.tableContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+}
+
+/* Empty state styles */
+.empty-state {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    text-align: center;
+    width: 100%;
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #666;
+    width: 100%;
+}
+
+/* Modal styling */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+.modalContent {
+    background: #ffffff;
+    width: clamp(280px, 85vw, 400px);
+    max-width: 90%;
+    padding: clamp(16px, 0.1px, 24px);
+    border-radius: clamp(6px, 1.5vw, 12px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+    min-height: fit-content;
+}
+
+.modalContent h3 {
+    margin-top: 0;
+    font-size: clamp(16px, 0.5vw, 18px);
+    color: #333;
+    text-align: center;
+    margin-bottom: 0.1vh;
+    font-weight: 600;
+}
+
+.formGroup {
+    margin-bottom: 0.1vh;
+}
+
+.formGroup label {
+    display: block;
+    font-size: clamp(12px, 0.1vw, 14px);
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 0.1vh;
+}
+
+.formGroup input,
+.formGroup select {
+    width: 100%;
+    padding: 1.5vh;
+    border: 1px solid #ddd;
+    border-radius: clamp(4px, 1vw, 6px);
+    font-size: clamp(12px, 3vw, 14px);
+    transition: border 0.2s ease;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+    outline: none;
+    border-color: #5c6bc0;
+    box-shadow: 0 0 0 2px rgba(92, 107, 192, 0.2);
+    background-color: #fff;
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: clamp(16px, 3vh, 24px);
+}
+
+.saveButton {
+    background-color: #5c6bc0;
+    color: white;
+    padding: clamp(8px, 1vw, 10px) clamp(12px, 3vw, 16px);
+    border: none;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    font-size: clamp(12px, 3vw, 14px);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    margin-right: clamp(5px, 2vw, 10px);
+    min-width: clamp(80px, 20vw, 120px);
+}
+
+.deleteButton {
+    background-color: #f44336;
+    color: #333;
+    padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px);
+    border: 1px solid #ddd;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    font-size: clamp(12px, 3vw, 14px);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    margin-left: clamp(5px, 2vw, 10px);
+    min-width: clamp(80px, 20vw, 120px);
+}
+
+.spacer {
+    padding-top: 18vh;
+}
+
+.cancelButton {
+    background-color: #f5f5f5;
+    color: #333;
+    padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 16px);
+    border: 1px solid #ddd;
+    border-radius: clamp(4px, 1vw, 6px);
+    cursor: pointer;
+    font-size: clamp(12px, 3vw, 14px);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+    margin-left: clamp(5px, 2vw, 10px);
+    min-width: clamp(80px, 20vw, 120px);
+}
+
+.saveButton:hover {
+    background-color: #3f51b5;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.cancelButton:hover {
+    background-color: #e0e0e0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.edit-btn {
+    background-color: #616161;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+.deleteConfirm {
+    text-align: center;
+}
+
+.warning {
+    color: #f44336;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.deleteButton {
+    background-color: #f44336;
+    color: white;
+}
+
+.deleteButton:hover {
+    background-color: #d32f2f;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

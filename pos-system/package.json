@@ -1,0 +1,102 @@
+{
+  "name": "pos-system",
+  "private": true,
+  "version": "0.0.1",
+  "description": "A POS system built with Electron and React.",
+  "author": "Josefe Johnatan M. Gillego",
+  "main": "main.js",
+  "homepage": "./",
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:win": "vite build && electron-builder --win",
+    "build:cordova": "vite build --outDir www --base ./",
+    "prepare:android": "npm run build:cordova && cordova prepare android",
+    "build:android": "npm run build:cordova && cordova build android",
+    "run:android": "npm run build:cordova && cordova run android",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "start": "react-scripts start",
+    "electron": "electron .",
+    "dist": "electron-builder",
+    "start-electron": "npm run build && electron .",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"npm run dev\" \"electron .\"",
+    "electron:build": "npm run build && electron .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf dist release-builds"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.3",
+    "base64-arraybuffer": "^1.0.2",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "pos-system": "file:",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.4.0",
+    "uuidv4": "^6.2.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "cordova-android": "^14.0.0",
+    "cordova-plugin-device": "^3.0.0",
+    "cordova-plugin-file": "^8.1.3",
+    "cordova-plugin-network-information": "^3.0.0",
+    "cordova-plugin-screen-orientation": "^3.0.4",
+    "cross-env": "^7.0.3",
+    "electron": "34.2.0",
+    "electron-builder": "^25.1.8",
+    "es6-promise-plugin": "^4.2.2",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "vite": "^6.2.0"
+  },
+  "build": {
+    "appId": "com.jocre.possystem",
+    "productName": "JOCRE POS SYSTEM",
+    "copyright": "Copyright © 2025 Josefe Johnatan M. Gillego",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "POS System",
+      "uninstallDisplayName": "POS System",
+      "deleteAppDataOnUninstall": true
+    }
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-device": {},
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      },
+      "cordova-plugin-network-information": {},
+      "cordova-plugin-screen-orientation": {}
+    }
+  }
+}

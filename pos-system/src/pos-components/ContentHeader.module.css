@@ -1,0 +1,41 @@
+.productHeaderViewer {
+    display: grid;
+    grid-template-columns: 25% 75%;
+    background-color: #3a3344;   
+    color: white;
+    position: relative;
+    height: min(67px, 10vh);
+    align-items: center;
+  }
+  
+  .titleBackground {
+    position: absolute;
+    display: grid;
+    grid-template-columns: 25% 75%; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* z-index: 1;  */
+    align-items: center;
+    overflow: hidden;
+  } 
+  
+  .titleBackground h1 {
+    font-size: 5.1vw;
+    opacity: 0.1;
+    color: rgb(255, 255, 255);
+    white-space: nowrap;
+    margin: 0;
+    margin-top: -15px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .productHeaderViewer h3 {
+    position: relative;
+    /* z-index: 2;  */
+    margin: 0;
+    /* padding: 1.7vw 0; */ 
+    text-align: center;
+  }

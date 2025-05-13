@@ -1,0 +1,146 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 5vh;
+    width: 120vh;
+    background: #fff;
+    padding-bottom: 5vh;
+    border-radius: clamp(8px, 2vw, 16px);
+    /* box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+.header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    margin-top: 5vh;
+}
+
+.text{
+    color: black;
+    font-size: 5vh;
+    font-weight: 700;
+}
+
+.underline{
+    width: 15vh;
+    height: 1vh;
+    background: #000000;
+    border-radius: 9px;
+}
+
+.inputs{
+    margin-top: 5vh;
+    display: flex;
+    flex-direction: column;
+    gap: 4vh;
+}
+
+.input{
+    display: flex;
+    align-items: center;
+    margin: auto;
+    width: 100vh;
+    height: 10vh;
+    background: #eaeaea;
+    border-radius: 6px;
+}
+ 
+.input img{
+    margin: 0px 3vh;
+    width: 5vh;
+    height: 5vh;
+}
+
+.input input, .input select {
+    height: 5vh;
+    width: 85vh;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #797979;
+    font-size: 2.5vh;
+}
+
+.role-select {
+    height: 5vh;
+    width: 5vh;
+    background: transparent;
+    border: 1px solid #d3d3d3;
+    outline: none;
+    color: #a3a0a0;
+    font-size: 2.5vh;
+    padding-right: 1vh;
+    padding-top: 1px;
+}
+
+.role-label {
+    margin-right: 2vh;
+    padding-left: 5vh;
+    font-size: 2.5vh;
+}
+
+.forgot-password{
+    padding-left: 12vh;
+    margin-top: 1.5vh;
+    color: #797979;
+    font-size: 2.5vh;
+}
+
+.forgot-password span{
+    color: #000000;
+    cursor: pointer;
+}
+
+.submit-container {
+    display: flex;
+    gap: 2vh;
+    justify-content: center;
+    margin: 1vh;
+}
+
+.submit, .submit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30vh;
+    height: 8vh;
+    color: #fff;
+    background: #000000;
+    border-radius: 50px;
+    font-size: 2.3vh;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.gray{
+    background: #eaeaea;
+    color: #676767;
+}
+
+.submit-container.column {
+    flex-direction: column;
+    border: 1px solid #ff0000;
+    /* margin-top: 0.1vh; */
+}
+
+.submit.gray {
+    background: gray;
+}
+
+.error-message p {
+    color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3vh;
+}

@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.jocres" version="1.0.0">
+    <name>POS System</name>
+    <description> Made with react and apache cordova</description>
+    <author email="josefe.edu.gillego@gmail.com" href="https://yourcompany.com">Josefe Johnatan M. Gillego</author>
+    
+    <content src="index.html" />
+
+    
+
+    <!-- General Preferences -->
+    <preference name="Orientation" value="landscape" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="Fullscreen" value="true" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#000000" />
+
+    <preference name="android-skipResourceProcessing" value="true" />
+    
+    <!-- Android Platform Settings -->
+    <platform name="android">
+        <preference name="android-compileSdkVersion" value="35" />
+        <preference name="AndroidWindowSplashScreenAnimatedIcon" value="res/screen/android/splash.png" />
+        <preference name="AndroidWindowSplashScreenBackground" value="#FFFFFF" />
+        
+        <!-- Icons -->
+        <!-- <icon src="res/icon/android/ldpi.png" density="ldpi" />
+        <icon src="res/icon/android/mdpi.png" density="mdpi" />
+        <icon src="res/icon/android/hdpi.png" density="hdpi" />
+        <icon src="res/icon/android/xhdpi.png" density="xhdpi" />
+        <icon src="res/icon/android/xxhdpi.png" density="xxhdpi" />
+        <icon src="res/icon/android/xxxhdpi.png" density="xxxhdpi" /> -->
+    </platform>
+    
+    <!-- iOS Platform Settings -->
+    <platform name="ios">
+        <preference name="scheme" value="app" />
+        <preference name="deployment-target" value="13.0" />
+        
+        <!-- Icons -->
+        <!-- <icon src="res/icon/ios/icon-60@2x.png" width="120" height="120" />
+        <icon src="res/icon/ios/icon-60@3x.png" width="180" height="180" />
+        <icon src="res/icon/ios/icon-76@2x.png" width="152" height="152" />
+        <icon src="res/icon/ios/icon-83.5@2x.png" width="167" height="167" />
+        <icon src="res/icon/ios/icon-1024.png" width="1024" height="1024" /> -->
+        
+        <!-- Splash Screens -->
+        <splash src="res/screen/ios/Default@2x~universal~anyany.png" />
+    </platform>
+    
+    <!-- Access Rules -->
+    <access origin="*" />
+    <allow-navigation href="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    
+    <!-- Android specific intents -->
+    <platform name="android">
+        <allow-intent href="market:*" />
+    </platform>
+    
+    <!-- iOS specific intents -->
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
+</widget>
