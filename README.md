@@ -7,8 +7,8 @@
 
 ### Running the application:
 *Open your IDE's terminal and run the following commands:*
-1. *If running for the first time run* `npm install`
-2. `cd umai-pos-system` *"umai-pos-system"* is the directory name.
+1. `cd umai-pos-system` *"umai-pos-system"* is the directory name.
+2. *If running for the first time run* `npm install`
 3. `npm run dev`
 4. Copy the address into your browser. *Usually in the form of http://localhost:####/*
 
@@ -25,7 +25,17 @@
 3. `npm run dist` (packages the application into an executable)
 4. (Optional) `npx electron .` (if you want to test the standalone version without creating an executable, but make sure to run step 2 at each new change)
 
-Foundation code credits:
+### Running and building Android Builds ###
+*Open your IDE's terminal and run the following commands:*
+1. `npm install` (ensures that all new node_modules are installed)
+2. `npm run run:android` (builds a standalone version of the application)
+
+### Known Issues with Apache Cordova ###
+*If a build for an android port fails due to directory being unknown*
+1. go to: node_modules->cor-android->lib->check_reqs.js
+2. find and insert this line `const result = execa.sync(`"${path.join(__dirname, 'getASPath.bat')}"`, { shell: true });`
+
+Legacy codebase credits:
 @Rysll
 @Remigaraki
 @arceezi
