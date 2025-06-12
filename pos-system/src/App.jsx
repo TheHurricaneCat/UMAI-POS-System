@@ -17,7 +17,7 @@ import ContentHeader from './pos-components/ContentHeader.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
 
-import { startSession, getSessionDetails, endSession, saveExcelFile, fetchProductCatalog } from './handlers/SessionHandler';
+import {startSession, getSessionDetails, getUsername, endSession, logOut, clockOut, saveExcelFile, fetchProductCatalog } from './handlers/SessionHandler';
  
 import { isCordova } from './handlers/platform.js';
 
@@ -48,11 +48,11 @@ function App() {
     saveCustomerToTray,  
   } = useTrayManager();
 
-
   const [startSessionPopup, setStartSessionPopup] = useState(false);
   
   const [endSessionPopup, setEndSessionPopup] = useState(false);
   const [endSessionFailedPopup, setEndSessionFailedPopup] = useState(false);
+  const [endSessionFailedClockOutPopup, setEndSessionFailedClockOutPopup] = useState(false);
 
   const [saveExcelPopup, setSaveExcelPopup] = useState(false);
   const [saveExcelFailedPopup, setSaveExcelFailedPopup] = useState(false);
@@ -63,7 +63,28 @@ function App() {
   const [restoreSessionPopup, setRestoreSessionPopup] = useState(false);
   const [confirm, setConfirm] = useState(false);
 
-  const { userRole, setUserRole, sessionId, setSessionId, clearUserContext } = useContext(UserContext);
+  const {userRole, setUserRole, sessionId, setSessionId, clearUserContext} = useContext(UserContext);
+
+  // get the employee's username and always check for sessionId
+  const [username, setUsername] = useState('');
+  useEffect(() => {
+    async function fetchUsername() {
+      const sessionDetails = getSessionDetails();
+      if (sessionDetails && !sessionId) {
+        setSessionId(sessionDetails.employee_id);
+        console.log("[SESSION] Restoring session with ID:", sessionDetails.employeeId);
+      }
+      
+      if (sessionId) {
+        const name = await getUsername(sessionId);
+        if (name) {
+          setUsername(name);
+        }
+      }
+    }
+    
+    fetchUsername();
+  }, [sessionId]);
 
   const handleStartSession = async () => {
     // IMPORTANT CHANGE HERE VVVVVVVVV
@@ -75,7 +96,7 @@ function App() {
       try {
         const sessionDetails = JSON.parse(rawSessionDetails);
         
-        setSessionId(sessionDetails.employeeId);
+        setSessionId(sessionDetails.employee_id);
         console.log("[SESSION] SessionId from localStorage:", sessionDetails.token);
       } catch (error) {
         console.error("Error parsing sessionDetails from localStorage:", error);
@@ -112,6 +133,9 @@ function App() {
     if (resultExcel === -1) {
       setNoExcelStoragePopup(true);
       return;
+    } else if (resultExcel === -2) {
+      setEndSessionFailedClockOutPopup(true);
+      return;
     } else if (!resultExcel) {
       setEndSessionFailedPopup(true);
       return;
@@ -136,7 +160,47 @@ function App() {
     window.history.replaceState(null, '', '/login');
     navigate('/login');
   }
+
+  /////////// Handle log out functionality //////////
+  const handleLogOut = async () => {
+    if (getSessionDetails().clock_out_time !== null) { return; }
+    const result = await logOut(sessionId);
+    console.log("Logging out with sessionId:", sessionId);
+    if (result) {
+      setUserRole('');
+      setSessionId('');
+      clearUserContext();
+      window.history.replaceState(null, '', '/login');
+      navigate('/login');
+    }
+  };
+
+  /////////// Handle clock out functionality //////////
+  const [systemLocked, setSystemLocked] = useState(false);
+  
+  const handleClockOut = async () => {
+    const result = await clockOut(sessionId);
+    if (result) {
+      setSystemLocked(true); // Lock the system
+      // Don't clear user context or navigate away yet
+      // This keeps the session active but prevents usage
+    }
+  };
+
+  // detect if previous session has clocked out but not ended
+  useEffect(() => {
+    async function checkSessionStatus() {
+      console.log("[SESSION] Checking session status...");
+      const sessionDetails = getSessionDetails();
+
+      if (sessionDetails && sessionDetails.clock_out_time && !sessionDetails.end_time) {
+        setSystemLocked(true);
+      }
+    }
     
+    checkSessionStatus();
+  }, []);
+
   const handleSaveOrder = async () => {
     const sessionDetails = getSessionDetails();
     await appendEntry(tray, sessionDetails);
@@ -160,6 +224,8 @@ function App() {
   useEffect(() => {
     async function loadProductData() {
       try {
+        console.log("[USER CONTEXT] SessionId:", sessionId);
+        
         const catalog = await fetchProductCatalog();
         console.log("STATUS:", catalog);
         
@@ -256,11 +322,13 @@ function App() {
             handleStartSession={handleStartSession}
             saveExcelFile={handleSaveExcel}
             userRole={userRole} // This should be dynamic based on the logged-in user
+            handleClockOut={handleClockOut}
+            handleLogOut={handleLogOut}
         /> 
       </div>
       <div className="popUpInterface">
         <PopUp 
-            text={"A new session has started, welcome " + sessionId}
+            text={"A new session has started, welcome " + username + "!"}
             button1={"Confirm"}
             button2={"Exit"} 
             trigger={startSessionPopup} 
@@ -279,7 +347,7 @@ function App() {
             setConfirm={setConfirm}
         />
         <PopUp 
-            text={"A session for " + sessionId + " is already active. Session has been restored."} 
+            text={"A session for " + username + " is already active. Session has been restored."} 
             button1={"Confirm"}
             button2={"Exit"} 
             trigger={restoreSessionPopup} 
@@ -315,6 +383,15 @@ function App() {
             setConfirm={setConfirm}
         />
         <PopUp 
+            text={"Session failed to close. Please clock out first."} 
+            button1={"Confirm"}
+            button2={"Exit"} 
+            trigger={endSessionFailedClockOutPopup} 
+            setTrigger={setEndSessionFailedClockOutPopup} 
+            confirm={confirm}
+            setConfirm={setConfirm}
+        />
+        <PopUp 
             text={"Warning. Session does not have an excel file. Continue?"} 
             button1={"Confirm"}
             button2={"Cancel"} 
@@ -323,6 +400,7 @@ function App() {
             confirm={noExcelStorageConfirm}
             setConfirm={setNoExcelStorageConfirm}
         />
+
       </div>
       <div className="posInterface">
         <div className="productListInterface"> 
@@ -416,7 +494,16 @@ function App() {
           </div>
           
         </div>
-        
+      
+      {systemLocked && (
+        <div className="lock-screen-overlay">
+          <div className="lock-screen-content">
+            <h2>Terminal Locked</h2>
+            <p>This terminal has been clocked out by {username}</p>
+            <p>Please end the session to continue.</p>
+          </div>
+        </div>
+      )}
       </div>
     {/*   <div className="navigationViewer"> 
             <NavigationContainer 

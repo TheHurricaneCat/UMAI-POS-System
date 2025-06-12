@@ -4,6 +4,8 @@ import styles from './KeypadContainer.module.css';
 import PopUp from '../global-components/PopUp.jsx';
 import { fetchProductCatalog } from '../handlers/SessionHandler.js';
 
+import ReceiptModal from './ReceiptModal';
+
 function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTray, clearCurrentTray, currentTray }) {
     const [buttonPopUp, setButtonPopUp] = useState(false);
     const [emptyTrayPopup, setEmptyTrayPopup] = useState(false);
@@ -12,6 +14,8 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
     const [savedTray, setSavedTray] = useState([]);
     const [total, setTotal] = useState(0);
     const [showDiscountModal, setShowDiscountModal] = useState(false);
+
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
 
     const [modifiers, setModifiers] = useState([]);
     const [discount, setDiscount] = useState({
@@ -50,14 +54,19 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
                 }
                 
                 await appendEntry(tray, discount.value);
-                setSavedTray([...tray]); // Save the current tray before clearing
+                
+                // Save the current tray before clearing
+                const currentTrayData = tray.find(t => t.id === currentTray);
+                setSavedTray(currentTrayData);
+                
                 setConfirm(false);
+                setShowReceiptModal(true); // Show receipt modal after saving
                 clearCurrentTray(); // Clear the tray after saving
             }
         };
         
         handleConfirmation();
-    }, [confirm, tray, appendEntry, clearCurrentTray]);
+    }, [confirm, tray, appendEntry, clearCurrentTray, currentTray]);
 
     useEffect(() => {
         const calculateTotal = () => {
@@ -119,15 +128,14 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
                 confirm={false}
                 setConfirm={() => {}}
             />
-            <PopUp 
-                text={"Order saved successfully. Do you want to download the receipt?"} 
-                button1={"Download"}
-                button2={"Close"}
-                trigger={receiptPopup} 
-                setTrigger={setReceiptPopup} 
-                confirm={false}
-                setConfirm={() => {}}
-            />
+            {savedTray && (
+                <ReceiptModal
+                    isOpen={showReceiptModal}
+                    onClose={() => setShowReceiptModal(false)}
+                    orderData={savedTray}
+                    discount={discount}
+                />
+            )}
             <div className={styles.primaryContainer}>
                {/*  <div className={styles.traySummary}> <h3> Tray {currentTray} Summary </h3> </div> */}
                <div className={styles.discountButton}>
@@ -135,6 +143,7 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
                 </div>
                 <div className={styles.totalMoney}> <h3> Total: P{total.toFixed(2)} </h3> </div>
                 
+                <div className={styles.printReceipt}> <button onClick={handleSaveOrder}> Print Receipt </button> </div>
                 <div className={styles.saveOrder}> <button onClick={handleSaveOrder}> Save Order </button> </div>
                 <div className={styles.clearOrder}> <button onClick={clearCurrentTray}> Clear Order </button> </div>
                 <div className={styles.addTray}> <button onClick={addNewTray}> Add Tray</button> </div>

@@ -1,12 +1,5 @@
-/* import { useState } from 'react'; */
-import { v4 as uuidv4 } from 'uuid';
-/* import { getFirestore, doc, setDoc } from 'firebase/firestore';
-import { app } from '../firebase'; // Adjust the path to your firebase.js file */
 
-/* import { firestore, storage } from '/firebase.js'
-import { collection, query, where, getDocs, addDoc, updateDoc, setDoc, doc } from '@firebase/firestore';
-import { ref, uploadString, getDownloadURL } from '@firebase/storage';
-import { products, modifiers, ingredients } from './product.js'; */
+import { v4 as uuidv4 } from 'uuid';
 
 import supabase from '../database/supabase.js';
 import { decode } from 'base64-arraybuffer'
@@ -27,6 +20,7 @@ export async function startSession(employee_id) {
     employee_id,
     start_time: new Date().toISOString(),
     end_time: null,
+    clock_out_time: null,
   };
   localStorage.setItem('sessionDetails', JSON.stringify(sessionDetails));
   sessionToken = token;
@@ -124,6 +118,31 @@ export async function startSession(employee_id) {
   return true;
 }
 
+export async function getUsername(employeeId) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', employeeId)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('[SUPABASE] Error finding username:', error);
+      return false;
+    }
+
+    if (!data) {
+      console.log('[SUPABASE] No active session found for employee:', employeeId);
+      return false;
+    }
+
+    console.log('[SUPABASE] Found username:', data.name);
+    return data.name
+  } catch (error) {
+    console.log('[SUPABASE] Exception during username search:', error);
+  }
+}
+
 export async function checkActiveSession(employeeId) {
   // check local storage
   const sessionDetails = JSON.parse(localStorage.getItem('sessionDetails'));
@@ -153,7 +172,8 @@ export async function checkActiveSession(employeeId) {
         token: data.token,
         employeeId: data.employee_id,
         startTime: data.start_time,
-        endTime: data.end_time
+        endTime: data.end_time,
+        clock_out_time: data.clock_out_time,
       };
 
       localStorage.setItem('sessionDetails', JSON.stringify(sessionDetails));
@@ -201,12 +221,13 @@ export async function checkActiveSession(employeeId) {
 
 export function getSessionDetails() {
   const sessionDetails = localStorage.getItem('sessionDetails');
-  console.log("[SESSION]  Raw session details from localStorage:", sessionDetails);
   
   if (!sessionDetails) {
     console.log("[SESSION]  No session details found in localStorage");
     return null;
   }
+  
+  console.log("[SESSION]  Raw session details from localStorage:", sessionDetails);
 
   try {
     const parsedDetails = JSON.parse(sessionDetails);
@@ -216,6 +237,33 @@ export function getSessionDetails() {
     console.error("[SESSION]  Error parsing session details:", error);
     return null;
   }
+}
+
+export async function clockOut(employeeId) {
+  const sessionDetails = getSessionDetails();
+  console.log("[SESSION]  Clocking out for employee:", employeeId);
+  if (sessionDetails) {
+    sessionDetails.clock_out_time = new Date().toISOString();
+    localStorage.setItem('sessionDetails', JSON.stringify(sessionDetails));
+    return true;
+  } else {
+    console.error("[SESSION]  No active session/employee found to clock out");
+    return false;
+  }
+}
+
+export async function logOut() {
+  try {
+      const { error } = await supabase.auth.signOut();
+      localStorage.removeItem('sessionDetails');
+      if (error) {
+          throw error;
+      }
+      return true;
+    } catch (error) {
+        console.error("[SUPABASE] Error logging out: ", error);
+        return false;
+    }
 }
 
 export async function endSession(employeeId) {
@@ -228,10 +276,10 @@ export async function endSession(employeeId) {
         console.error("[SESSION] No internet connection available");
         return false;
       }
-      
+
       const { data, error } = await supabase
         .from(import.meta.env.VITE_SUPABASE_SESSION_TABLE)
-        .update({end_time: new Date().toISOString()})
+        .update({end_time: new Date().toISOString(), clock_out_time: sessionDetails.clock_out_time})
         .is('end_time', null)
         .eq('employee_id', employeeId);
         
@@ -297,6 +345,11 @@ export async function saveExcelFile() {
       return false;
     }
     
+    if (sessionDetails.clock_out_time === null) {
+        console.error("[SESSION] Cannot end session without clocking out first");
+        return -2;
+    }
+
     // Get Excel data from localStorage
     const sessionID = `session_${sessionDetails.token}`;
     const base64Data = localStorage.getItem(sessionID);
@@ -411,6 +464,8 @@ export function useSessionHandler() {
     startSession,
     getSessionDetails,
     endSession,
+    getUsername,
+    clockOut,
     sessionToken: token,
   };
 }
