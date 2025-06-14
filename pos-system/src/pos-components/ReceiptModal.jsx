@@ -30,7 +30,6 @@ function ReceiptModal({ isOpen, onClose, orderData, discount }) {
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
           <h2>Receipt Preview</h2>
-          <button className={styles.closeButton} onClick={onClose}>×</button>
         </div>
         
         <div className={styles.receiptContainer}>
@@ -42,9 +41,6 @@ function ReceiptModal({ isOpen, onClose, orderData, discount }) {
         </div>
         
         <div className={styles.modalActions}>
-          {/* <button className={styles.printButton} onClick={handlePrint}>
-            Print Receipt
-          </button> */}
           <button className={styles.downloadButton} onClick={handleDownloadPDF}>
             Download PDF
           </button>

@@ -290,7 +290,7 @@ export async function endSession(employeeId) {
       } else {
         console.log('[SUPABASE] Session ended successfully:', data);
       }
-
+      localStorage.removeItem('session_' + sessionDetails.token);
       localStorage.removeItem('sessionDetails');
       sessionToken = null;
       console.log("[SESSION]  Session ended:", sessionDetails);

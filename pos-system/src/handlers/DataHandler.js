@@ -139,12 +139,14 @@ export async function appendEntry(newEntries, discount) {
     try {
       for (let i = worksheet.rowCount; i > 0; i--) {
         const row = worksheet.getRow(i);
-        const invoiceCell = row.getCell(1).value; // Assuming invoice number is in column 1
+        const invoiceCell = row.getCell(5).value; // Assuming invoice number is in column 1
+        console.log("[EXCEL]  Checking row:", i, "Invoice Cell:", invoiceCell);
         if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
           lastInvoiceRow = row;
           const lastInvoiceParts = invoiceCell.split('-');
-          if (lastInvoiceParts.length === 2) {
-            lastInvoiceNumber = parseInt(lastInvoiceParts[1], 10);
+          if (lastInvoiceParts.length >= 2) {
+            lastInvoiceNumber = parseInt(lastInvoiceParts[3], 10);
+            console.log("[EXCEL]  Found last invoice number extracted");
           }
           break;
         }
@@ -222,11 +224,11 @@ export async function appendEntry(newEntries, discount) {
           saveExcelFile();
           console.log("Excel file saved to Firebase Storage");
           
-          // Force download (optional - can be configured based on parameter)
+          /* // Force download (optional - can be configured based on parameter)
           const link = document.createElement("a");
           link.href = url;
           link.download = sessionID + ".xlsx";
-          link.click();
+          link.click(); */
           
           resolve(true); // Successfully saved
         } catch (error) {
@@ -243,6 +245,138 @@ export async function appendEntry(newEntries, discount) {
   } catch (error) {
     console.error("Error in appendEntry:", error);
     return false;
+  }
+}
+
+export async function getLastTransaction() {
+  try {
+    const sessionDetails = getSessionDetails();
+    if (!sessionDetails || !sessionDetails.token) {
+      console.warn("[SESSION] No valid session details found");
+      return null;
+    }
+    
+    const sessionID = `session_${sessionDetails.token}`;
+    console.log("[SESSION] Getting last transaction from session ID:", sessionID);
+    
+    const fileBuffer = await fetchFromLocalStorage(sessionID);
+    if (!fileBuffer) {
+      console.warn("[SESSION] No Excel file found for this session");
+      return null;
+    }
+    
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer);
+    
+    const worksheet = workbook.getWorksheet(1);
+    if (!worksheet) {
+      console.error("[EXCEL] No worksheet found in Excel file");
+      return null;
+    }
+    
+    // Get the last invoice number from the sheet
+    let lastInvoiceNumber = "";
+    let lastTransaction = {
+      invoiceNumber: "",
+      customerName: "",
+      address: "",
+      contactNumber: "",
+      paymentMethod: "",
+      products: [],
+      total: 0
+    };
+    
+    // First pass: find the last invoice number
+    for (let i = worksheet.rowCount; i > 0; i--) {
+      const row = worksheet.getRow(i);
+      const invoiceCell = row.getCell(5).value; // Column E - Invoice number
+      
+      if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
+        lastInvoiceNumber = invoiceCell;
+        lastTransaction.invoiceNumber = invoiceCell;
+        lastTransaction.customerName = row.getCell(6).value || "-"; // Column F - Customer name
+        lastTransaction.address = row.getCell(7).value || "-"; // Column G - Address
+        lastTransaction.contactNumber = row.getCell(8).value || "-"; // Column H - Contact number
+        lastTransaction.paymentMethod = row.getCell(9).value || "-"; // Column I - Payment method
+        break;
+      }
+    }
+    
+    if (!lastInvoiceNumber) {
+      console.warn("[EXCEL] No transactions found in the Excel file");
+      return null;
+    }
+    
+    // Second pass: collect all products with the last invoice number
+    let currentProduct = null;
+    
+    for (let i = 1; i <= worksheet.rowCount; i++) {
+      const row = worksheet.getRow(i);
+      const invoiceCell = row.getCell(5).value;
+      
+      // If this row belongs to the last invoice
+      if (invoiceCell === lastInvoiceNumber) {
+        const quantity = row.getCell(1).value;
+        const name = row.getCell(2).value;
+        const price = row.getCell(3).value;
+        const total = row.getCell(4).value;
+        
+        if (quantity && name && price !== null) {
+          // This is a main product row
+          currentProduct = {
+            quantity: Number(quantity),
+            name: name,
+            price: Number(price),
+            total: Number(total),
+            modifiers: [],
+            content: []
+          };
+          lastTransaction.products.push(currentProduct);
+          lastTransaction.total += Number(total);
+        }
+      } 
+      // Check for modifiers or content (they have null in column A but values in B and C)
+      else if (
+        currentProduct && 
+        row.getCell(1).value === null && 
+        row.getCell(2).value !== null && 
+        row.getCell(3).value !== null
+      ) {
+        const modQuantity = row.getCell(2).value;
+        const modName = row.getCell(3).value;
+        const modPriceInfo = row.getCell(4).value;
+        
+        if (typeof modPriceInfo === 'string') {
+          if (modPriceInfo.includes('>>')) {
+            // This is a modifier
+            const price = parseFloat(modPriceInfo.split('>>')[0].trim());
+            
+            currentProduct.modifiers.push({
+              quantity: Number(modQuantity),
+              name: modName,
+              price: price,
+              total: price * Number(modQuantity)
+            });
+          } else if (modPriceInfo.includes('>')) {
+            // This is a promo content
+            const price = parseFloat(modPriceInfo.split('>')[0].trim());
+            
+            currentProduct.content.push({
+              quantity: Number(modQuantity),
+              name: modName,
+              price: price,
+              total: price * Number(modQuantity)
+            });
+          }
+        }
+      }
+    }
+    
+    console.log("[EXCEL] Retrieved last transaction:", lastTransaction);
+    return lastTransaction;
+  } catch (error) {
+    console.error("[EXCEL] Error retrieving last transaction:", error);
+    return null;
   }
 }
 

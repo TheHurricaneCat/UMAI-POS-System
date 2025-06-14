@@ -3,6 +3,7 @@ import { appendEntry } from '../handlers/DataHandler';
 import styles from './KeypadContainer.module.css';
 import PopUp from '../global-components/PopUp.jsx';
 import { fetchProductCatalog } from '../handlers/SessionHandler.js';
+import { getLastTransaction } from '../handlers/DataHandler';
 
 import ReceiptModal from './ReceiptModal';
 
@@ -60,7 +61,7 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
                 setSavedTray(currentTrayData);
                 
                 setConfirm(false);
-                setShowReceiptModal(true); // Show receipt modal after saving
+                // setShowReceiptModal(true); // Show receipt modal after saving
                 clearCurrentTray(); // Clear the tray after saving
             }
         };
@@ -99,6 +100,30 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
             return;
         } else {
             setButtonPopUp(true);
+        }
+    };
+
+    const handlePrintReceipt = async () => {
+        try {
+            // Get the last transaction from the Excel file
+            const lastTransaction = await getLastTransaction();
+            
+            if (!lastTransaction) {
+                console.error("No transaction found to print");
+                setEmptyTrayPopup(true);
+                return;
+            }
+            
+            console.log("Retrieved last transaction for receipt:", lastTransaction);
+            
+            // Set the retrieved transaction as the data for the receipt
+            setSavedTray(lastTransaction);
+            
+            // Show the receipt modal
+            setShowReceiptModal(true);
+        } catch (error) {
+            console.error("Error printing receipt:", error);
+            setEmptyTrayPopup(true);
         }
     };
 
@@ -143,7 +168,7 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
                 </div>
                 <div className={styles.totalMoney}> <h3> Total: P{total.toFixed(2)} </h3> </div>
                 
-                <div className={styles.printReceipt}> <button onClick={handleSaveOrder}> Print Receipt </button> </div>
+                <div className={styles.printReceipt}> <button onClick={handlePrintReceipt}> Print Receipt </button> </div>
                 <div className={styles.saveOrder}> <button onClick={handleSaveOrder}> Save Order </button> </div>
                 <div className={styles.clearOrder}> <button onClick={clearCurrentTray}> Clear Order </button> </div>
                 <div className={styles.addTray}> <button onClick={addNewTray}> Add Tray</button> </div>

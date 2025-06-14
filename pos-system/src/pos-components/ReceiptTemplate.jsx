@@ -4,21 +4,21 @@ import styles from './ReceiptTemplate.module.css';
 const ReceiptTemplate = forwardRef(({ orderData, discount }, ref) => {
   const currentDate = new Date().toLocaleString();
   const totalBeforeDiscount = orderData.products.reduce((sum, product) => 
-    sum + (product.price * product.quantity), 0);
+  sum + (product.price * product.quantity), 0);
   const discountAmount = totalBeforeDiscount * (discount?.value || 0);
   const finalTotal = totalBeforeDiscount - discountAmount;
 
   return (
     <div className={styles.receipt} ref={ref}>
       <div className={styles.receiptHeader}>
-        <h2>RESTAURANT NAME</h2>
+        <h2>UMAI POS SYSTEM</h2>
         <p>123 Main Street, City</p>
         <p>Tel: (123) 456-7890</p>
-        <p>VAT Reg: 123-456-789</p>
+        {/* <p>VAT Reg: 123-456-789</p> */}
       </div>
 
       <div className={styles.receiptInfo}>
-        <p><strong>Order #:</strong> {orderData.id}</p>
+        <p><strong>Order #:</strong> {orderData.invoiceNumber}</p>
         <p><strong>Date:</strong> {currentDate}</p>
         <p><strong>Cashier:</strong> {orderData.cashier || 'Staff'}</p>
         {orderData.customer && (
