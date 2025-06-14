@@ -269,6 +269,12 @@ export async function logOut() {
 export async function endSession(employeeId) {
   const sessionDetails = getSessionDetails();
   console.log("[SESSION]  Ending session for employee:", employeeId);
+  
+  if (sessionDetails.clock_out_time === null) {
+      console.error("[SESSION] Cannot end session without clocking out first");
+      return -2;
+  }
+  
   if (sessionDetails) {
     try {
       
@@ -343,11 +349,6 @@ export async function saveExcelFile() {
     if (!sessionDetails || !sessionDetails.token) {
       console.error("[STORAGE] No active session found");
       return false;
-    }
-    
-    if (sessionDetails.clock_out_time === null) {
-        console.error("[SESSION] Cannot end session without clocking out first");
-        return -2;
     }
 
     // Get Excel data from localStorage

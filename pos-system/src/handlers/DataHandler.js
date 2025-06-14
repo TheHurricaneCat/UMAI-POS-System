@@ -244,11 +244,11 @@ export async function appendEntry(newEntries, discount, discountedTotal) {
           saveExcelFile();
           console.log("Excel file saved to Firebase Storage");
           
-          // Force download (optional - can be configured based on parameter)
+          /* // Force download (optional - can be configured based on parameter)
           const link = document.createElement("a");
           link.href = url;
           link.download = sessionID + ".xlsx";
-          link.click();
+          link.click(); */
           
           resolve(true); // Successfully saved
         } catch (error) {

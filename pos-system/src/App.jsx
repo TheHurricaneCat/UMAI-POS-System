@@ -133,27 +133,27 @@ function App() {
     if (resultExcel === -1) {
       setNoExcelStoragePopup(true);
       return;
-    } else if (resultExcel === -2) {
-      setEndSessionFailedClockOutPopup(true);
-      return;
     } else if (!resultExcel) {
       setEndSessionFailedPopup(true);
       return;
     }
-
+    setLoggingOut(true);
     await handlePostEndSession();
   };
 
   const handlePostEndSession = async () => {
     const resultEndSession = await endSession(sessionId);
-
     if (!resultEndSession) {
       setEndSessionFailedPopup(true);
+      setLoggingOut(false);
       return;
-    }
+    } else if (resultEndSession === -2) {
+      setEndSessionFailedClockOutPopup(true);
+      setLoggingOut(false);
+      return;
+    } 
 
     clearUserContext();
-
     setEndSessionPopup(true);
     setUserRole('');
     setSessionId('');
@@ -162,8 +162,11 @@ function App() {
   }
 
   /////////// Handle log out functionality //////////
+  const [loggingOut, setLoggingOut] = useState(false);
+  
   const handleLogOut = async () => {
     if (getSessionDetails().clock_out_time !== null) { return; }
+    setLoggingOut(true);
     const result = await logOut(sessionId);
     console.log("Logging out with sessionId:", sessionId);
     if (result) {
@@ -506,6 +509,14 @@ function App() {
                 userRole={"admin"} // This should be dynamic based on the logged-in user
             /> 
       </div> */}
+      {loggingOut && (
+        <div className="logout-screen-overlay">
+          <div className="logout-screen-content">
+            <h2>Logging Out...</h2>
+            <p>Please wait while we log you out.</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

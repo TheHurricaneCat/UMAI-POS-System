@@ -353,12 +353,58 @@
   border: 2px solid #e74c3c;
 }
 
+
 .lock-screen-content h2 {
   color: #e74c3c;
   margin-bottom: 1rem;
 }
 
 .lock-screen-content p {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+/* log-out screen */
+.logout-screen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(103, 103, 103, 0.753);
+  backdrop-filter: blur(5px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(255, 255, 255, 0.1) 10px,
+    rgba(255, 255, 255, 0.1) 20px
+  );
+  z-index: 9999;
+}
+
+.logout-screen-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid #e74c3c;
+}
+
+
+.logout-screen-content h2 {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.logout-screen-content p {
   margin-bottom: 0.5rem;
   color: #333;
 }
