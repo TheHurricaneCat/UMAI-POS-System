@@ -97,7 +97,7 @@ export async function fetchFromLocalStorage(token) {
 
 // Function to save the Excel file
 // revert to simpler version. Check old commit
-export async function appendEntry(newEntries, discount) {
+export async function appendEntry(newEntries, discount, discountedTotal) {
   // Check if there are any entries to append
   if (!newEntries || newEntries.length === 0) {
     console.warn("No entries to append to Excel file");
@@ -115,7 +115,7 @@ export async function appendEntry(newEntries, discount) {
     const sessionDetails = await getSessionDetails();
     const sessionID = `session_${sessionDetails.token}`;
     console.log("Session ID:", sessionID);
-    const cashierName = sessionDetails?.employeeID || "Unknown";
+    const cashierName = sessionDetails?.employee_id || "Unknown";
     
     const fileBuffer = await fetchFromLocalStorage(sessionID);
 
@@ -139,7 +139,9 @@ export async function appendEntry(newEntries, discount) {
     try {
       for (let i = worksheet.rowCount; i > 0; i--) {
         const row = worksheet.getRow(i);
-        const invoiceCell = row.getCell(5).value; // Assuming invoice number is in column 1
+        // IMPORTANT ///////////////////////////////////////////////////
+        // make this somehow adaptive in cases where the column index changes again
+        const invoiceCell = row.getCell(6).value; // Assuming invoice number is in column 1
         console.log("[EXCEL]  Checking row:", i, "Invoice Cell:", invoiceCell);
         if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
           lastInvoiceRow = row;
@@ -164,6 +166,7 @@ export async function appendEntry(newEntries, discount) {
   
       tray.products.forEach((product) => {
         const productRow = [
+          "PRODUCT",
           product.quantity,
           product.name,
           product.price,
@@ -173,28 +176,45 @@ export async function appendEntry(newEntries, discount) {
           tray.customer.address,
           tray.customer.contactNumber,
           tray.customer.paymentMethod,
+          cashierName
         ];
         worksheet.addRow(productRow);
   
         product.modifiers.forEach((modifier) => {
           const modifierRow = [
-            null,
+            "MODIFIER",
             modifier.quantity,
             modifier.name,
-            `${modifier.price} >> ${modifier.price * modifier.quantity}`,
+            modifier.price,
+            modifier.price * modifier.quantity,
+            invoice,
           ];
           worksheet.addRow(modifierRow);
         });
   
         product.content.forEach((content) => {
           const contentRow = [
-            null,
+            "PROMO",
             content.quantity,
             content.name,
-            `${content.price} > ${content.price * content.quantity}`,
+            content.price,
+            content.price * content.quantity,
+            invoice,
           ];
           worksheet.addRow(contentRow);
         });
+
+        if (discount) {
+          const discountRow = [
+            "DISCOUNT",
+            discount.name,
+            discount.value,
+            discountedTotal,
+            "-",
+            invoice,
+          ]
+          worksheet.addRow(discountRow);
+        }
       });
     });
 
@@ -224,11 +244,11 @@ export async function appendEntry(newEntries, discount) {
           saveExcelFile();
           console.log("Excel file saved to Firebase Storage");
           
-          /* // Force download (optional - can be configured based on parameter)
+          // Force download (optional - can be configured based on parameter)
           const link = document.createElement("a");
           link.href = url;
           link.download = sessionID + ".xlsx";
-          link.click(); */
+          link.click();
           
           resolve(true); // Successfully saved
         } catch (error) {

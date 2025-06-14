@@ -201,12 +201,6 @@ function App() {
     checkSessionStatus();
   }, []);
 
-  const handleSaveOrder = async () => {
-    const sessionDetails = getSessionDetails();
-    await appendEntry(tray, sessionDetails);
-    clearCurrentTray();
-  };
-
   useEffect(() => {
     const handleNoExcelConfirmation = async () => {
       if (noExcelStorageConfirm) {
@@ -486,7 +480,6 @@ function App() {
             <KeypadContainer 
               addNewTray={addNewTray} 
               currentTotal={currentTotal} 
-              appendEntry={handleSaveOrder} 
               tray={tray} 
               clearTray={clearTray} 
               clearCurrentTray={clearCurrentTray}

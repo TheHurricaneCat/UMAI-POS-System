@@ -7,7 +7,7 @@ import { getLastTransaction } from '../handlers/DataHandler';
 
 import ReceiptModal from './ReceiptModal';
 
-function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTray, clearCurrentTray, currentTray }) {
+function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurrentTray, currentTray }) {
     const [buttonPopUp, setButtonPopUp] = useState(false);
     const [emptyTrayPopup, setEmptyTrayPopup] = useState(false);
     const [confirm, setConfirm] = useState(false);
@@ -54,7 +54,7 @@ function KeypadContainer({ addNewTray, currentTotal, appendEntry, tray, clearTra
                     return;
                 }
                 
-                await appendEntry(tray, discount.value);
+                await appendEntry(tray, discount, total);
                 
                 // Save the current tray before clearing
                 const currentTrayData = tray.find(t => t.id === currentTray);
