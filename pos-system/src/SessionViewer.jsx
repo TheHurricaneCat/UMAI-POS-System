@@ -1,7 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import supabase from './database/supabase';
 import './SessionViewer.css';
+
+const EmployeeTable = () => {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        const { data, error } = await supabase.from("Users").select("*");
+        console.log("Fetched users:", data, error);
+        if (!error) setUsers(data);
+        setLoading(false);
+    };
+
+    const handleRoleChange = async (id, newRole) => {
+        await supabase.from("users").update({ role: newRole }).eq("id", id);
+        fetchUsers();
+    };
+
+    if (loading) return <div>Loading users...</div>;
+
+    return (
+        <div style={{ marginTop: "40px" }}>
+            <h2>User Management</h2>
+            <table className="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Employee ID</th>
+                        <th>Role</th>
+                        <th>Change Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {users.map(user => (
+                        <tr key={user.id}>
+                            <td>{user.username}</td>
+                            <td>{user.employee_id}</td>
+                            <td>{user.role}</td>
+                            <td>
+                                <button
+                                    onClick={() =>
+                                        handleRoleChange(user.id, user.role === "admin" ? "user" : "admin")
+                                    }
+                                >
+                                    Set as {user.role === "admin" ? "User" : "Admin"}
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
 const SessionViewer = () => {
     const [sessions, setSessions] = useState([]);
@@ -30,7 +88,6 @@ const SessionViewer = () => {
                 setLoading(false);
             }
         };
-
         fetchSessions();
     }, []);
 
@@ -108,6 +165,9 @@ const SessionViewer = () => {
                     </tbody>
                 </table>
             )}
+
+            {/* Employee Management Table */}
+            <EmployeeTable />
         </div>
     );
 };

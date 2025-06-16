@@ -15,7 +15,7 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
-    const [role, setRole] = useState("employee");
+    const [role, setRole] = useState("user");
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -96,7 +96,7 @@ const Login = () => {
                     options: {
                         data: {
                             name,
-                            role
+                            role: "user" // Default role for new users
                         }
                     }
                 });
@@ -109,7 +109,7 @@ const Login = () => {
                     .insert({
                         id: data.user.id,
                         name: name,
-                        role: role,
+                        role: "user", // Default role for new users
                         email: email
                     })
                     .select()
@@ -126,7 +126,7 @@ const Login = () => {
                 setEmail("");
                 setPassword("");
                 setName("");
-                setRole("employee");
+                setRole("user");
                 setAction("Login");
             }
         } catch (error) {
@@ -164,17 +164,7 @@ const Login = () => {
                                 onChange={(e) => setName(e.target.value)} 
                             />
                         </div>
-                        <div className="input">
-                            <label className="role-label">Role:</label>
-                            <select 
-                                className="role-select"
-                                value={role} 
-                                onChange={(e) => setRole(e.target.value)}
-                            >
-                                <option value="employee">Employee</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
+                      
                     </>
                 )}
 
