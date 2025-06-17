@@ -190,38 +190,50 @@ const ProductManager = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { code, image, ...dataWithType } = editData; 
+            // Keep code within productData, only extract image separately
+            const { image, ...productData } = editData; 
 
-            if (code) {
+            // First check if this product code already exists
+            const { data: existingProduct, error: checkError } = await supabase
+                .from(import.meta.env.VITE_SUPABASE_PRODUCT_TABLE)
+                .select('*')
+                .eq('code', productData.code)
+                .single();
+            
+            if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "not found" error
+                throw checkError;
+            }
+
+            if (existingProduct) {
                 // Update existing product/modifier
-                console.log('[PRODUCT MANAGER]Editing new item');
+                console.log('[PRODUCT MANAGER] Editing existing item');
                 const { error } = await supabase
                     .from(import.meta.env.VITE_SUPABASE_PRODUCT_TABLE)
-                    .update(dataWithType)
-                    .eq('code', code);
+                    .update(productData)
+                    .eq('code', productData.code);
                 
                 if (error) throw error;
 
-                if (dataWithType.type === 'product') {
+                if (productData.type === 'product') {
                     setProducts((prev) =>
-                        prev.map((item) => (item.code === code ? { ...item, ...dataWithType } : item))
+                        prev.map((item) => (item.code === productData.code ? { ...item, ...productData } : item))
                     );
                 } else {
                     setModifiers((prev) =>
-                        prev.map((item) => (item.code === code ? { ...item, ...dataWithType } : item))
+                        prev.map((item) => (item.code === productData.code ? { ...item, ...productData } : item))
                     );
                 }
             } else {
                 // Add new product/modifier
-                console.log('[PRODUCT MANAGER]Adding new item');
+                console.log('[PRODUCT MANAGER] Adding new item');
                 const { data: newData, error } = await supabase
                     .from(import.meta.env.VITE_SUPABASE_PRODUCT_TABLE)
-                    .insert([dataWithType]) // Include type
+                    .insert([productData]) // Include type
                     .select();
                 
                 if (error) throw error;
 
-                if (dataWithType.type === 'product') {
+                if (productData.type === 'product') {
                     setProducts((prev) => [...prev, newData[0]]);
                 } else {
                     setModifiers((prev) => [...prev, newData[0]]);
@@ -229,9 +241,9 @@ const ProductManager = () => {
             }
             
             // Handle image upload if present
-            if (image && dataWithType.type === 'product') {
-                console.log(code);
-                const filePath = `${code}.jpg`;
+            if (image && productData.type === 'product') {
+                console.log(`Uploading image for product code: ${productData.code}`);
+                const filePath = `${productData.code}.jpg`;
                 
                 const { error: uploadError } = await supabase.storage
                     .from(import.meta.env.VITE_SUPABASE_IMAGE_STORAGE_BUCKET)
@@ -245,14 +257,14 @@ const ProductManager = () => {
                     alert('Product saved but image upload failed');
                 } else {
                     // Refresh image status for this product
-                    checkForImage(dataWithType);
+                    checkForImage(productData);
                 }
             }
 
             closeModal();
         } catch (error) {
             console.error('Error in submission:', error);
-            alert('An error occurred. Please try again.');
+            alert(`An error occurred: ${error.message || 'Unknown error'}`);
         }
     };
 

@@ -3,11 +3,16 @@ import styles from './CategoryMenu.module.css';
 function CategoryMenu({productList = [], handleScrollToCategory, categoryRefs}) {
     const colors = ["#FFDE59", "#3DCDC4", "#4766C2"];
     
+    const filteredCategories = productList.filter(category => 
+        !category.name.toLowerCase().includes('discount') && 
+        !category.isDiscount
+    );
+
     return (
         <>
             <div className={styles.rootContainer}>
                 <div className={styles.categoryContainer}> 
-                    {productList.map((category, index) => (
+                    {filteredCategories.map((category, index) => (
                         <div>
                             
                             <div

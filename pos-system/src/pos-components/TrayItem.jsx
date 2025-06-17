@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './TrayItem.module.css';
 import defaultImage from '../assets/0.png'
 import TrayModifierItem from './TrayModifierItem.jsx';
+import supabase from '../database/supabase';
 
 function TrayItem({ 
     productContent, 
@@ -16,10 +17,38 @@ function TrayItem({
     parentTray,
     currentTray,
     }) {
-    const { name, price, quantity} = productContent;
-
+    const { name, price, quantity, code} = productContent;
+    const [imageUrl, setImageUrl] = useState(defaultImage);
     const isSelected = currentProduct === name && currentTray === parentTray;
 
+    useEffect(() => {
+        const fetchProductImage = async () => {
+            try {
+                if (code) {
+                    const { data, error } = await supabase.storage
+                        .from(import.meta.env.VITE_SUPABASE_IMAGE_STORAGE_BUCKET)
+                        .getPublicUrl(`${code}.jpg`);
+                    
+                    if (!error && data) {
+                        // Check if image exists by preloading it
+                        const img = new Image();
+                        img.onload = () => {
+                            setImageUrl(data.publicUrl);
+                        };
+                        img.onerror = () => {
+                            setImageUrl(defaultImage); // Keep default if image doesn't load
+                        };
+                        img.src = data.publicUrl;
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching product image:", error);
+                setImageUrl(defaultImage);
+            }
+        };
+
+        fetchProductImage();
+    }, [code]);
     useEffect(() => {
         console.log("currentProduct:", currentProduct);
         console.log("name:", name);
@@ -37,7 +66,7 @@ function TrayItem({
                     <h4>{quantity}</h4>
                 </div>
                 <div className={styles.productImage}>
-                    <img src={defaultImage} alt="Product Image" />
+                    <img src={imageUrl} alt="Product Image" />
                 </div>
                 <div className={styles.productName}>
                     <h4>{name}</h4>

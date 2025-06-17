@@ -6,6 +6,10 @@ import { Category } from '../handlers/DataHandler.js';
 function CategoryContainer({category, type, addToTray, addModifier, categoryRefs, index, currentProduct}) {
     const colors = ["#FFDE59", "#3DCDC4", "#4766C2"];
     const backgroundColor = colors[index % colors.length];
+
+    if (category.name.toLowerCase().includes('discount') || category.isDiscount === true) {
+        return null;
+    }
     
     if (type === 'product') {
         return (
