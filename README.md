@@ -7,7 +7,7 @@
 
 ### Running the application:
 *Open your IDE's terminal and run the following commands:*
-1. `cd umai-pos-system` *"umai-pos-system"* is the directory name.
+1. `cd pos-system` *"umai-pos-system"* is the directory name.
 2. *If running for the first time run* `npm install`
 3. `npm run dev`
 4. Copy the address into your browser. *Usually in the form of http://localhost:####/*
