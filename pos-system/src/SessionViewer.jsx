@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import supabase from './database/supabase';
 import './SessionViewer.css';
+import.meta.env
 
 const EmployeeTable = () => {
     const [users, setUsers] = useState([]);
@@ -13,14 +14,14 @@ const EmployeeTable = () => {
 
     const fetchUsers = async () => {
         setLoading(true);
-        const { data, error } = await supabase.from("Users").select("*");
+        const { data, error } = await supabase.from(import.meta.env.VITE_SUPABASE_PROFILE_TABLE).select("*");
         console.log("Fetched users:", data, error);
         if (!error) setUsers(data);
         setLoading(false);
     };
 
     const handleRoleChange = async (id, newRole) => {
-        await supabase.from("users").update({ role: newRole }).eq("id", id);
+        await supabase.from(import.meta.env.VITE_SUPABASE_PROFILE_TABLE).update({ role: newRole }).eq("id", id);
         fetchUsers();
     };
 
@@ -28,7 +29,7 @@ const EmployeeTable = () => {
 
     return (
         <div style={{ marginTop: "40px" }}>
-            <h2>User Management</h2>
+            <h1>User Management</h1>
             <table className="sessions-table">
                 <thead>
                     <tr>
@@ -41,8 +42,8 @@ const EmployeeTable = () => {
                 <tbody>
                     {users.map(user => (
                         <tr key={user.id}>
-                            <td>{user.username}</td>
-                            <td>{user.employee_id}</td>
+                            <td>{user.name}</td>
+                            <td>{user.id}</td>
                             <td>{user.role}</td>
                             <td>
                                 <button
@@ -124,13 +125,18 @@ const SessionViewer = () => {
 
     return (
         <div className="account-page">
-            <h1>Employee Sessions</h1>
+            {/* Employee Management Table */}
+            
+            
             <button className="redirect-btn" onClick={handleRedirect}>Go to App</button>
+            <EmployeeTable />
+            <h1 className="space">Employee Sessions</h1>
             {loading ? (
                 <p>Loading sessions...</p>
             ) : error ? (
                 <p className="error-message">{error}</p>
             ) : (
+                
                 <table className="sessions-table">
                     <thead>
                         <tr>
@@ -166,8 +172,7 @@ const SessionViewer = () => {
                 </table>
             )}
 
-            {/* Employee Management Table */}
-            <EmployeeTable />
+            
         </div>
     );
 };
