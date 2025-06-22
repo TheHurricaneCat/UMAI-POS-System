@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
-import supabase from './database/supabase';
+import { supabase } from './database/supabase';
 import { UserContext } from './UserContext';
 import { startSession } from './handlers/SessionHandler';
 

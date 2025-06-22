@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import supabase from './database/supabase.js';
+import { supabase } from './database/supabase.js';
 import './ProductManager.css';
 import { fetchProductCatalog } from './handlers/SessionHandler.js';
 

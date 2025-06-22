@@ -1,5 +1,36 @@
 import ExcelJS from 'exceljs';
 import { getSessionDetails, saveExcelFile } from './SessionHandler';
+import { supabase } from '../database/supabase.js';
+/* import { firestore } from '/firebase.js';
+import { collection, query, where, getDocs } from 'firebase/firestore'; */
+
+
+// class functions are useless
+// since react does not prefer having their objects to change (states)
+// So it wants to create a new object instead of changing the existing one
+
+// todo:
+// remove firebase functions
+
+export async function fetchSessionItems(collectionName, sessionToken) {
+  try {
+    if (!collectionName || !sessionToken) {
+      throw new Error('Missing collectionName or sessionToken');
+    }
+    const { data, error } = await supabase
+      .from(collectionName)
+      .select('*')
+      .eq('sessionToken', sessionToken);
+    if (error) {
+      console.error(`Error fetching ${collectionName}:`, error);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.error(`Error in fetchSessionItems for ${collectionName}:`, err);
+    return [];
+  }
+}
 
 //////////////
 // Bound to app.jsx

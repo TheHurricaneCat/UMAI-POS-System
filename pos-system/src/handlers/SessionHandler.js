@@ -1,7 +1,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
-import supabase from '../database/supabase.js';
+import { supabase } from '../database/supabase.js';
 import { decode } from 'base64-arraybuffer'
 
 let sessionToken = null;
