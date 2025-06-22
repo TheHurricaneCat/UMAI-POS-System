@@ -97,10 +97,10 @@ function NavigationContainer({handleStartSession, handleEndSession, saveExcelFil
             </button>
             {(userRole === "admin") ? (
                 <>
-                {/* <button className="header-button inventory" onClick={() => navigate('/inventory')}>
+                {<button className="header-button inventory" onClick={() => navigate('/inventory')}>
                     Inventory
                 </button>
-                <button className="header-button statistics" onClick={() => navigate('/statistics')}>
+                /* <button className="header-button statistics" onClick={() => navigate('/statistics')}>
                     Statistics
                 </button> */}
                 <button className="header-button account" onClick={() => navigate('/session-viewer')}>

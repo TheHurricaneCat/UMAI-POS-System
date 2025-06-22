@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './TrayItem.module.css';
 import defaultImage from '../assets/0.png'
 import TrayModifierItem from './TrayModifierItem.jsx';
-import supabase from '../database/supabase';
+import { supabase } from '../database/supabase';
 
 function TrayItem({ 
     productContent, 

@@ -5,7 +5,7 @@ import defaultImage from '../assets/0.png';
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'; */
 import { getSessionDetails } from '../handlers/SessionHandler';
-import supabase from '../database/supabase';
+import { supabase } from '../database/supabase';
 
 function ProductCard({productClass, type, addToTray, categoryColor}) {
     const [imageUrl, setImageUrl] = useState(defaultImage);

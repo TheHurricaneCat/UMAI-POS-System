@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { getSessionDetails, saveExcelFile } from './SessionHandler';
+import { supabase } from '../database/supabase.js';
 /* import { firestore } from '/firebase.js';
 import { collection, query, where, getDocs } from 'firebase/firestore'; */
 
@@ -11,26 +12,25 @@ import { collection, query, where, getDocs } from 'firebase/firestore'; */
 // todo:
 // remove firebase functions
 
-/* export async function fetchSessionItems(collectionName, sessionToken) {
+export async function fetchSessionItems(collectionName, sessionToken) {
   try {
-    console.log(`Attempting to fetch ${collectionName} with sessionToken:`, sessionToken);
-    const collectionRef = collection(firestore, collectionName);
-    const q = query(collectionRef, where('sessionToken', '==', sessionToken));
-    const querySnapshot = await getDocs(q);
-    
-    const items = [];
-    querySnapshot.forEach((doc) => {
-      items.push({ id: doc.id, ...doc.data() });
-    });
-
-    console.log(`Fetched ${items.length} ${collectionName}:`, items);
-    return items;
-  } catch (error) {
-    console.error(`Error fetching ${collectionName}:`, error);
+    if (!collectionName || !sessionToken) {
+      throw new Error('Missing collectionName or sessionToken');
+    }
+    const { data, error } = await supabase
+      .from(collectionName)
+      .select('*')
+      .eq('sessionToken', sessionToken);
+    if (error) {
+      console.error(`Error fetching ${collectionName}:`, error);
+      return [];
+    }
+    return data || [];
+  } catch (err) {
+    console.error(`Error in fetchSessionItems for ${collectionName}:`, err);
     return [];
   }
 }
- */
 
 export function initProductList(products = []) {
   let categories = [];

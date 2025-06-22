@@ -5,7 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import Login from './Login.jsx'
 /* import Statistics from './statistics.jsx' */
-/* import Inventory from './inventory-components/Inventory.jsx' */
+import Inventory from './inventory-components/Inventory.jsx'
 import SessionViewer from './SessionViewer.jsx'
 import ProductManager from './ProductManager.jsx'
 
@@ -23,7 +23,7 @@ const startApp = () => {
             <Route path="/product-manager" element={<ProductManager />} />
             <Route path="/app" element={<App />} />
             {/* <Route path="/statistics" element={<Statistics />} /> */}
-            {/* <Route path="/inventory" element={<Inventory />} /> */}
+            {<Route path="/inventory" element={<Inventory />} />}
           </Routes>
         </HashRouter>
        </UserProvider>
