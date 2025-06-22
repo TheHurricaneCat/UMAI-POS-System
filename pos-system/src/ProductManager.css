@@ -230,18 +230,23 @@
     align-items: center;
     z-index: 9999;
     backdrop-filter: blur(3px);
+    overflow-y: auto;
+    padding: 20px 0;
 }
 
 .modalContent {
     background: #ffffff;
     width: clamp(280px, 85vw, 400px);
     max-width: 90%;
-    padding: clamp(16px, 0.1px, 24px);
-    border-radius: clamp(6px, 1.5vw, 12px);
+    padding: 20px;
+    border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     position: relative;
     animation: fadeIn 0.3s ease-in-out;
-    min-height: fit-content;
+    max-height: 80vh;
+    overflow-y: auto;
+    margin: auto;
+    -webkit-overflow-scrolling: touch; /* For smooth iOS scrolling */
 }
 
 .modalContent h3 {
@@ -393,6 +398,191 @@
 
 .deleteButton:hover {
     background-color: #d32f2f;
+}
+
+/* Add these styles to your existing CSS file */
+
+.bundleContentGroup {
+    display: flex;
+    gap: 10px;
+}
+
+.bundleContentGroup input {
+    flex: 1;
+}
+
+.selectProductsButton {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.selectProductsButton:hover {
+    background-color: #357ae8;
+}
+
+.selectedProductsInfo {
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.selectedProductsList {
+    max-height: 100px;
+    overflow-y: auto;
+    margin-top: 5px;
+    padding-left: 20px;
+}
+
+.productSelectorModal {
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.productSelectorContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.productSelectorItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.productSelectorItem:hover {
+    background-color: #f0f0f0;
+}
+
+.productSelectorItem.selected {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+}
+
+.productSelectorInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.productSelectorCheckbox {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+.doneButton {
+    background-color: #52c41a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.doneButton:hover {
+    background-color: #49ad17;
+}
+
+.bundleGroup {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    margin-bottom: 15px;
+}
+
+.bundleSelectionGroup {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.productDropdown {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.selectedProductItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.removeProductButton {
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.removeProductButton:hover {
+    background-color: #ff7875;
+}
+
+.noProductsMessage {
+    color: #999;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.selectedProductsInfo {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+/* Update the button row to accommodate more buttons */
+.button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Make the Bundle button stand out */
+.button-row .add-btn:nth-child(2) {
+    background-color: #722ed1;
+}
+
+.button-row .add-btn:nth-child(2):hover {
+    background-color: #9254de;
 }
 
 @keyframes fadeIn {

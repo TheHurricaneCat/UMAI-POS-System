@@ -1,42 +1,18 @@
 import ExcelJS from 'exceljs';
 import { getSessionDetails, saveExcelFile } from './SessionHandler';
-/* import { firestore } from '/firebase.js';
-import { collection, query, where, getDocs } from 'firebase/firestore'; */
 
-
-// class functions are useless
-// since react does not prefer having their objects to change (states)
-// So it wants to create a new object instead of changing the existing one
-
-// todo:
-// remove firebase functions
-
-/* export async function fetchSessionItems(collectionName, sessionToken) {
-  try {
-    console.log(`Attempting to fetch ${collectionName} with sessionToken:`, sessionToken);
-    const collectionRef = collection(firestore, collectionName);
-    const q = query(collectionRef, where('sessionToken', '==', sessionToken));
-    const querySnapshot = await getDocs(q);
-    
-    const items = [];
-    querySnapshot.forEach((doc) => {
-      items.push({ id: doc.id, ...doc.data() });
-    });
-
-    console.log(`Fetched ${items.length} ${collectionName}:`, items);
-    return items;
-  } catch (error) {
-    console.error(`Error fetching ${collectionName}:`, error);
-    return [];
-  }
-}
- */
+//////////////
+// Bound to app.jsx
+// initializes productlist from an array
+// parses the product data and organizes it into categories
+//////////////
 
 export function initProductList(products = []) {
   let categories = [];
   products.forEach((product) => {
     // Find the category in the list
     let existingCategory = categories.find((category) => category.name === product.category);
+    // make this dynamic somehow
     let productType = product.code.search("PR");
     let productInstance = new Product(product.name, product.price, 1, product.code);
     
@@ -95,8 +71,12 @@ export async function fetchFromLocalStorage(token) {
   }
 }
 
+//////////////
+// Bound to keypadviewer and app.jsx
 // Function to save the Excel file
 // revert to simpler version. Check old commit
+//////////////
+
 export async function appendEntry(newEntries, discount, discountedTotal) {
   // Check if there are any entries to append
   if (!newEntries || newEntries.length === 0) {
@@ -268,6 +248,160 @@ export async function appendEntry(newEntries, discount, discountedTotal) {
   }
 }
 
+
+//////////////
+// Bound to transactionViewer page
+// fetches all transactions from the Excel file
+//////////////
+
+
+export async function getTransactions() {
+  try {
+    const sessionDetails = getSessionDetails();
+    if (!sessionDetails || !sessionDetails.token) {
+      console.warn("[SESSION] No valid session details found");
+      return [];
+    }
+    
+    const sessionID = `session_${sessionDetails.token}`;
+    console.log("[SESSION] Getting transactions from session ID:", sessionID);
+    
+    const fileBuffer = await fetchFromLocalStorage(sessionID);
+    if (!fileBuffer) {
+      console.warn("[SESSION] No Excel file found for this session");
+      return [];
+    }
+    
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer);
+    
+    const worksheet = workbook.getWorksheet(1);
+    if (!worksheet) {
+      console.error("[EXCEL] No worksheet found in Excel file");
+      return [];
+    }
+    
+    const transactions = [];
+    
+    // Iterate through the rows to collect transactions
+    for (let i = 1; i <= worksheet.rowCount; i++) {
+      const row = worksheet.getRow(i);
+      const rowType = row.getCell(1).value; // Column A - Type (PRODUCT, MODIFIER, PROMO, DISCOUNT)
+      
+      if (rowType === "PRODUCT") {
+        const invoiceNumber = row.getCell(6).value; // Column F - Invoice number
+        const customerName = row.getCell(7).value || "-"; // Column G - Customer name
+        const address = row.getCell(8).value || "-"; // Column H - Address
+        const contactNumber = row.getCell(9).value || "-"; // Column I - Contact number
+        const paymentMethod = row.getCell(10).value || "-"; // Column J - Payment method
+        const cashierName = row.getCell(11).value || "-"; // Column K - Cashier name
+        
+        let transaction = transactions.find(t => t.invoiceNumber === invoiceNumber);
+        
+        if (!transaction) {
+          transaction = {
+            invoiceNumber: invoiceNumber,
+            customerName: customerName,
+            address: address,
+            contactNumber: contactNumber,
+            paymentMethod: paymentMethod,
+            cashierName: cashierName,
+            products: [],
+            total: 0
+          };
+          transactions.push(transaction);
+        }
+        
+        const quantity = row.getCell(2).value; // Column B - Quantity
+        const name = row.getCell(3).value; // Column C - Name
+        const price = row.getCell(4).value; // Column D - Price
+        const total = row.getCell(5).value; // Column E - Total
+        
+        const product = {
+          quantity: Number(quantity),
+          name: name,
+          price: Number(price),
+          total: Number(total),
+          modifiers: [],
+          content: []
+        };
+        
+        transaction.products.push(product);
+        transaction.total += Number(total);
+      } else if (rowType === "MODIFIER") {
+        // Find the transaction this modifier belongs to
+        const invoiceNumber = row.getCell(6).value;
+        const transaction = transactions.find(t => t.invoiceNumber === invoiceNumber);
+        
+        if (transaction && transaction.products.length > 0) {
+          // Add modifier to the last added product in this transaction
+          const currentProduct = transaction.products[transaction.products.length - 1];
+          
+          const quantity = row.getCell(2).value;
+          const name = row.getCell(3).value;
+          const price = row.getCell(4).value;
+          const total = row.getCell(5).value;
+          
+          currentProduct.modifiers.push({
+            quantity: Number(quantity),
+            name: name,
+            price: Number(price),
+            total: Number(total)
+          });
+        }
+      } else if (rowType === "PROMO") {
+        // Find the transaction this promo content belongs to
+        const invoiceNumber = row.getCell(6).value;
+        const transaction = transactions.find(t => t.invoiceNumber === invoiceNumber);
+        
+        if (transaction && transaction.products.length > 0) {
+          // Add promo content to the last added product in this transaction
+          const currentProduct = transaction.products[transaction.products.length - 1];
+          
+          const quantity = row.getCell(2).value;
+          const name = row.getCell(3).value;
+          const price = row.getCell(4).value;
+          const total = row.getCell(5).value;
+          
+          currentProduct.content.push({
+            quantity: Number(quantity),
+            name: name,
+            price: Number(price),
+            total: Number(total)
+          });
+        }
+      } else if (rowType === "DISCOUNT") {
+        // Find the transaction this discount belongs to
+        const invoiceNumber = row.getCell(6).value;
+        const transaction = transactions.find(t => t.invoiceNumber === invoiceNumber);
+        
+        if (transaction) {
+          const name = row.getCell(2).value;
+          const value = row.getCell(3).value;
+          const discountedTotal = row.getCell(4).value;
+          
+          transaction.discount = {
+            name: name,
+            value: Number(value)
+          };
+          transaction.discountedTotal = Number(discountedTotal);
+        }
+      }
+    }
+    
+    console.log("[EXCEL] Retrieved transactions:", transactions);
+    return transactions;
+  } catch (error) {
+    console.error("[EXCEL] Error retrieving transactions:", error);
+    return [];
+  }
+}
+
+//////////////
+// Bound to receipt generation
+// Function to \get the last transaction from the local excel
+//////////////
+
 export async function getLastTransaction() {
   try {
     const sessionDetails = getSessionDetails();
@@ -302,22 +436,25 @@ export async function getLastTransaction() {
       address: "",
       contactNumber: "",
       paymentMethod: "",
+      cashierName: "",
       products: [],
       total: 0
     };
     
     // First pass: find the last invoice number
+    // Update column indices to match those in appendEntry
     for (let i = worksheet.rowCount; i > 0; i--) {
       const row = worksheet.getRow(i);
-      const invoiceCell = row.getCell(5).value; // Column E - Invoice number
+      const invoiceCell = row.getCell(6).value; // Column F - Invoice number (changed from 5/E)
       
       if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
         lastInvoiceNumber = invoiceCell;
         lastTransaction.invoiceNumber = invoiceCell;
-        lastTransaction.customerName = row.getCell(6).value || "-"; // Column F - Customer name
-        lastTransaction.address = row.getCell(7).value || "-"; // Column G - Address
-        lastTransaction.contactNumber = row.getCell(8).value || "-"; // Column H - Contact number
-        lastTransaction.paymentMethod = row.getCell(9).value || "-"; // Column I - Payment method
+        lastTransaction.customerName = row.getCell(7).value || "-"; // Column G - Customer name
+        lastTransaction.address = row.getCell(8).value || "-"; // Column H - Address
+        lastTransaction.contactNumber = row.getCell(9).value || "-"; // Column I - Contact number
+        lastTransaction.paymentMethod = row.getCell(10).value || "-"; // Column J - Payment method
+        lastTransaction.cashierName = row.getCell(11).value || "-"; // Column K - Cashier name
         break;
       }
     }
@@ -332,17 +469,18 @@ export async function getLastTransaction() {
     
     for (let i = 1; i <= worksheet.rowCount; i++) {
       const row = worksheet.getRow(i);
-      const invoiceCell = row.getCell(5).value;
+      const rowType = row.getCell(1).value; // Column A - Type (PRODUCT, MODIFIER, PROMO, DISCOUNT)
+      const invoiceCell = row.getCell(6).value; // Column F - Invoice number
       
       // If this row belongs to the last invoice
       if (invoiceCell === lastInvoiceNumber) {
-        const quantity = row.getCell(1).value;
-        const name = row.getCell(2).value;
-        const price = row.getCell(3).value;
-        const total = row.getCell(4).value;
-        
-        if (quantity && name && price !== null) {
-          // This is a main product row
+        // For regular products
+        if (rowType === "PRODUCT") {
+          const quantity = row.getCell(2).value; // Column B - Quantity
+          const name = row.getCell(3).value; // Column C - Name
+          const price = row.getCell(4).value; // Column D - Price
+          const total = row.getCell(5).value; // Column E - Total
+          
           currentProduct = {
             quantity: Number(quantity),
             name: name,
@@ -354,40 +492,45 @@ export async function getLastTransaction() {
           lastTransaction.products.push(currentProduct);
           lastTransaction.total += Number(total);
         }
-      } 
-      // Check for modifiers or content (they have null in column A but values in B and C)
-      else if (
-        currentProduct && 
-        row.getCell(1).value === null && 
-        row.getCell(2).value !== null && 
-        row.getCell(3).value !== null
-      ) {
-        const modQuantity = row.getCell(2).value;
-        const modName = row.getCell(3).value;
-        const modPriceInfo = row.getCell(4).value;
-        
-        if (typeof modPriceInfo === 'string') {
-          if (modPriceInfo.includes('>>')) {
-            // This is a modifier
-            const price = parseFloat(modPriceInfo.split('>>')[0].trim());
-            
-            currentProduct.modifiers.push({
-              quantity: Number(modQuantity),
-              name: modName,
-              price: price,
-              total: price * Number(modQuantity)
-            });
-          } else if (modPriceInfo.includes('>')) {
-            // This is a promo content
-            const price = parseFloat(modPriceInfo.split('>')[0].trim());
-            
-            currentProduct.content.push({
-              quantity: Number(modQuantity),
-              name: modName,
-              price: price,
-              total: price * Number(modQuantity)
-            });
-          }
+        // For modifiers
+        else if (rowType === "MODIFIER" && currentProduct) {
+          const quantity = row.getCell(2).value; // Column B - Quantity
+          const name = row.getCell(3).value; // Column C - Name
+          const price = row.getCell(4).value; // Column D - Price
+          const total = row.getCell(5).value; // Column E - Total
+          
+          currentProduct.modifiers.push({
+            quantity: Number(quantity),
+            name: name,
+            price: Number(price),
+            total: Number(total)
+          });
+        }
+        // For promo content
+        else if (rowType === "PROMO" && currentProduct) {
+          const quantity = row.getCell(2).value; // Column B - Quantity
+          const name = row.getCell(3).value; // Column C - Name
+          const price = row.getCell(4).value; // Column D - Price
+          const total = row.getCell(5).value; // Column E - Total
+          
+          currentProduct.content.push({
+            quantity: Number(quantity),
+            name: name,
+            price: Number(price),
+            total: Number(total)
+          });
+        }
+        // For discount (optional - if you want to include it in the receipt)
+        else if (rowType === "DISCOUNT") {
+          const name = row.getCell(2).value; // Column B - Discount name
+          const value = row.getCell(3).value; // Column C - Discount value
+          const discountedTotal = row.getCell(4).value; // Column D - Discounted total
+          
+          lastTransaction.discount = {
+            name: name,
+            value: Number(value)
+          };
+          lastTransaction.discountedTotal = Number(discountedTotal);
         }
       }
     }
@@ -399,6 +542,122 @@ export async function getLastTransaction() {
     return null;
   }
 }
+
+//////////////
+// Bound to sessionViewer
+// Function to void the last transaction
+// Must be on a one-at-time transaction only basis
+//////////////
+
+export async function voidLastTransaction() {
+  try {
+    // Get session details
+    const sessionDetails = getSessionDetails();
+    if (!sessionDetails || !sessionDetails.token) {
+      console.warn("[SESSION] No valid session details found for voiding transaction");
+      return false;
+    }
+    
+    const sessionID = `session_${sessionDetails.token}`;
+    console.log("[SESSION] Attempting to void last transaction from session:", sessionID);
+    
+    // Fetch the Excel file
+    const fileBuffer = await fetchFromLocalStorage(sessionID);
+    if (!fileBuffer) {
+      console.warn("[SESSION] No Excel file found for voiding transaction");
+      return false;
+    }
+    
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer);
+    
+    const worksheet = workbook.getWorksheet(1);
+    if (!worksheet) {
+      console.error("[EXCEL] No worksheet found in Excel file");
+      return false;
+    }
+    
+    // Find the last invoice number
+    let lastInvoiceNumber = null;
+    for (let i = worksheet.rowCount; i > 0; i--) {
+      const row = worksheet.getRow(i);
+      const invoiceCell = row.getCell(6).value; // Column F - Invoice number
+      
+      if (invoiceCell && typeof invoiceCell === 'string' && invoiceCell.includes('-')) {
+        lastInvoiceNumber = invoiceCell;
+        break;
+      }
+    }
+    
+    if (!lastInvoiceNumber) {
+      console.warn("[EXCEL] No transactions found to void");
+      return false;
+    }
+    
+    console.log("[EXCEL] Found last invoice number for voiding:", lastInvoiceNumber);
+    
+    // Identify rows to remove (all rows with matching invoice number)
+    const rowsToDelete = [];
+    for (let i = 1; i <= worksheet.rowCount; i++) {
+      const row = worksheet.getRow(i);
+      const invoiceCell = row.getCell(6).value;
+      
+      if (invoiceCell === lastInvoiceNumber) {
+        rowsToDelete.push(i);
+      }
+    }
+    
+    if (rowsToDelete.length === 0) {
+      console.warn("[EXCEL] No rows found with the last invoice number");
+      return false;
+    }
+    
+    console.log("[EXCEL] Found", rowsToDelete.length, "rows to delete for invoice:", lastInvoiceNumber);
+    
+    // Delete rows in reverse order to avoid shifting issues
+    for (let i = rowsToDelete.length - 1; i >= 0; i--) {
+      worksheet.spliceRows(rowsToDelete[i], 1);
+    }
+    
+    console.log("[EXCEL] Removed rows for transaction with invoice:", lastInvoiceNumber);
+    
+    // Save the updated workbook
+    const updatedExcelBuffer = await workbook.xlsx.writeBuffer();
+    
+    // Web mode: Save to cache
+    const blob = new Blob([updatedExcelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    
+    // Return a promise to ensure we wait for the file to be saved
+    return new Promise((resolve, reject) => {
+      reader.onloadend = () => {
+        try {
+          localStorage.setItem(sessionID, reader.result);
+          console.log("[EXCEL] File saved to cache after voiding transaction");
+          
+          resolve(true); // Successfully voided
+        } catch (error) {
+          console.error("[EXCEL] Error saving file after voiding:", error);
+          reject(error);
+        }
+      };
+      
+      reader.onerror = (error) => {
+        console.error("[EXCEL] Error reading file data after voiding:", error);
+        reject(error);
+      };
+    });
+  } catch (error) {
+    console.error("[EXCEL] Error voiding last transaction:", error);
+    return false;
+  }
+}
+
+//////////////
+// Class declarations
+//////////////
 
 
 export class Modifier {
