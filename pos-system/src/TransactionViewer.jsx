@@ -9,15 +9,26 @@ const TransactionViewer = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [voidPopup, setVoidPopup] = useState(false);
+  const [voidConfirmPopup, setVoidConfirmPopup] = useState(false);
+  const [confirmVoid, setConfirmVoid] = useState(false);
   const [messagePopup, setMessagePopup] = useState(false);
   const [messageText, setMessageText] = useState('');
+  const [successPopup, setSuccessPopup] = useState(false);
+  const [errorPopup, setErrorPopup] = useState(false);
   const [hasVoidedRecently, setHasVoidedRecently] = useState(false);
   const [expandedTransactionId, setExpandedTransactionId] = useState(null);
 
   useEffect(() => {
     loadTransactions();
   }, []);
+
+  // Add effect to handle confirmation
+  useEffect(() => {
+    if (confirmVoid) {
+      performVoidTransaction();
+      setConfirmVoid(false);
+    }
+  }, [confirmVoid]);
 
   const loadTransactions = async () => {
     try {
@@ -45,16 +56,8 @@ const TransactionViewer = () => {
       return;
     }
 
-    setVoidPopup(true);
-  };
-
-  const handleConfirmVoid = () => {
-    setVoidPopup(false);
-    performVoidTransaction();
-  };
-
-  const handleCancelVoid = () => {
-    setVoidPopup(false);
+    // Show confirmation popup
+    setVoidConfirmPopup(true);
   };
 
   const performVoidTransaction = async () => {
@@ -63,20 +66,22 @@ const TransactionViewer = () => {
     try {
       const success = await voidLastTransaction();
       if (success) {
-        setMessageText('Last transaction has been successfully voided.');
         setHasVoidedRecently(true);
         await loadTransactions(); // Reload transactions after voiding
         setExpandedTransactionId(null); // Close any expanded transaction
+        
+        // Use success popup instead of message popup
+        setSuccessPopup(true);
       } else {
-        setMessageText('Failed to void the last transaction. Please try again.');
+        // Use error popup for failed void operation
+        setErrorPopup(true);
       }
     } catch (err) {
-      setMessageText('An error occurred while voiding the transaction.');
       console.error('Error voiding transaction:', err);
+      setErrorPopup(true);
     }
     
     setLoading(false);
-    setMessagePopup(true);
   };
 
   const formatCurrency = (amount) => {
@@ -120,18 +125,20 @@ const TransactionViewer = () => {
           <button className="header-button statistics" onClick={() => handleRedirect('/product-manager')}>
             Product Manager
           </button>
+        </div>
+      </div>
+
+      <div className="tx-content-interface">
+        <div className="tx-page-header">
+          <h1 className="tx-page-title">Transaction History</h1>
           <button 
-            className="header-button session-end" 
+            className="void-btn" 
             onClick={handleVoidLastTransaction}
             disabled={loading || transactions.length === 0 || hasVoidedRecently}
           >
             Void Last Transaction
           </button>
         </div>
-      </div>
-
-      <div className="tx-content-interface">
-        <h1 className="tx-page-title">Transaction History</h1>
 
         {loading ? (
           <div className="tx-loading">Loading transactions...</div>
@@ -238,14 +245,15 @@ const TransactionViewer = () => {
         )}
       </div>
 
+      {/* Multiple separate PopUps for different scenarios */}
       <PopUp 
         text="Are you sure you want to void the last transaction? This action cannot be undone."
         button1="Confirm"
         button2="Cancel"
-        trigger={voidPopup}
-        setTrigger={setVoidPopup}
-        onButton1Click={handleConfirmVoid}
-        onButton2Click={handleCancelVoid}
+        trigger={voidConfirmPopup}
+        setTrigger={setVoidConfirmPopup}
+        confirm={confirmVoid}
+        setConfirm={setConfirmVoid}
       />
 
       <PopUp 
@@ -253,6 +261,28 @@ const TransactionViewer = () => {
         button1="OK"
         trigger={messagePopup}
         setTrigger={setMessagePopup}
+        confirm={false}
+        setConfirm={() => {}}
+      />
+
+      <PopUp 
+        text="Last transaction has been successfully voided."
+        button1="OK"
+        button2="Close"
+        trigger={successPopup}
+        setTrigger={setSuccessPopup}
+        confirm={false}
+        setConfirm={() => {}}
+      />
+
+      <PopUp 
+        text="Failed to void the last transaction. Please try again."
+        button1="OK"
+        button2="Close"
+        trigger={errorPopup}
+        setTrigger={setErrorPopup}
+        confirm={false}
+        setConfirm={() => {}}
       />
     </div>
   );

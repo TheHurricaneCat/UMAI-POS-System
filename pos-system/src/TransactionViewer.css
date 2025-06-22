@@ -52,16 +52,16 @@
   background-color: #3e8e41;
 }
 
-.void-button {
+.void-btn {
   background-color: #ff4d4f;
   color: white;
 }
 
-.void-button:hover {
+.void-btn:hover {
   background-color: #d32f2f;
 }
 
-.void-button:disabled, .void-btn:disabled {
+.void-btn:disabled {
   background-color: #ffcccb;
   cursor: not-allowed;
   opacity: 0.5;
@@ -159,9 +159,16 @@
   background-color: #f5f5f5;
 }
 
+.tx-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 .tx-page-title {
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 0; /* Changed from 20px to 0 */
   font-size: 24px;
 }
 
