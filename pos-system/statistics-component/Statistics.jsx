@@ -126,44 +126,27 @@ function Statistics() {
         return filtered;
     };
     
-    const parseExcelRows = (jsonData) => {
-    let products = [];
-    let inProductSection = false;
-    for (let i = 0; i < jsonData.length; i++) {
-        const row = jsonData[i];
-        if (!row || row.length === 0) continue;
-        // Start reading after "PRODUCT" header
-        if (row[0] && String(row[0]).toUpperCase() === "PRODUCT") {
-            inProductSection = true;
-            continue;
-        }
-        if (inProductSection) {
-            // Stop if row is empty or a new section header
-            if (
-                !row[2] ||
-                typeof row[2] !== "string" ||
-                row[2].trim() === "" ||
-                (row[0] && typeof row[0] === "string" && ["DISCOUNT", "TOTAL", "SUBTOTAL"].includes(row[0].toUpperCase()))
-            ) {
-                break;
-            }
-            // Find the first number after the product name (after col 2)
-            let value = 0;
-            for (let j = 3; j < row.length; j++) {
-                if (typeof row[j] === "number" && !isNaN(row[j])) {
-                    value = row[j];
-                    break;
-                }
-                if (!isNaN(Number(row[j])) && row[j] !== "" && row[j] !== null) {
-                    value = Number(row[j]);
-                    break;
+        const parseExcelRows = (jsonData) => {
+        let products = [];
+        for (let i = 0; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (!row || row.length === 0) continue;
+            // Only look for PRODUCT rows
+            if (row[0] && String(row[0]).toUpperCase() === "PRODUCT") {
+                const name = row[2];
+                // Use the "total" column (row[4]) for sales amount, fallback to price (row[3]) if needed
+                let value = 0;
+                if (typeof row[4] === "number" && !isNaN(row[4])) value = row[4];
+                else if (!isNaN(Number(row[4]))) value = Number(row[4]);
+                else if (typeof row[3] === "number" && !isNaN(row[3])) value = row[3];
+                else if (!isNaN(Number(row[3]))) value = Number(row[3]);
+                if (name && value) {
+                    products.push({ name, value });
                 }
             }
-            products.push({ name: row[2], value });
         }
-    }
-    return products;
-};
+        return products;
+    };
 
     const generateGraph = async () => {
         setLoading(true);
