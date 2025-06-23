@@ -145,6 +145,44 @@ const Login = () => {
         }
     };
 
+    const handleForgotPassword = async () => {
+        if (!email) {
+            setErrorMessage("Please enter your email to reset your password.");
+            return;
+        }
+        setLoading(true);
+        setErrorMessage("");
+        try {
+            // Check if email exists in profiles table
+            const { data: profiles, error: profileError } = await supabase
+                .from('profiles')
+                .select('email')
+                .eq('email', email)
+                .single();
+            if (profileError || !profiles) {
+                setErrorMessage("No account found with this email.");
+                setLoading(false);
+                return;
+            }
+            // Email exists, try to send reset
+            const { error } = await supabase.auth.resetPasswordForEmail(email);
+            if (error) {
+                if (error.message && error.message.toLowerCase().includes("invalid")) {
+                    setErrorMessage("This account cannot reset password. Please contact admin.");
+                } else {
+                    setErrorMessage(error.message || "Failed to send password reset email.");
+                }
+                setLoading(false);
+                return;
+            }
+            setErrorMessage("Password reset email sent! Please check your inbox.");
+        } catch (error) {
+            setErrorMessage(error.message || "Failed to send password reset email.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="container">
             <div className="header">
@@ -191,7 +229,7 @@ const Login = () => {
 
             {action === "Login" && (
                 <div className="forgot-password">
-                    Forgot Password? <span onClick={() => navigate('/reset-password')}>Click Here!</span>
+                    Forgot Password? <span onClick={handleForgotPassword}>Click Here!</span>
                 </div>
             )}
 
