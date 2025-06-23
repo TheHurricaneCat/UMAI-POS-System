@@ -58,7 +58,8 @@ function NavigationContainer({handleStartSession, handleEndSession, saveExcelFil
     // Define admin buttons with colors
     const adminButtons = userRole === "admin" ? [
         { label: "Session Viewer", className: "header-button account", onClick: () => navigate('/session-viewer'), color: "green" },
-        { label: "Product Manager", className: "header-button account", onClick: () => navigate('/product-manager'), color: "blue" }
+        { label: "Product Manager", className: "header-button account", onClick: () => navigate('/product-manager'), color: "blue" },
+        { label: "Database Backup", className: "header-button account", onClick: () => navigate('/backup-manager'), color: "purple" }
     ] : [];
 
     return (

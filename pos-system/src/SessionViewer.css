@@ -71,3 +71,11 @@
     color: red;
     font-size: 16px;
 }
+
+/* Navigation Bar Styles */
+.navigation-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}

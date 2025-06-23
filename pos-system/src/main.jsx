@@ -9,6 +9,7 @@ import Inventory from './inventory-components/Inventory.jsx'
 import SessionViewer from './SessionViewer.jsx'
 import ProductManager from './ProductManager.jsx'
 import TransactionViewer from './TransactionViewer.jsx'
+import BackupManager from './BackupManager.jsx'
 
 import { UserProvider } from './UserContext';
 
@@ -23,6 +24,7 @@ const startApp = () => {
             <Route path="/session-viewer" element={<SessionViewer />} />
             <Route path="/transaction-viewer" element={<TransactionViewer />} />
             <Route path="/product-manager" element={<ProductManager />} />
+            <Route path="/backup-manager" element={<BackupManager />} />
             <Route path="/app" element={<App />} />
             {/* <Route path="/statistics" element={<Statistics />} /> */}
             {<Route path="/inventory" element={<Inventory />} />}
