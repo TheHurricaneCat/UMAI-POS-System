@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Bar } from 'react-chartjs-2';
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate } from "react-router-dom"; 
 import { Chart, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
 import { supabase } from '../src/database/supabase';
 import * as XLSX from "xlsx";
@@ -8,7 +8,6 @@ import './Statistics.css';
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-// Helper to extract date string from PRODUCT row (assumes date is in last column)
 function extractDateFromExcel(jsonData) {
     for (let i = 0; i < jsonData.length; i++) {
         const row = jsonData[i];
@@ -38,7 +37,7 @@ function getWeekString(dateStr) {
 }
 
 function Statistics() {
-    const navigate = useNavigate(); // Use useNavigate hook
+    const navigate = useNavigate(); 
     const [files, setFiles] = useState([]);
     const [activeReport, setActiveReport] = useState('yearly');
     const [input, setInput] = useState({});
