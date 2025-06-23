@@ -59,7 +59,8 @@ function NavigationContainer({handleStartSession, handleEndSession, saveExcelFil
     const adminButtons = userRole === "admin" ? [
         { label: "Session Viewer", className: "header-button account", onClick: () => navigate('/session-viewer'), color: "green" },
         { label: "Product Manager", className: "header-button account", onClick: () => navigate('/product-manager'), color: "blue" },
-        { label: "Database Backup", className: "header-button account", onClick: () => navigate('/backup-manager'), color: "purple" }
+        { label: "Database Backup", className: "header-button account", onClick: () => navigate('/backup-manager'), color: "purple" },
+        { label: "Statistics", className: "header-button account", onClick: () => navigate('/statistics'), color: "yellow" }
     ] : [];
 
     return (
