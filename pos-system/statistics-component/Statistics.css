@@ -1,0 +1,262 @@
+.statisticsFlexContainer {
+    display: flex;
+    min-height: 100vh;
+    background: #322c41; /* matches your POS background */
+}
+
+/* Sidebar */
+.statisticsSidebar {
+    width: 300px;
+    background: #2d2736;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 36px 18px 24px 18px;
+    border-radius: 0 18px 18px 0;
+    box-shadow: 2px 0 18px rgba(0,0,0,0.13);
+    min-width: 220px;
+    min-height: 100vh;
+    position: relative;
+}
+
+.goToAppBtn {
+    width: 100%;
+    padding: 15px 0;
+    background: #ffd600;
+    color: #3a3350;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    margin-bottom: 32px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    letter-spacing: 1px;
+}
+.goToAppBtn:hover {
+    background: #ffe066;
+    color: #a259e6;
+}
+
+.sidebarBtnGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    margin-bottom: 32px;
+}
+
+.sidebarBtn {
+    width: 100%;
+    padding: 18px 0;
+    background: #3a3350;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    margin-bottom: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.sidebarBtn.active,
+.sidebarBtn:hover {
+    background: #a259e6;
+    color: #ffd600;
+    box-shadow: 0 4px 16px #a259e6a0;
+}
+
+.sidebarInputs {
+    margin-bottom: 28px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+}
+
+.statInput, .fileSelect {
+    width: 100%;
+    margin-bottom: 0;
+    padding: 14px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #ffd600;
+    font-size: 1.13rem;
+    background: #fffbe6;
+    color: #3a3350;
+    text-align: left;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+
+.statInput:focus, .fileSelect:focus {
+    outline: 2px solid #a259e6;
+    border-color: #a259e6;
+}
+
+.generateBtn {
+    width: 100%;
+    padding: 16px 0;
+    background: #ffd600;
+    color: #3a3350;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.generateBtn:hover {
+    background: #ffe066;
+}
+
+/* Main statistics area */
+.statisticsMain {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 32px 32px 32px;
+    background: #322c41; /* match POS background */
+    min-height: 100vh;
+}
+
+/* Header */
+.statisticsHeader {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #ffd600;
+    margin-bottom: 28px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(162,89,230,0.12);
+}
+
+/* Graph section card */
+.statisticsGraphSection {
+    width: 100%;
+    max-width: 700px;
+    min-height: 340px;
+    background: #eceaf5; /* dark card */
+    border-radius: 18px;
+    box-shadow: 0 2px 18px rgba(162,89,230,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    padding: 32px;
+    position: relative;
+}
+
+.graphPlaceholder {
+    color: #a59db5;
+    font-size: 1.2rem;
+    text-align: center;
+    width: 100%;
+}
+.generateReportBtn {
+    background: #00e676;
+    color: #2d2736;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.15rem;
+    font-weight: bold;
+    padding: 14px 32px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.generateReportBtn:hover {
+    background: #00c853;
+}
+
+.comparisonSection {
+    background: #3a3350;
+    color: #fff;
+    border-radius: 10px;
+    padding: 18px 24px;
+    font-size: 1.1rem;
+    margin-top: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+}
+
+.comparisonSection div {
+    margin: 0 8px;
+}
+
+@media (max-width: 900px) {
+    .statisticsFlexContainer {
+        flex-direction: column;
+    }
+    .statisticsSidebar {
+        width: 100%;
+        flex-direction: row;
+        align-items: flex-start;
+        border-radius: 0 0 18px 18px;
+        box-shadow: none;
+        padding: 16px 8px;
+        margin-bottom: 16px;
+        min-width: unset;
+        min-height: unset;
+    }
+    .sidebarBtnGroup {
+        flex-direction: row;
+        gap: 10px;
+        width: auto;
+        margin-bottom: 0;
+    }
+    .sidebarBtn {
+        width: 120px;
+        min-width: 90px;
+        padding: 14px 0;
+        font-size: 1rem;
+    }
+    .sidebarInputs {
+        margin-bottom: 0;
+        margin-right: 8px;
+        width: 180px;
+        gap: 10px;
+    }
+    .generateBtn {
+        margin-top: 0;
+        width: 120px;
+        font-size: 1rem;
+        padding: 12px 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .statisticsMain {
+        padding: 12px 2px;
+    }
+    .statisticsHeader {
+        font-size: 1.3rem;
+    }
+    .statisticsGraphSection {
+        padding: 8px;
+        min-height: 200px;
+    }
+    .generateReportBtn {
+        padding: 10px 8px;
+        font-size: 1rem;
+    }
+    .comparisonSection {
+        padding: 10px 8px;
+        font-size: 1rem;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .statInput, .generateBtn, .fileSelect {
+        width: 100%;
+        font-size: 0.95rem;
+        padding: 10px 6px;
+    }
+}

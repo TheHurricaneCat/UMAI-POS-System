@@ -14,6 +14,7 @@ import CategoryMenu from './pos-components/CategoryMenu.jsx'
 import PopUp from './global-components/PopUp.jsx';
 import NavigationContainer from './pos-components/NavigationContainer.jsx';
 import ContentHeader from './pos-components/ContentHeader.jsx';
+import Statistics from '../statistics-component/Statistics.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
 
@@ -64,6 +65,12 @@ function App() {
   const [confirm, setConfirm] = useState(false);
 
   const {userRole, setUserRole, sessionId, setSessionId, clearUserContext} = useContext(UserContext);
+
+  // for statistics component
+   const [showStatistics, setShowStatistics] = useState(false);
+
+  const handleShowStatistics = () => setShowStatistics(true);
+  const handleHideStatistics = () => setShowStatistics(false);
 
   // get the employee's username and always check for sessionId
   const [username, setUsername] = useState('');
@@ -321,6 +328,7 @@ function App() {
             userRole={userRole} // This should be dynamic based on the logged-in user
             handleClockOut={handleClockOut}
             handleLogOut={handleLogOut}
+            handleShowStatistics={handleShowStatistics}
         /> 
       </div>
       <div className="popUpInterface">
