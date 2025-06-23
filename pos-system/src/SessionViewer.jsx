@@ -45,13 +45,14 @@ const EmployeeTable = () => {
                             <td>{user.id}</td>
                             <td>{user.role}</td>
                             <td>
-                                <button
-                                    onClick={() =>
-                                        handleRoleChange(user.id, user.role === "admin" ? "user" : "admin")
-                                    }
+                                <select
+                                    value={user.role}
+                                    onChange={e => handleRoleChange(user.id, e.target.value)}
                                 >
-                                    Set as {user.role === "admin" ? "User" : "Admin"}
-                                </button>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="employee">Employee</option>
+                                </select>
                             </td>
                         </tr>
                     ))}
