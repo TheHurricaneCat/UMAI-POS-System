@@ -1,0 +1,73 @@
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdownButton {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 150px;
+}
+
+.dropdownContent {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.dropdownItem {
+    padding: 6px 12px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+/* Add color theme classes */
+.redButton {
+    background-color: tomato;
+    color: white;
+}
+
+.blueButton {
+    background-color: #007bff;
+    color: white;
+}
+
+.greenButton {
+    background-color: #28a745;
+    color: white;
+}
+
+.orangeButton {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.yellowButton {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.grayButton {
+    background-color: #6c757d;
+    color: white;
+}
+
+.defaultButton {
+    background-color: #f8f9fa;
+    color: #212529;
+}

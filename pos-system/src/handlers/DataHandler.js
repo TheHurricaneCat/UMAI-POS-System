@@ -76,17 +76,29 @@ export function initProductList(products = []) {
   return categories;
 }
 
-export async function fetchFromLocalStorage(token) {
-  console.log("[SESSION]  Fetching Excel file from local storage with token:", token);
+export async function fetchFromLocalStorage(token) {  console.log("[SESSION]  Fetching Excel file from local storage with token:", token);
   const base64Data = localStorage.getItem(token);
   if (!base64Data) {
-    const filePathWeb = "/TestFile.xlsx";
-      console.log("[SESSION]  Fetching Excel template from:", filePathWeb);
-      const response = await fetch(filePathWeb);
-      
-      if (!response.ok) {
-        throw new Error(`[SESSION]  Failed to fetch Excel file: ${response.status} ${response.statusText}`);
-      }
+    // Check if we're in Electron environment
+    const isElectron = window.navigator.userAgent.toLowerCase().indexOf('electron') > -1;
+    
+    let filePathWeb;
+    if (isElectron) {
+      // In Electron, use relative path that works with file protocol
+      filePathWeb = "./TestFile.xlsx";
+    } else {
+      // In web browser, use absolute path
+      filePathWeb = "/TestFile.xlsx";
+    }
+    
+    console.log("[SESSION]  Fetching Excel template from:", filePathWeb);
+    console.log("[SESSION]  Running in Electron:", isElectron);
+    
+    const response = await fetch(filePathWeb);
+    
+    if (!response.ok) {
+      throw new Error(`[SESSION]  Failed to fetch Excel file: ${response.status} ${response.statusText}`);
+    }
       console.log('[SESSION]  Data has been fetched');
       return await response.arrayBuffer();
   } else {
