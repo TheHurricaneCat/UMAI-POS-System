@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './database/supabase';
 import './SessionViewer.css';
-import.meta.env
 
 const EmployeeTable = () => {
     const [users, setUsers] = useState([]);
@@ -90,11 +89,12 @@ const SessionViewer = () => {
                 setLoading(false);
             }
         };
+
         fetchSessions();
     }, []);
 
-    const handleRedirect = () => {
-        navigate('/app');
+    const handleRedirect = (path) => {
+        navigate(path);
     };
 
     const handleDownload = async (fileName) => {
@@ -126,18 +126,22 @@ const SessionViewer = () => {
 
     return (
         <div className="account-page">
+            {/* Navigation Buttons */}
+            <div className="navigation-bar">
+                <button className="redirect-btn" onClick={() => handleRedirect('/app')}>Go to App</button>
+                <button className="redirect-btn" onClick={() => handleRedirect('/backup-manager')}>Database Backup</button>
+            </div>
+            
             {/* Employee Management Table */}
-            
-            
-            <button className="redirect-btn" onClick={handleRedirect}>Go to App</button>
             <EmployeeTable />
+            
+            {/* Sessions Table */}
             <h1 className="space">Employee Sessions</h1>
             {loading ? (
                 <p>Loading sessions...</p>
             ) : error ? (
                 <p className="error-message">{error}</p>
             ) : (
-                
                 <table className="sessions-table">
                     <thead>
                         <tr>
@@ -172,8 +176,6 @@ const SessionViewer = () => {
                     </tbody>
                 </table>
             )}
-
-            
         </div>
     );
 };

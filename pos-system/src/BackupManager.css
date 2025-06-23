@@ -1,0 +1,378 @@
+.account-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Navigation Bar Styles */
+.navigation-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.redirect-btn {
+  background-color: #2196F3;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.redirect-btn:hover {
+  background-color: #1976D2;
+}
+
+/* Page title styling */
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.page-title .icon {
+  background-color: #f5f5f5;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+/* Backup section styling */
+.backup-section {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.backup-section h2 {
+  margin-top: 0;
+  color: #333;
+  font-size: 22px;
+}
+
+.backup-section h3 {
+  color: #555;
+  font-size: 18px;
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+.backup-description {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* Action buttons styling */
+.backup-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.table-select, .bucket-select {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  min-width: 150px;
+  max-width: 300px;
+}
+
+.backup-btn, .excel-backup-btn, .refresh-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.backup-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.backup-btn:hover {
+  background-color: #388E3C;
+}
+
+.excel-backup-btn {
+  background-color: #9C27B0;
+  color: white;
+}
+
+.excel-backup-btn:hover {
+  background-color: #7B1FA2;
+}
+
+.excel-backup-btn:disabled {
+  background-color: #E1BEE7;
+  cursor: not-allowed;
+}
+
+.refresh-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.refresh-btn:hover {
+  background-color: #1976D2;
+}
+
+/* Table styling */
+.sessions-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.sessions-table th, .sessions-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.sessions-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.sessions-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.sessions-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.backup-actions-cell {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.download-btn, .restore-btn, .delete-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.download-btn {
+  background-color: #2196F3;
+  color: white;
+}
+
+.download-btn:hover {
+  background-color: #1976D2;
+}
+
+.restore-btn {
+  background-color: #FF9800;
+  color: white;
+}
+
+.restore-btn:hover {
+  background-color: #F57C00;
+}
+
+.delete-btn {
+  background-color: #F44336;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #D32F2F;
+}
+
+/* Restore modal styling */
+.restore-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.restore-modal.show {
+  display: flex;
+}
+
+.restore-modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+}
+
+.restore-modal-content h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.warning {
+  color: #F44336;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #FFEBEE;
+  border-radius: 4px;
+}
+
+.confirm-phrase-container {
+  margin: 20px 0;
+}
+
+.confirm-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.confirm-btn, .cancel-btn {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.confirm-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background-color: #388E3C;
+}
+
+.confirm-btn:disabled {
+  background-color: #E0E0E0;
+  color: #9E9E9E;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background-color: #F44336;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #D32F2F;
+}
+
+/* Offline message styling */
+.offline-message {
+  text-align: center;
+  padding: 30px;
+  background-color: #FFEBEE;
+  border-radius: 8px;
+  margin: 20px 0;
+  border: 1px solid #FFCDD2;
+}
+
+.offline-message p {
+  color: #D32F2F;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .backup-actions {
+    flex-direction: column;
+  }
+  
+  .table-select, .bucket-select {
+    max-width: none;
+  }
+  
+  .restore-modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .sessions-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+.backup-status.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* Page title styling */
+.page-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.page-title h1 {
+    margin: 0;
+    color: #333;
+}
+
+.page-title .icon {
+    margin-right: 10px;
+    color: #17a2b8;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .backup-actions {
+        flex-direction: column;
+    }
+    
+    .table-select, .backup-btn, .refresh-btn, .pg-dump-btn {
+        width: 100%;
+    }
+    
+    .restore-modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+}

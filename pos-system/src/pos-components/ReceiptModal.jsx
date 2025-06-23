@@ -1,4 +1,6 @@
 import React, { useRef } from 'react';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import ReceiptTemplate from './ReceiptTemplate';
 import styles from './ReceiptModal.module.css';
 

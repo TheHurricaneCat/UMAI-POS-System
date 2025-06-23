@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import styles from './NavigationContainer.module.css';
 import PopUp from "../global-components/PopUp";
-import { logOut } from "../handlers/SessionHandler";
+import DropdownMenu from "./DropdownMenu";
 
 function NavigationContainer({handleStartSession, handleEndSession, saveExcelFile, userRole, handleClockOut, handleLogOut}) {
     const navigate = useNavigate();
@@ -48,6 +48,20 @@ function NavigationContainer({handleStartSession, handleEndSession, saveExcelFil
         }
     }, [confirmEndSession, handleEndSession]);
 
+    // Define session management buttons with colors
+    const sessionManagementButtons = [
+        { label: "Clock out", className: "header-button clock-out", onClick: handleClockoutClick, color: "red" },
+        { label: "Log out", className: "header-button sign-out", onClick: handleLogoutClick, color: "orange" },
+        { label: "End Session", className: "header-button session-end", onClick: handleEndSessionClick, color: "red" }
+    ];
+
+    // Define admin buttons with colors
+    const adminButtons = userRole === "admin" ? [
+        { label: "Session Viewer", className: "header-button account", onClick: () => navigate('/session-viewer'), color: "green" },
+        { label: "Product Manager", className: "header-button account", onClick: () => navigate('/product-manager'), color: "blue" },
+        { label: "Database Backup", className: "header-button account", onClick: () => navigate('/backup-manager'), color: "purple" }
+    ] : [];
+
     return (
         <div className={styles.headerButtons}>
             <PopUp 
@@ -83,34 +97,34 @@ function NavigationContainer({handleStartSession, handleEndSession, saveExcelFil
             <button className="header-button session-start" onClick={handleStartSession}>
                 Restore Session
             </button>
-            <button className="header-button clock-out" onClick={handleClockoutClick}>
-                Clock out
-            </button>
-            <button className="header-button sign-out" onClick={handleLogoutClick}>
-                Log out
-            </button>
-            <button className="header-button session-end" onClick={handleEndSessionClick}>
-                End Session
-            </button>
+
+            <DropdownMenu 
+                title="Session Management" 
+                buttons={sessionManagementButtons} 
+                className="header-button session-dropdown"
+                buttonColor="red"  // Default color for session buttons
+            />
+
             <button className="header-button excel" onClick={saveExcelFile}>
                 Save Excel
             </button>
-            {(userRole === "admin") ? (
-                <>
-                {<button className="header-button inventory" onClick={() => navigate('/inventory')}>
-                    Inventory
-                </button>
-                /* <button className="header-button statistics" onClick={() => navigate('/statistics')}>
-                    Statistics
-                </button> */}
-                <button className="header-button account" onClick={() => navigate('/session-viewer')}>
-                    Session Viewer
-                </button>
-                <button className="header-button account" onClick={() => navigate('/product-manager')}>
-                    Product Manager
-                </button>
-                </>
-            ) : null }
+            
+            <button className="header-button transaction-viewer" onClick={() => navigate('/transaction-viewer')}>
+                Transaction Viewer
+            </button>
+
+            <button className="header-button inventory" onClick={() => navigate('/inventory')}>
+                Inventory
+            </button>
+            
+            {(userRole === "admin") && (
+                <DropdownMenu 
+                    title="Admin Tools" 
+                    buttons={adminButtons}
+                    className="header-button admin-dropdown"
+                    buttonColor="blue"  // Default color for admin buttons
+                />
+            )}
         </div>
     );
 }

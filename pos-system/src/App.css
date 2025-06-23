@@ -261,6 +261,15 @@
   background-color: #d32f2f;
 }
 
+.transaction-viewer {
+  background-color: #2cb2a0;
+  color: white;
+}
+
+.transaction-viewer:hover {
+  background-color: rgb(45, 212, 190);
+}
+
 .excel {
   background-color: #FF9800;
   color: white;
