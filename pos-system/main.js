@@ -17,6 +17,9 @@ function createWindow() {
 
   mainWindow.setMenu(null);
 
+  // Always open DevTools regardless of environment
+  mainWindow.webContents.openDevTools();
+
   // Handle development vs production loading
   if (process.env.NODE_ENV === 'development') {
     // Load from Vite dev server
