@@ -412,7 +412,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showBackupSuccess}
                 setTrigger={setShowBackupSuccess}
                 confirm={false}
@@ -423,7 +423,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showBackupError}
                 setTrigger={setShowBackupError}
                 confirm={false}
@@ -434,7 +434,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showExcelBackupSuccess}
                 setTrigger={setShowExcelBackupSuccess}
                 confirm={false}
@@ -445,7 +445,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showExcelBackupError}
                 setTrigger={setShowExcelBackupError}
                 confirm={false}
@@ -505,7 +505,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showRestoreSuccess}
                 setTrigger={setShowRestoreSuccess}
                 confirm={false}
@@ -516,7 +516,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showRestoreError}
                 setTrigger={setShowRestoreError}
                 confirm={false}
@@ -542,7 +542,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showDeleteSuccess}
                 setTrigger={setShowDeleteSuccess}
                 confirm={false}
@@ -553,7 +553,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showDeleteError}
                 setTrigger={setShowDeleteError}
                 confirm={false}
@@ -564,7 +564,7 @@ const BackupManager = () => {
             <PopUp 
                 text={popupMessage}
                 button1="OK"
-                button2=""
+                button2="Close"
                 trigger={showOfflineError}
                 setTrigger={setShowOfflineError}
                 confirm={false}
