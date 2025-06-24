@@ -201,7 +201,7 @@ function Statistics() {
 
         if (!filtered.length) {
             setLoading(false);
-            setPopupText("No files found for this period.");
+            setPopupText("Enter a valid date.");
             setPopupTrigger(true);
             return;
         }
