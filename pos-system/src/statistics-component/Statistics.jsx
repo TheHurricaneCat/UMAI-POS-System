@@ -90,38 +90,41 @@ function Statistics() {
 
     // Validate input and show popup if invalid
     const handleShowGraph = async () => {
-        let errorMsg = "";
-        if (activeReport === "yearly" && !input.year) {
+    let errorMsg = "";
+    if (activeReport === "yearly" && !input.year) {
+        errorMsg = "Please enter a valid year.";
+    } else if (activeReport === "monthly") {
+        if (!input.year && !input.month) {
+            errorMsg = "Please enter a valid year and month.";
+        } else if (!input.year) {
             errorMsg = "Please enter a valid year.";
-        } else if (activeReport === "monthly") {
-            if (!input.year && !input.month) {
-                errorMsg = "Please enter a valid year and month.";
-            } else if (!input.year) {
-                errorMsg = "Please enter a valid year.";
-            } else if (!input.month) {
-                errorMsg = "Please enter a valid month.";
-            }
-        } else if (activeReport === "weekly") {
-            if (!input.year && !input.week) {
-                errorMsg = "Please enter a valid year and week.";
-            } else if (!input.year) {
-                errorMsg = "Please enter a valid year.";
-            } else if (!input.week) {
-                errorMsg = "Please enter a valid week.";
-            }
-        } else if (activeReport === "daily" && !input.date) {
-            errorMsg = "Please enter a valid date.";
+        } else if (!input.month) {
+            errorMsg = "Please enter a valid month.";
+        } else if (input.month < 1 || input.month > 12) {
+            errorMsg = "Please enter a valid month (1-12).";
         }
-
-        if (errorMsg) {
-            setPopupText(errorMsg);
-            setPopupTrigger(true);
-            return;
+    } else if (activeReport === "weekly") {
+        if (!input.year && !input.week) {
+            errorMsg = "Please enter a valid year and week.";
+        } else if (!input.year) {
+            errorMsg = "Please enter a valid year.";
+        } else if (!input.week) {
+            errorMsg = "Please enter a valid week.";
+        } else if (input.week < 1 || input.week > 53) {
+            errorMsg = "Please enter a valid week (1-53).";
         }
+    } else if (activeReport === "daily" && !input.date) {
+        errorMsg = "Please enter a valid date.";
+    }
 
-        await generateGraph();
-    };
+    if (errorMsg) {
+        setPopupText(errorMsg);
+        setPopupTrigger(true);
+        return;
+    }
 
+    await generateGraph();
+};
     // Filter files by reading the date from inside each file
     const filterFilesByPeriod = async () => {
         if (!isInputValid()) return [];
@@ -201,7 +204,7 @@ function Statistics() {
 
         if (!filtered.length) {
             setLoading(false);
-            setPopupText("Enter a valid date.");
+            setPopupText("Date not found.");
             setPopupTrigger(true);
             return;
         }
