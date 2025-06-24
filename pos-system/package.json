@@ -33,6 +33,7 @@
     "exceljs": "^4.4.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "pos-system": "file:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

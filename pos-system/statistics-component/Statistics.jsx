@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Bar } from 'react-chartjs-2';
 import { useNavigate } from "react-router-dom"; 
 import { Chart, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
 import { supabase } from '../src/database/supabase';
 import * as XLSX from "xlsx";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import './Statistics.css';
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -38,6 +40,7 @@ function getWeekString(dateStr) {
 
 function Statistics() {
     const navigate = useNavigate(); 
+    const chartRef = useRef(null);
     const [files, setFiles] = useState([]);
     const [activeReport, setActiveReport] = useState('yearly');
     const [input, setInput] = useState({});
@@ -303,6 +306,93 @@ function Statistics() {
         }
     };
 
+    const generatePDFReport = () => {
+        if (!graphData || !comparison) {
+            alert("Please generate a graph first before creating a PDF report.");
+            return;
+        }
+
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        
+        // Header
+        doc.setFontSize(20);
+        doc.setFont(undefined, 'bold');
+        doc.text('Sales Statistics Report', pageWidth / 2, 20, { align: 'center' });
+        
+        // Report details
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        let reportType = activeReport.charAt(0).toUpperCase() + activeReport.slice(1);
+        let periodText = '';
+        
+        switch (activeReport) {
+            case 'yearly':
+                periodText = `Year: ${input.year}`;
+                break;
+            case 'monthly':
+                periodText = `Year: ${input.year}, Month: ${input.month}`;
+                break;
+            case 'weekly':
+                periodText = `Year: ${input.year}, Week: ${input.week}`;
+                break;
+            case 'daily':
+                periodText = `Date: ${input.date}`;
+                break;
+        }
+        
+        doc.text(`Report Type: ${reportType}`, 20, 35);
+        doc.text(`Period: ${periodText}`, 20, 45);
+        doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 55);
+        
+        if (selectedFile) {
+            doc.text(`File: ${selectedFile}`, 20, 65);
+        }
+        
+        // Summary section
+        doc.setFont(undefined, 'bold');
+        doc.text('Summary:', 20, 80);
+        doc.setFont(undefined, 'normal');
+        doc.text(`Total Sales: P${comparison.reportTotal.toFixed(2)}`, 20, 90);
+        doc.text(`Number of Products: ${graphData.labels.length}`, 20, 100);
+        
+        // Add chart image if possible
+        if (chartRef.current) {
+            try {
+                const canvas = chartRef.current.canvas;
+                const chartImage = canvas.toDataURL('image/png');
+                doc.addImage(chartImage, 'PNG', 20, 110, 170, 100);
+            } catch (error) {
+                console.warn('Could not add chart to PDF:', error);
+            }
+        }
+        
+        // Sales data table
+        const tableData = graphData.labels.map((label, index) => [
+            label,
+            `P${graphData.datasets[0].data[index].toFixed(2)}`
+        ]);
+        
+        autoTable(doc, {
+            startY: 220,
+            head: [['Product Name', 'Sales Amount']],
+            body: tableData,
+            theme: 'grid',
+            headStyles: { fillColor: [255, 214, 0] },
+            styles: { fontSize: 10 }
+        });
+        
+        // Footer
+        const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 250;
+        doc.setFontSize(10);
+        doc.text('This report was generated automatically by the UMAI POS Statistics System.', 
+                pageWidth / 2, finalY, { align: 'center' });
+        
+        // Save the PDF
+        const fileName = `${reportType}_Report_${periodText.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+        doc.save(fileName);
+    };
+
     return (
         <div className="statisticsFlexContainer">
             <div className="statisticsSidebar">
@@ -352,14 +442,27 @@ function Statistics() {
                 <div className="statisticsHeader">Statistics</div>
                 <div className="statisticsGraphSection">
                     {graphData ? (
-                        <Bar data={graphData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                        <Bar 
+                            ref={chartRef}
+                            data={graphData} 
+                            options={{ responsive: true, plugins: { legend: { display: false } } }} 
+                        />
                     ) : (
                         <div className="graphPlaceholder">Select a period and click "Show Graph".</div>
                     )}
                 </div>
-                <button className="generateReportBtn" onClick={generateGraph} disabled={loading || !isInputValid()}>
-                    {loading ? "Loading..." : "Generate Report & Compare"}
-                </button>
+                <div className="reportButtonGroup">
+                    <button className="generateReportBtn" onClick={generateGraph} disabled={loading || !isInputValid()}>
+                        {loading ? "Loading..." : "Generate Report & Compare"}
+                    </button>
+                    <button 
+                        className="pdfReportBtn" 
+                        onClick={generatePDFReport} 
+                        disabled={!graphData || !comparison}
+                    >
+                        Download PDF Report
+                    </button>
+                </div>
                 {comparison && (
                     <div className="comparisonSection">
                         <div>Report Total: <b>{comparison.reportTotal}</b></div>
