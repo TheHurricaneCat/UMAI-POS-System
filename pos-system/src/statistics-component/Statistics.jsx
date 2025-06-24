@@ -123,7 +123,7 @@ function Statistics() {
         return;
     }
 
-    await generateGraph();
+    await generateGraph(false);
 };
     // Filter files by reading the date from inside each file
     const filterFilesByPeriod = async () => {
@@ -189,64 +189,67 @@ function Statistics() {
         return products;
     };
 
-    // Show popup if no files found
-    const generateGraph = async () => {
-        setLoading(true);
-        setGraphData(null);
-        setComparison(null);
+    // Modified generateGraph to accept a flag
+const generateGraph = async (withComparison = true) => {
+    setLoading(true);
+    setGraphData(null);
+    if (withComparison) setComparison(null);
 
-        let filtered = await filterFilesByPeriod();
-        setMatchingFiles(filtered.map(f => f.file));
+    let filtered = await filterFilesByPeriod();
+    setMatchingFiles(filtered.map(f => f.file));
 
-        if (selectedFile) {
-            filtered = filtered.filter(f => f.file.name === selectedFile);
-        }
+    if (selectedFile) {
+        filtered = filtered.filter(f => f.file.name === selectedFile);
+    }
 
-        if (!filtered.length) {
-            setLoading(false);
-            setPopupText("Date not found.");
-            setPopupTrigger(true);
-            return;
-        }
+    if (!filtered.length) {
+        setLoading(false);
+        setPopupText("Date not found.");
+        setPopupTrigger(true);
+        return;
+    }
 
-        let allProducts = [];
-        for (const { jsonData } of filtered) {
-            allProducts = allProducts.concat(parseExcelRows(jsonData));
-        }
+    let allProducts = [];
+    for (const { jsonData } of filtered) {
+        allProducts = allProducts.concat(parseExcelRows(jsonData));
+    }
 
-        const salesMap = {};
-        let manualTotal = 0;
-        allProducts.forEach(prod => {
-            if (!salesMap[prod.name]) salesMap[prod.name] = 0;
-            salesMap[prod.name] += prod.value;
-            manualTotal += prod.value;
-        });
+    const salesMap = {};
+    let manualTotal = 0;
+    allProducts.forEach(prod => {
+        if (!salesMap[prod.name]) salesMap[prod.name] = 0;
+        salesMap[prod.name] += prod.value;
+        manualTotal += prod.value;
+    });
 
-        const labels = Object.keys(salesMap);
-        const sales = labels.map(l => salesMap[l]);
+    const labels = Object.keys(salesMap);
+    const sales = labels.map(l => salesMap[l]);
 
-        setGraphData({
-            labels,
-            datasets: [
-                {
-                    label: 'Sales',
-                    data: sales,
-                    backgroundColor: '#ffd600',
-                    borderColor: '#3a3350',
-                    borderWidth: 2,
-                },
-            ],
-        });
+    setGraphData({
+        labels,
+        datasets: [
+            {
+                label: 'Sales',
+                data: sales,
+                backgroundColor: '#ffd600',
+                borderColor: '#3a3350',
+                borderWidth: 2,
+            },
+        ],
+    });
 
+    if (withComparison) {
         setComparison({
             reportTotal: manualTotal,
             manualTotal: manualTotal,
             difference: 0,
         });
+    } else {
+        setComparison(null);
+    }
 
-        setLoading(false);
-    };
-
+    setLoading(false);
+};
     const renderInputs = () => {
         switch (activeReport) {
             case 'yearly':
