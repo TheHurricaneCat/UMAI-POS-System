@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Bar } from 'react-chartjs-2';
 import { useNavigate } from "react-router-dom"; 
 import { Chart, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js';
-import { supabase } from '../src/database/supabase';
+import { supabase } from '../database/supabase';
 import * as XLSX from "xlsx";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './Statistics.css';
+import PopUp from '../global-components/PopUp.jsx'; // <-- Import your popup
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -16,10 +17,9 @@ function extractDateFromExcel(jsonData) {
         if (row[0] && String(row[0]).toUpperCase() === "PRODUCT") {
             const prodRow = jsonData[i + 1];
             if (prodRow && prodRow.length > 0) {
-                // Try to find a cell that looks like a date (YYYY-MM-DD)
                 for (let cell of prodRow) {
                     if (typeof cell === "string" && /^\d{4}-\d{2}-\d{2}/.test(cell)) {
-                        return cell.slice(0, 10); // return YYYY-MM-DD
+                        return cell.slice(0, 10);
                     }
                 }
             }
@@ -28,7 +28,6 @@ function extractDateFromExcel(jsonData) {
     return null;
 }
 
-// Helper to extract week string from date
 function getWeekString(dateStr) {
     const date = new Date(dateStr);
     const year = date.getFullYear();
@@ -49,6 +48,11 @@ function Statistics() {
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState('');
     const [matchingFiles, setMatchingFiles] = useState([]);
+
+    // Popup states
+    const [popupTrigger, setPopupTrigger] = useState(false);
+    const [popupConfirm, setPopupConfirm] = useState(false);
+    const [popupText, setPopupText] = useState("");
 
     useEffect(() => {
         async function fetchFiles() {
@@ -84,6 +88,40 @@ function Statistics() {
         setSelectedFile(e.target.value);
     };
 
+    // Validate input and show popup if invalid
+    const handleShowGraph = async () => {
+        let errorMsg = "";
+        if (activeReport === "yearly" && !input.year) {
+            errorMsg = "Please enter a valid year.";
+        } else if (activeReport === "monthly") {
+            if (!input.year && !input.month) {
+                errorMsg = "Please enter a valid year and month.";
+            } else if (!input.year) {
+                errorMsg = "Please enter a valid year.";
+            } else if (!input.month) {
+                errorMsg = "Please enter a valid month.";
+            }
+        } else if (activeReport === "weekly") {
+            if (!input.year && !input.week) {
+                errorMsg = "Please enter a valid year and week.";
+            } else if (!input.year) {
+                errorMsg = "Please enter a valid year.";
+            } else if (!input.week) {
+                errorMsg = "Please enter a valid week.";
+            }
+        } else if (activeReport === "daily" && !input.date) {
+            errorMsg = "Please enter a valid date.";
+        }
+
+        if (errorMsg) {
+            setPopupText(errorMsg);
+            setPopupTrigger(true);
+            return;
+        }
+
+        await generateGraph();
+    };
+
     // Filter files by reading the date from inside each file
     const filterFilesByPeriod = async () => {
         if (!isInputValid()) return [];
@@ -99,10 +137,9 @@ function Statistics() {
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            const fileDate = extractDateFromExcel(jsonData); // YYYY-MM-DD or null
+            const fileDate = extractDateFromExcel(jsonData);
             if (!fileDate) continue;
 
-            // Compare fileDate to input
             switch (activeReport) {
                 case "yearly":
                     if (input.year && fileDate.startsWith(input.year)) filtered.push({ file, jsonData });
@@ -128,16 +165,14 @@ function Statistics() {
         }
         return filtered;
     };
-    
-        const parseExcelRows = (jsonData) => {
+
+    const parseExcelRows = (jsonData) => {
         let products = [];
         for (let i = 0; i < jsonData.length; i++) {
             const row = jsonData[i];
             if (!row || row.length === 0) continue;
-            // Only look for PRODUCT rows
             if (row[0] && String(row[0]).toUpperCase() === "PRODUCT") {
                 const name = row[2];
-                // Use the "total" column (row[4]) for sales amount, fallback to price (row[3]) if needed
                 let value = 0;
                 if (typeof row[4] === "number" && !isNaN(row[4])) value = row[4];
                 else if (!isNaN(Number(row[4]))) value = Number(row[4]);
@@ -151,25 +186,23 @@ function Statistics() {
         return products;
     };
 
+    // Show popup if no files found
     const generateGraph = async () => {
         setLoading(true);
         setGraphData(null);
         setComparison(null);
 
-        // Filter files by period (reads inside each file)
         let filtered = await filterFilesByPeriod();
-
-        // For select file dropdown
         setMatchingFiles(filtered.map(f => f.file));
 
-        // If a file is selected, only use that file
         if (selectedFile) {
             filtered = filtered.filter(f => f.file.name === selectedFile);
         }
 
         if (!filtered.length) {
             setLoading(false);
-            alert("No files found for this period.");
+            setPopupText("No files found for this period.");
+            setPopupTrigger(true);
             return;
         }
 
@@ -308,19 +341,18 @@ function Statistics() {
 
     const generatePDFReport = () => {
         if (!graphData || !comparison) {
-            alert("Please generate a graph first before creating a PDF report.");
+            setPopupText("Please generate a graph first before creating a PDF report.");
+            setPopupTrigger(true);
             return;
         }
 
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
         
-        // Header
         doc.setFontSize(20);
         doc.setFont(undefined, 'bold');
         doc.text('Sales Statistics Report', pageWidth / 2, 20, { align: 'center' });
         
-        // Report details
         doc.setFontSize(12);
         doc.setFont(undefined, 'normal');
         let reportType = activeReport.charAt(0).toUpperCase() + activeReport.slice(1);
@@ -349,14 +381,12 @@ function Statistics() {
             doc.text(`File: ${selectedFile}`, 20, 65);
         }
         
-        // Summary section
         doc.setFont(undefined, 'bold');
         doc.text('Summary:', 20, 80);
         doc.setFont(undefined, 'normal');
         doc.text(`Total Sales: P${comparison.reportTotal.toFixed(2)}`, 20, 90);
         doc.text(`Number of Products: ${graphData.labels.length}`, 20, 100);
         
-        // Add chart image if possible
         if (chartRef.current) {
             try {
                 const canvas = chartRef.current.canvas;
@@ -367,7 +397,6 @@ function Statistics() {
             }
         }
         
-        // Sales data table
         const tableData = graphData.labels.map((label, index) => [
             label,
             `P${graphData.datasets[0].data[index].toFixed(2)}`
@@ -382,13 +411,11 @@ function Statistics() {
             styles: { fontSize: 10 }
         });
         
-        // Footer
         const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 250;
         doc.setFontSize(10);
         doc.text('This report was generated automatically by the UMAI POS Statistics System.', 
                 pageWidth / 2, finalY, { align: 'center' });
         
-        // Save the PDF
         const fileName = `${reportType}_Report_${periodText.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
         doc.save(fileName);
     };
@@ -434,7 +461,7 @@ function Statistics() {
                         ))}
                     </select>
                 </div>
-                <button className="generateBtn" onClick={generateGraph} disabled={loading || !isInputValid()}>
+                <button className="generateBtn" onClick={handleShowGraph} disabled={loading}>
                     {loading ? "Loading..." : "Show Graph"}
                 </button>
             </div>
@@ -471,6 +498,16 @@ function Statistics() {
                     </div>
                 )}
             </div>
+            {/* Popup for errors and notifications */}
+            <PopUp
+                text={popupText}
+                button1="Confirm"
+                button2="Cancel"
+                trigger={popupTrigger}
+                setTrigger={setPopupTrigger}
+                confirm={popupConfirm}
+                setConfirm={setPopupConfirm}
+            />
         </div>
     );
 }

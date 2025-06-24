@@ -9,7 +9,7 @@ import Inventory from './inventory-components/Inventory.jsx'
 import SessionViewer from './SessionViewer.jsx'
 import ProductManager from './ProductManager.jsx'
 import TransactionViewer from './TransactionViewer.jsx'
-import Statistics from '../statistics-component/Statistics.jsx';
+import Statistics from './statistics-component/Statistics.jsx';
 import BackupManager from './BackupManager.jsx'
 
 import { UserProvider } from './UserContext';

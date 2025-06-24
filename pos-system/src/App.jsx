@@ -14,7 +14,7 @@ import CategoryMenu from './pos-components/CategoryMenu.jsx'
 import PopUp from './global-components/PopUp.jsx';
 import NavigationContainer from './pos-components/NavigationContainer.jsx';
 import ContentHeader from './pos-components/ContentHeader.jsx';
-import Statistics from '../statistics-component/Statistics.jsx';
+import Statistics from './statistics-component/Statistics.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
 
