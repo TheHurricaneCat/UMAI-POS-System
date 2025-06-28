@@ -1,6 +1,6 @@
 .primaryContainer {
     display: grid;
-    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-columns: 25% 25% 25% 25%;
     grid-template-rows: auto auto;;
     gap: min(8px, 1vw);
     width: 100%;
@@ -36,7 +36,7 @@
 }
 
 .totalMoney {
-    grid-column: 2 / 6;
+    grid-column: 1 / 6;
     display: flex;
     justify-content: center;
     align-items: center;

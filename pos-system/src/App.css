@@ -130,7 +130,7 @@
 
 .trayHeader {
   display: grid;
-  grid-template-columns: 11% 12% 40% 20%;
+  grid-template-columns: 15% 35% 15% 25% 10%;
   /* border: 1px solid rgb(255, 0, 0); */
   border-bottom: 0px;
   background-color: #3a3344;   

@@ -461,10 +461,16 @@ function App() {
         
         <div className="trayInterface">
           <div className="trayHeader"> 
+            <h4> Image </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0' }}>
+              <h4 style={{ margin: '0', marginBottom: '-1.7vh' }}> Item Name </h4>
+              <h5 style={{ margin: '0' }}> <span style={{ fontSize: '1.2vh' }}>+product code </span> </h5>
+            </div>  
             <h4> Qty </h4>
-            <h4> Img </h4>
-            <h4> Item Name </h4>
-            <h4> Total Price </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0' }}>
+              <h4 style={{ margin: '0', marginBottom: '-1.7vh' }}> Unit Price </h4>
+              <h5 style={{ margin: '0' }}> <span style={{ fontSize: '1.2vh' }}>+total price </span> </h5>
+            </div> 
           </div>
           <div className="trayViewer">
             {tray.map((content) => (

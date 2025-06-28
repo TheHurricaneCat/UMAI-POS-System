@@ -15,6 +15,7 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
     const [savedTray, setSavedTray] = useState([]);
     const [total, setTotal] = useState(0);
     const [showDiscountModal, setShowDiscountModal] = useState(false);
+    const [discountSelected, setDiscountSelected] = useState(false); // New state to track discount selection
 
     const [showReceiptModal, setShowReceiptModal] = useState(false);
 
@@ -43,31 +44,49 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
         loadModifiers();
     }, []);
 
+    ////////////////////////
+    // Listener that handles confirmation and saving of orders
+    // Press save order -> show popup confirmation -> show discount modal -> [process confirmation]
+    ////////////////////////
+
     useEffect(() => {
         const handleConfirmation = async () => {
-            if (confirm) {
+            if (confirm && discountSelected) {
                 const traysWithoutCustomers = tray.filter(t => !t.customer || !t.customer.customerName);
                 
                 if (traysWithoutCustomers.length > 0) {
                     const trayNumbers = traysWithoutCustomers.map(t => `Tray ${t.id}`).join(', ');
                     alert(`Please add customer details for ${trayNumbers} before saving the order.`);
+                    setConfirm(false);
+                    setDiscountSelected(false);
                     return;
                 }
-                
+
                 await appendEntry(tray, discount, total);
+                
+                //QoL change - Immediately print the receipt after saving
+                handlePrintReceipt();
                 
                 // Save the current tray before clearing
                 const currentTrayData = tray.find(t => t.id === currentTray);
                 setSavedTray(currentTrayData);
                 
                 setConfirm(false);
-                // setShowReceiptModal(true); // Show receipt modal after saving
+                setDiscountSelected(false);
                 clearCurrentTray(); // Clear the tray after saving
             }
         };
         
         handleConfirmation();
-    }, [confirm, tray, appendEntry, clearCurrentTray, currentTray]);
+    }, [confirm, discountSelected, tray, discount, total, currentTray]);
+
+    // New useEffect to handle showing discount modal after initial confirmation
+    useEffect(() => {
+        if (confirm && !discountSelected) {
+            setButtonPopUp(false); // Hide the initial confirmation popup
+            setShowDiscountModal(true); // Show discount modal
+        }
+    }, [confirm, discountSelected]);
 
     useEffect(() => {
         const calculateTotal = () => {
@@ -97,6 +116,7 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
         
         if (!hasItems) {
             setEmptyTrayPopup(true);
+            handlePrintReceipt
             return;
         } else {
             setButtonPopUp(true);
@@ -131,6 +151,7 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
         // Logic to apply discount to the current tray
         setDiscount(discountObj);
         setShowDiscountModal(false);
+        setDiscountSelected(true); // Mark that discount has been selected
     };
 
     return (
@@ -163,12 +184,12 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
             )}
             <div className={styles.primaryContainer}>
                {/*  <div className={styles.traySummary}> <h3> Tray {currentTray} Summary </h3> </div> */}
-               <div className={styles.discountButton}>
+                {/* <div className={styles.discountButton}>
                     <button onClick={() => setShowDiscountModal(true)}>Apply Discount</button>
-                </div>
-                <div className={styles.totalMoney}> <h3> Total: P{total.toFixed(2)} </h3> </div>
+                </div> */}
+                <div className={styles.totalMoney}> <h3> Tray Total: P{total.toFixed(2)} </h3> </div>
                 
-                <div className={styles.printReceipt}> <button onClick={handlePrintReceipt}> Print Receipt </button> </div>
+                {/* <div className={styles.printReceipt}> <button onClick={handlePrintReceipt}> Print Receipt </button> </div> */}
                 <div className={styles.saveOrder}> <button onClick={handleSaveOrder}> Save Order </button> </div>
                 <div className={styles.clearOrder}> <button onClick={clearCurrentTray}> Clear Order </button> </div>
                 <div className={styles.addTray}> <button onClick={addNewTray}> Add Tray</button> </div>
@@ -177,7 +198,11 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
             {showDiscountModal && (
                 <DiscountModal
                 onApply={handleApplyDiscount}
-                onClose={() => setShowDiscountModal(false)}
+                onClose={() => {
+                    setShowDiscountModal(false);
+                    setConfirm(false); // Cancel the entire process if discount modal is closed
+                    setDiscountSelected(false);
+                }}
                 modifiers={modifiers}
                 currentDiscount={discount}
                 />

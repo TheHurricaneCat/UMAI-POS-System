@@ -62,26 +62,26 @@ function TrayItem({
         }
         }>
             <div className={styles.productDetails}> 
-                <div className={styles.productQuantity}>
-                    <h4>{quantity}</h4>
-                </div>
+                
                 <div className={styles.productImage}>
                     <img src={imageUrl} alt="Product Image" />
                 </div>
                 <div className={styles.productName}>
-                    <h4>{name}</h4>
+                    <h5>{name}</h5>
+                    <p>P{code}</p>
+                    {/* <p>P{price.toFixed(2)}</p> */}
+                </div>
+                <div className={styles.qtyButton}>
+                    <button className={styles.subtractButton} onClick={() => handleProductDecrement(name)}> - </button>
+                    <h5>{quantity}</h5>
+                    <button className={styles.addButton} onClick={() => handleProductIncrement(name)}> + </button>
                 </div>
                 <div className={styles.productPrice}>
-                    <h4>P{price.toFixed(2)}</h4>
-                </div>
-                <div className={styles.addButton}>
-                    <button onClick={() => handleProductIncrement(name)}> + </button>
-                </div>
-                <div className={styles.subtractButton}>
-                    <button onClick={() => handleProductDecrement(name)}> - </button>
+                    <h5>P{price.toFixed(2)}</h5>
+                    <p> total: P{(quantity * price).toFixed(2)}</p>
                 </div>
                 <div className={styles.removeButton}>
-                    <button onClick={() => handleProductDeletion(name)}> x </button>
+                    <button onClick={() => handleProductDeletion(name)}> X </button>
                 </div>
             </div>
             <div> 
