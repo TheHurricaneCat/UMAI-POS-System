@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 
 import { supabase } from '../database/supabase.js';
@@ -435,19 +434,23 @@ export async function fetchProductCatalog(specificType) {
       
       const products = data.filter(item => item.type === 'product' || !item.type);
       const modifiers = data.filter(item => item.type === 'modifier');
+      const ingredients = data.filter(item => item.type === 'ingredient');
       
       if (specificType === "product") {
-        return [products, []];
+        return [products, [], []];
       } else if (specificType === "modifier") {
-        return [[], modifiers];
+        return [[], modifiers, []];
+      } else if (specificType === "ingredient") {
+        return [[], [], ingredients];
       }
 
       // save fallback 
       localStorage.setItem('products', JSON.stringify(products));
       localStorage.setItem('modifiers', JSON.stringify(modifiers));
+      localStorage.setItem('ingredients', JSON.stringify(ingredients));
       console.log("[SESSION] Successfully fetched product catalog and saved to local storage");
       
-      return [products, modifiers];
+      return [products, modifiers, ingredients];
     } else {
       console.log('[SUPABASE] No product data found');
       return false; // Return empty arrays for consistency

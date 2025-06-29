@@ -9,14 +9,16 @@ const ProductManager = () => {
     const [imageStatus, setImageStatus] = useState({});
     const [products, setProducts] = useState([]);
     const [modifiers, setModifiers] = useState([]);
+    const [ingredients, setIngredients] = useState([]); // New state for ingredients
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState(null); // 'product' or 'modifier'
-    const [editData, setEditData] = useState(null); // Data for the product/modifier being edited or added
+    const [modalType, setModalType] = useState(null); // 'product', 'modifier', or 'ingredient'
+    const [editData, setEditData] = useState(null);
 
     // Search states
     const [productSearch, setProductSearch] = useState('');
     const [modifierSearch, setModifierSearch] = useState('');
+    const [ingredientSearch, setIngredientSearch] = useState(''); // New search state
 
     // Filtered products and modifiers
     const filteredProducts = products.filter(product => 
@@ -31,9 +33,18 @@ const ProductManager = () => {
         (modifier.category && modifier.category.toLowerCase().includes(modifierSearch.toLowerCase()))
     );
 
-    // State for bundle product selection
+    // Filtered ingredients
+    const filteredIngredients = ingredients.filter(ingredient => 
+        ingredient.name.toLowerCase().includes(ingredientSearch.toLowerCase()) || 
+        ingredient.code.toLowerCase().includes(ingredientSearch.toLowerCase()) ||
+        (ingredient.category && ingredient.category.toLowerCase().includes(ingredientSearch.toLowerCase()))
+    );
+
+    // State for bundle product selection and ingredient selection
     const [selectedBundleProducts, setSelectedBundleProducts] = useState([]);
+    const [selectedIngredients, setSelectedIngredients] = useState([]); // New state for ingredient selection with quantities
     const [showProductSelector, setShowProductSelector] = useState(false);
+    const [showIngredientSelector, setShowIngredientSelector] = useState(false); // New state
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
@@ -48,18 +59,21 @@ const ProductManager = () => {
         try {
             setLoading(true);
             const catalog = await fetchProductCatalog();
-            if (catalog && Array.isArray(catalog) && catalog.length >= 2) {
+            if (catalog && Array.isArray(catalog) && catalog.length >= 3) {
                 setProducts(catalog[0] || []);
                 setModifiers(catalog[1] || []);
+                setIngredients(catalog[2] || []);
             } else {
                 console.log("Catalog data not in expected format:", catalog);
                 setProducts([]);
                 setModifiers([]);
+                setIngredients([]);
             }
         } catch (error) {
             console.error("Error loading product catalog:", error);
             setProducts([]);
             setModifiers([]);
+            setIngredients([]);
         } finally {
             setLoading(false);
         }
@@ -191,13 +205,38 @@ const ProductManager = () => {
 
     const openModal = (type, item = null) => {
         setModalType(type);
-        setEditData(item || { name: '', code: '', price: '', category: '', type });
+        if (item) {
+            setEditData({ ...item });
+            // Initialize selected ingredients for products with quantities
+            if (item.ingredients && type === 'product') {
+                const ingredientEntries = item.ingredients.split(',').filter(entry => entry.trim());
+                const ingredientsWithQty = ingredientEntries.map(entry => {
+                    const [qty, code] = entry.trim().split('/');
+                    return { code, quantity: qty || '1' };
+                });
+                setSelectedIngredients(ingredientsWithQty);
+            } else {
+                setSelectedIngredients([]);
+            }
+            // Initialize bundle products for existing bundles
+            if (item.content && (item.category === 'Bundle' || item.category === 'Promo')) {
+                setSelectedBundleProducts(item.content.split(',').filter(code => code.trim()));
+            } else {
+                setSelectedBundleProducts([]);
+            }
+        } else {
+            setEditData({ name: '', code: '', price: '', category: '', type });
+            setSelectedIngredients([]);
+            setSelectedBundleProducts([]);
+        }
         setShowModal(true);
     };
 
     const closeModal = () => {
         setShowModal(false);
         setEditData(null);
+        setSelectedIngredients([]);
+        setSelectedBundleProducts([]);
     };
 
     const handleInputChange = (e) => {
@@ -315,6 +354,21 @@ const ProductManager = () => {
         setShowModal(true);
     };
 
+    // Add a specific function to open ingredient creation modal
+    const openIngredientModal = () => {
+        setModalType('ingredient');
+        setEditData({ 
+            name: '', 
+            code: '', 
+            price: '', 
+            category: 'Ingredient', 
+            type: 'ingredient'
+        });
+        setSelectedIngredients([]);
+        setSelectedBundleProducts([]);
+        setShowModal(true);
+    };
+
     // Add a function to add a product directly from dropdown
     const handleAddProductToBundle = (e) => {
         const selectedCode = e.target.value;
@@ -344,6 +398,112 @@ const ProductManager = () => {
         }));
     };
 
+    // Handle ingredient selection with quantities
+    const toggleIngredientSelection = (code) => {
+        setSelectedIngredients(prev => {
+            const existingIndex = prev.findIndex(item => item.code === code);
+            
+            if (existingIndex >= 0) {
+                // Remove ingredient if already selected
+                const newSelection = prev.filter(item => item.code !== code);
+                
+                // Update editData ingredients
+                const ingredientString = newSelection.map(item => `${item.quantity}/${item.code}`).join(',');
+                setEditData(prevData => ({
+                    ...prevData,
+                    ingredients: ingredientString
+                }));
+                
+                return newSelection;
+            } else {
+                // Add ingredient if not selected with default quantity of 1
+                const newSelection = [...prev, { code, quantity: '1' }];
+                
+                // Update editData ingredients
+                const ingredientString = newSelection.map(item => `${item.quantity}/${item.code}`).join(',');
+                setEditData(prevData => ({
+                    ...prevData,
+                    ingredients: ingredientString
+                }));
+                
+                return newSelection;
+            }
+        });
+    };
+
+    // Update ingredient quantity
+    const updateIngredientQuantity = (code, quantity) => {
+        setSelectedIngredients(prev => {
+            const newSelection = prev.map(item => 
+                item.code === code ? { ...item, quantity } : item
+            );
+            
+            // Update editData ingredients
+            const ingredientString = newSelection.map(item => `${item.quantity}/${item.code}`).join(',');
+            setEditData(prevData => ({
+                ...prevData,
+                ingredients: ingredientString
+            }));
+            
+            return newSelection;
+        });
+    };
+
+    // Open ingredient selector modal
+    const openIngredientSelector = () => {
+        // Initialize selectedIngredients from ingredients field if it exists
+        if (editData.ingredients) {
+            const ingredientEntries = editData.ingredients.split(',').filter(entry => entry.trim());
+            const ingredientsWithQty = ingredientEntries.map(entry => {
+                const [qty, code] = entry.trim().split('/');
+                return { code, quantity: qty || '1' };
+            });
+            setSelectedIngredients(ingredientsWithQty);
+        } else {
+            setSelectedIngredients([]);
+        }
+        setShowIngredientSelector(true);
+    };
+
+    // Close ingredient selector modal
+    const closeIngredientSelector = () => {
+        setShowIngredientSelector(false);
+    };
+
+    // Add ingredient directly from dropdown
+    const handleAddIngredientToProduct = (e) => {
+        const selectedCode = e.target.value;
+        if (!selectedCode) return;
+        
+        // Prevent adding duplicates
+        const existingIngredient = selectedIngredients.find(item => item.code === selectedCode);
+        if (!existingIngredient) {
+            const newSelection = [...selectedIngredients, { code: selectedCode, quantity: '1' }];
+            setSelectedIngredients(newSelection);
+            
+            const ingredientString = newSelection.map(item => `${item.quantity}/${item.code}`).join(',');
+            setEditData(prev => ({
+                ...prev,
+                ingredients: ingredientString
+            }));
+        }
+        
+        // Reset the dropdown to default value
+        e.target.value = '';
+    };
+    
+    // Remove ingredient from product
+    const removeIngredientFromProduct = (codeToRemove) => {
+        const newSelection = selectedIngredients.filter(item => item.code !== codeToRemove);
+        setSelectedIngredients(newSelection);
+        
+        const ingredientString = newSelection.map(item => `${item.quantity}/${item.code}`).join(',');
+        setEditData(prev => ({
+            ...prev,
+            ingredients: ingredientString
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -360,6 +520,11 @@ const ProductManager = () => {
                 delete cleanProductData.content;
             }
 
+            // Only include ingredients field if this is a product with ingredients
+            if (cleanProductData.type !== 'product' || !cleanProductData.ingredients) {
+                delete cleanProductData.ingredients;
+            }
+
             console.log('Submitting product data:', cleanProductData);
 
             // First check if this product code already exists
@@ -374,7 +539,7 @@ const ProductManager = () => {
             }
 
             if (existingProduct) {
-                // Update existing product/modifier
+                // Update existing product/modifier/ingredient
                 console.log('[PRODUCT MANAGER] Editing existing item');
                 const { error } = await supabase
                     .from(import.meta.env.VITE_SUPABASE_PRODUCT_TABLE)
@@ -390,13 +555,17 @@ const ProductManager = () => {
                     setProducts((prev) =>
                         prev.map((item) => (item.code === cleanProductData.code ? { ...item, ...cleanProductData } : item))
                     );
-                } else {
+                } else if (cleanProductData.type === 'modifier') {
                     setModifiers((prev) =>
+                        prev.map((item) => (item.code === cleanProductData.code ? { ...item, ...cleanProductData } : item))
+                    );
+                } else if (cleanProductData.type === 'ingredient') {
+                    setIngredients((prev) =>
                         prev.map((item) => (item.code === cleanProductData.code ? { ...item, ...cleanProductData } : item))
                     );
                 }
             } else {
-                // Add new product/modifier
+                // Add new product/modifier/ingredient
                 console.log('[PRODUCT MANAGER] Adding new item');
                 const { data: newData, error } = await supabase
                     .from(import.meta.env.VITE_SUPABASE_PRODUCT_TABLE)
@@ -410,8 +579,10 @@ const ProductManager = () => {
 
                 if (cleanProductData.type === 'product') {
                     setProducts((prev) => [...prev, newData[0]]);
-                } else {
+                } else if (cleanProductData.type === 'modifier') {
                     setModifiers((prev) => [...prev, newData[0]]);
+                } else if (cleanProductData.type === 'ingredient') {
+                    setIngredients((prev) => [...prev, newData[0]]);
                 }
             }
             
@@ -441,6 +612,8 @@ const ProductManager = () => {
             console.error('Error in submission:', error);
             if (error.message.includes('column "content" does not exist')) {
                 alert('Error: The database schema is missing the "content" column needed for bundle products. Please update your database schema.');
+            } else if (error.message.includes('column "ingredients" does not exist')) {
+                alert('Error: The database schema is missing the "ingredients" column needed for product ingredients. Please update your database schema.');
             } else {
                 alert(`An error occurred: ${error.message || 'Unknown error'}`);
             }
@@ -463,12 +636,6 @@ const ProductManager = () => {
             </div>
             
             <div className="contentInterface">
-                <div className="button-container">
-                    <button className="action-button product" onClick={() => openModal('product')}>Add Product</button>
-                    <button className="action-button bundle" onClick={() => openBundleModal()}>Add Bundle</button>
-                    <button className="action-button modifier" onClick={() => openModal('modifier')}>Add Modifier</button>
-                </div>
-
                 {loading ? (
                     <div className="loading-indicator">Loading product data...</div>
                 ) : (
@@ -476,22 +643,28 @@ const ProductManager = () => {
                         <div className="section-container">
                             <div className="section-header">
                                 <h2>Products {filteredProducts.length > 0 ? `(${filteredProducts.length})` : '(No products found)'}</h2>
-                                <div className="search-container">
-                                    <input
-                                        type="text"
-                                        className="search-input"
-                                        placeholder="Search products..."
-                                        value={productSearch}
-                                        onChange={(e) => setProductSearch(e.target.value)}
-                                    />
-                                    {productSearch && (
-                                        <button 
-                                            className="clear-search" 
-                                            onClick={() => setProductSearch('')}
-                                        >
-                                            ×
-                                        </button>
-                                    )}
+                                <div className="section-actions">
+                                    <div className="search-container">
+                                        <input
+                                            type="text"
+                                            className="search-input"
+                                            placeholder="Search products..."
+                                            value={productSearch}
+                                            onChange={(e) => setProductSearch(e.target.value)}
+                                        />
+                                        {productSearch && (
+                                            <button 
+                                                className="clear-search" 
+                                                onClick={() => setProductSearch('')}
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="action-buttons">
+                                        <button className="action-button product" onClick={() => openModal('product')}>Add Product</button>
+                                        <button className="action-button bundle" onClick={() => openBundleModal()}>Add Bundle</button>
+                                    </div>
                                 </div>
                             </div>
                             <table className="productTable">
@@ -546,22 +719,27 @@ const ProductManager = () => {
                         <div className="section-container">
                             <div className="section-header">
                                 <h2>Modifiers {filteredModifiers.length > 0 ? `(${filteredModifiers.length})` : '(No modifiers found)'}</h2>
-                                <div className="search-container">
-                                    <input
-                                        type="text"
-                                        className="search-input"
-                                        placeholder="Search modifiers..."
-                                        value={modifierSearch}
-                                        onChange={(e) => setModifierSearch(e.target.value)}
-                                    />
-                                    {modifierSearch && (
-                                        <button 
-                                            className="clear-search" 
-                                            onClick={() => setModifierSearch('')}
-                                        >
-                                            ×
-                                        </button>
-                                    )}
+                                <div className="section-actions">
+                                    <div className="search-container">
+                                        <input
+                                            type="text"
+                                            className="search-input"
+                                            placeholder="Search modifiers..."
+                                            value={modifierSearch}
+                                            onChange={(e) => setModifierSearch(e.target.value)}
+                                        />
+                                        {modifierSearch && (
+                                            <button 
+                                                className="clear-search" 
+                                                onClick={() => setModifierSearch('')}
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="action-buttons">
+                                        <button className="action-button modifier" onClick={() => openModal('modifier')}>Add Modifier</button>
+                                    </div>
                                 </div>
                             </div>
                             <table className="productTable">
@@ -600,6 +778,69 @@ const ProductManager = () => {
                                 </tbody>
                             </table>
                         </div>
+
+                        <div className="section-container">
+                            <div className="section-header">
+                                <h2>Ingredients {filteredIngredients.length > 0 ? `(${filteredIngredients.length})` : '(No ingredients found)'}</h2>
+                                <div className="section-actions">
+                                    <div className="search-container">
+                                        <input
+                                            type="text"
+                                            className="search-input"
+                                            placeholder="Search ingredients..."
+                                            value={ingredientSearch}
+                                            onChange={(e) => setIngredientSearch(e.target.value)}
+                                        />
+                                        {ingredientSearch && (
+                                            <button 
+                                                className="clear-search" 
+                                                onClick={() => setIngredientSearch('')}
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="action-buttons">
+                                        <button className="action-button ingredient" onClick={() => openIngredientModal()}>Add Ingredient</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <table className="productTable">
+                                <thead>
+                                    <tr>
+                                        <th>Ingredient Name</th>
+                                        <th>Ingredient Code</th>
+                                        <th>Price</th>
+                                        <th>Category</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredIngredients.map((ingredient, index) => (
+                                        <tr key={index}>
+                                            <td>{ingredient.name}</td>
+                                            <td>{ingredient.code}</td>
+                                            <td>{ingredient.price}</td>
+                                            <td>{ingredient.category}</td>
+                                            <td>
+                                                <button
+                                                    className="edit-btn"
+                                                    onClick={() => openModal('ingredient', ingredient)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    className="delete-btn"
+                                                    onClick={() => openDeleteConfirm('ingredient', ingredient)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>
@@ -613,7 +854,7 @@ const ProductManager = () => {
                                 ? (editData.category === 'Bundle' || editData.category === 'Promo' 
                                     ? ' Bundle/Promo' 
                                     : ' Product') 
-                                : ' Modifier'}
+                                : modalType === 'modifier' ? ' Modifier' : ' Ingredient'}
                         </h3>
                         <form onSubmit={handleSubmit}>
                             <div className="formGroup">
@@ -651,13 +892,25 @@ const ProductManager = () => {
                             </div>
                             <div className="formGroup">
                                 <label htmlFor="category">Category</label>
-                                <input
-                                    type="text"
-                                    id="category"
-                                    name="category"
-                                    value={editData.category}
-                                    onChange={handleInputChange}
-                                />
+                                {modalType === 'ingredient' ? (
+                                    <input
+                                        type="text"
+                                        id="category"
+                                        name="category"
+                                        value="Ingredient"
+                                        readOnly
+                                        disabled
+                                        style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                                    />
+                                ) : (
+                                    <input
+                                        type="text"
+                                        id="category"
+                                        name="category"
+                                        value={editData.category}
+                                        onChange={handleInputChange}
+                                    />
+                                )}
                             </div>
                             {/* Bundle content field that appears when category is Promo or Bundle */}
                             {modalType === 'product' && 
@@ -726,6 +979,83 @@ const ProductManager = () => {
                                     )}
                                 </div>
                             )}
+                            {/* Ingredient selection field for products */}
+                            {modalType === 'product' && 
+                             editData.category !== 'Promo' && editData.category !== 'Bundle' && (
+                                <div className="formGroup bundleGroup">
+                                    <label htmlFor="ingredients">Product Ingredients</label>
+                                    <div className="bundleSelectionGroup">
+                                        <select 
+                                            className="productDropdown" 
+                                            onChange={handleAddIngredientToProduct}
+                                            defaultValue=""
+                                        >
+                                            <option value="" disabled>Select ingredients to add...</option>
+                                            {ingredients
+                                                .filter(ingredient => !selectedIngredients.some(item => item.code === ingredient.code))
+                                                .map((ingredient) => (
+                                                    <option key={ingredient.code} value={ingredient.code}>
+                                                        {ingredient.name} ({ingredient.code}) - P{ingredient.price}
+                                                    </option>
+                                                ))
+                                            }
+                                        </select>
+                                        <button 
+                                            type="button" 
+                                            className="selectProductsButton"
+                                            onClick={openIngredientSelector}
+                                        >
+                                            View All Ingredients
+                                        </button>
+                                    </div>
+                                    
+                                    {selectedIngredients.length > 0 ? (
+                                        <div className="selectedProductsInfo">
+                                            <p>Selected Ingredients: {selectedIngredients.length}</p>
+                                            <ul className="selectedProductsList">
+                                                {selectedIngredients.map(item => {
+                                                    const ingredient = ingredients.find(i => i.code === item.code);
+                                                    return (
+                                                        <li key={item.code} className="selectedProductItem">
+                                                            <div className="ingredientItemContent">
+                                                                <span className="ingredientInfo">
+                                                                    {ingredient ? `${ingredient.name} (${item.code}) - P${ingredient.price}` : item.code}
+                                                                </span>
+                                                                <div className="quantityControls">
+                                                                    <label>Qty:</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0.01"
+                                                                        step="0.01"
+                                                                        value={item.quantity}
+                                                                        onChange={(e) => updateIngredientQuantity(item.code, e.target.value)}
+                                                                        className="quantityInput"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <button 
+                                                                type="button" 
+                                                                className="removeProductButton"
+                                                                onClick={() => removeIngredientFromProduct(item.code)}
+                                                            >
+                                                                ✕
+                                                            </button> 
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                            <input
+                                                type="hidden"
+                                                id="ingredients"
+                                                name="ingredients"
+                                                value={editData.ingredients || ''}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <p className="noProductsMessage">No ingredients selected for this product.</p>
+                                    )}
+                                </div>
+                            )}
                             {modalType === 'product' && !editData.id && (
                                 <div className="formGroup">
                                     <label htmlFor="image">Image</label>
@@ -772,6 +1102,46 @@ const ProductManager = () => {
                         </div>
                         <div className="buttonGroup">
                             <button className="doneButton" onClick={closeProductSelector}>Done</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Ingredient Selector Modal */}
+            {showIngredientSelector && (
+                <div className="modalOverlay" onClick={closeIngredientSelector}>
+                    <div className="modalContent productSelectorModal" onClick={(e) => e.stopPropagation()}>
+                        <h3>Select Ingredients for Product</h3>
+                        <div className="productSelectorContainer">
+                            {ingredients.map((ingredient) => {
+                                const selectedItem = selectedIngredients.find(item => item.code === ingredient.code);
+                                const isSelected = !!selectedItem;
+                                
+                                return (
+                                    <div 
+                                        key={ingredient.code} 
+                                        className={`productSelectorItem ${isSelected ? 'selected' : ''}`}
+                                        onClick={() => toggleIngredientSelection(ingredient.code)}
+                                    >
+                                        <div className="productSelectorInfo">
+                                            <strong>{ingredient.name}</strong>
+                                            <span>({ingredient.code})</span>
+                                            <span>P{ingredient.price}</span>
+                                            {isSelected && (
+                                                <div className="quantityDisplay">
+                                                    Qty: {selectedItem.quantity}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="productSelectorCheckbox">
+                                            {isSelected ? '✓' : ''}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div className="buttonGroup">
+                            <button className="doneButton" onClick={closeIngredientSelector}>Done</button>
                         </div>
                     </div>
                 </div>

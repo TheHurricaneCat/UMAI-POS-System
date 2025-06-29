@@ -12,10 +12,11 @@ function TrayModifierItem({ modifierContent, handleModifierIncrement, handleModi
             <div className={styles.modifierQuantity}>
                 <p>{quantity}</p>
             </div>
-            <div className={styles.modifierPrice}>
-                <p>P{price.toFixed(2)}</p>
-                
-            </div>
+            { (isPromo === false) ? (
+                <div className={styles.modifierPrice}>
+                    <p>P{price.toFixed(2)}</p>
+                </div>
+            ) : null }
             { (isPromo === false) ? (
                 <div className={styles.removeButton}>
                     <button onClick={() => handleModifierDeletion(name)}> x </button>

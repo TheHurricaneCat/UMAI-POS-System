@@ -102,6 +102,14 @@
   background-color: #F57C00;
 }
 
+.action-button.ingredient {
+  background-color: #795548;
+}
+
+.action-button.ingredient:hover {
+  background-color: #5D4037;
+}
+
 /* Data container styles */
 .data-container {
   display: grid;
@@ -129,6 +137,35 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-header h2 {
+  color: #3a3344;
+  margin: 0;
+  font-size: 1.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-buttons .action-button {
+  padding: 6px 12px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .section-header h2 {
@@ -380,9 +417,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  padding: 12px;
   border-bottom: 1px solid #f0f0f0;
   background-color: white;
+  gap: 8px;
 }
 
 .selectedProductItem:last-child {
@@ -559,6 +597,55 @@
   font-style: italic;
 }
 
+/* Ingredient quantity controls */
+.ingredientItemContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  gap: 12px;
+}
+
+.ingredientInfo {
+  flex: 1;
+  font-size: 14px;
+  color: #333;
+}
+
+.quantityControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.quantityControls label {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.quantityInput {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.quantityInput:focus {
+  border-color: #9C27B0;
+  outline: none;
+}
+
+.quantityDisplay {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .modalContent {
@@ -585,5 +672,24 @@
   
   .productSelectorModal {
     max-width: 95%;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .section-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .action-buttons {
+    justify-content: stretch;
+  }
+  
+  .action-buttons .action-button {
+    flex: 1;
+    min-width: 120px;
   }
 }
