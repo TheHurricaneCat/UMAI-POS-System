@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { appendEntry } from '../handlers/DataHandler';
+import { appendEntry, getLastTransaction } from '../handlers/DataHandler';
 import styles from './KeypadContainer.module.css';
-import PopUp from '../global-components/PopUp.jsx';
+import PopUp from '../global-components/Popup.jsx';
 import { fetchProductCatalog } from '../handlers/SessionHandler.js';
-import { getLastTransaction } from '../handlers/DataHandler';
-
 import ReceiptModal from './ReceiptModal';
+import { useExcelData } from '../context/ExcelDataContext';
 
 function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurrentTray, currentTray }) {
     const [buttonPopUp, setButtonPopUp] = useState(false);
@@ -25,6 +24,8 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
         value: 0,
         type: 'None'
     });
+
+    const { deductStock } = useExcelData();
 
     useEffect(() => {
         async function loadModifiers() {
@@ -64,7 +65,30 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
 
                 await appendEntry(tray, discount, total);
                 
-                //QoL change - Immediately print the receipt after saving
+                // Deduct stock for each product, ingredient, and modifier in the current tray
+                const currentTrayObj = tray.find(t => t.id === currentTray);
+                if (currentTrayObj && currentTrayObj.products) {
+                  currentTrayObj.products.forEach(product => {
+                    // Deduct for product
+                    const ok = deductStock(product.code, product.quantity);
+                    if (!ok) console.warn(`Deduction failed for product code: ${product.code}`);
+                    // Deduct for ingredients (if present)
+                    if (product.ingredients && Array.isArray(product.ingredients)) {
+                      product.ingredients.forEach(ing => {
+                        const okIng = deductStock(ing.code, ing.quantity);
+                        if (!okIng) console.warn(`Deduction failed for ingredient code: ${ing.code}`);
+                      });
+                    }
+                    // Deduct for modifiers (if present)
+                    if (product.modifiers && Array.isArray(product.modifiers)) {
+                      product.modifiers.forEach(mod => {
+                        const okMod = deductStock(mod.code, mod.quantity);
+                        if (!okMod) console.warn(`Deduction failed for modifier code: ${mod.code}`);
+                      });
+                    }
+                  });
+                }
+                // No need to call exportToExcel here; context will auto-export after deduction
                 handlePrintReceipt();
                 
                 // Save the current tray before clearing

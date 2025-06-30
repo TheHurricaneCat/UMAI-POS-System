@@ -11,12 +11,13 @@ import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
 import CategoryMenu from './pos-components/CategoryMenu.jsx'
-import PopUp from './global-components/PopUp.jsx';
+import PopUp from './global-components/Popup.jsx';
 import NavigationContainer from './pos-components/NavigationContainer.jsx';
 import ContentHeader from './pos-components/ContentHeader.jsx';
 import Statistics from './statistics-component/Statistics.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
+import { useExcelData } from './context/ExcelDataContext.jsx';
 
 import {startSession, getSessionDetails, getUsername, endSession, logOut, clockOut, saveExcelFile, fetchProductCatalog } from './handlers/SessionHandler';
  
@@ -294,6 +295,22 @@ function App() {
       window.removeEventListener('orientationchange', checkOrientation);
     };
   }, []);
+
+	const { excelData } = useExcelData();
+
+  useEffect(() => {
+    // Reset all popups when a new Excel file is loaded
+    setStartSessionPopup(false);
+    setEndSessionPopup(false);
+    setEndSessionFailedPopup(false);
+    setEndSessionFailedClockOutPopup(false);
+    setSaveExcelPopup(false);
+    setSaveExcelFailedPopup(false);
+    setNoExcelStoragePopup(false);
+    setNoExcelStorageConfirm(false);
+    setRestoreSessionPopup(false);
+    setConfirm(false);
+  }, [excelData]);
 
 	return (
     // interfaces are invisible containers that hold the components

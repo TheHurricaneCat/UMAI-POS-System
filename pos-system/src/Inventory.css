@@ -1,0 +1,199 @@
+/* --- Refined Inventory.css --- */
+
+.inventory-horizontal-root {
+  width: 100vw;
+  min-height: 100vh;
+  background: #f7f7f7;
+}
+
+.inventory-navbar {
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+  align-items: center;
+  background: #8b6b3c;
+  padding: 24px 32px 16px 32px;
+  border-radius: 0 0 32px 32px;
+  margin-bottom: 24px;
+}
+
+.nav-btn {
+  border: none;
+  outline: none;
+  border-radius: 24px;
+  padding: 12px 36px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  background: #7beea6;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-right: 12px;
+}
+
+.nav-btn:last-child {
+  background: #2196f3;
+}
+
+.nav-btn:hover {
+  filter: brightness(0.95);
+}
+
+.inventory-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.inventory-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.control-group {
+  display: flex;
+  gap: 12px;
+}
+
+.control-button {
+  border: none;
+  border-radius: 18px;
+  padding: 10px 24px;
+  background: #2196f3;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.control-button:hover {
+  background: #1769aa;
+}
+
+.stock-status {
+  margin-top: 8px;
+}
+
+.status {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.status.high { color: #43a047; }
+.status.medium { color: #ffa000; }
+.status.low, .status.critical { color: #e53935; }
+
+.inventory-horizontal-main {
+  display: flex;
+  gap: 32px;
+}
+
+.products-ingredients-section {
+  flex: 2;
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ingredient-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 16px 20px;
+  min-width: 180px;
+  margin-bottom: 8px;
+}
+
+.stock-levels-section {
+  flex: 1;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 20px 16px;
+  min-width: 260px;
+}
+
+.stock-levels-card {
+  margin-bottom: 16px;
+}
+
+.ingredients-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredient-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.status-indicator {
+  border-radius: 12px;
+  padding: 2px 12px;
+  font-size: 0.95em;
+  font-weight: 500;
+}
+.status-indicator.high { background: #e8f5e9; color: #43a047; }
+.status-indicator.medium { background: #fff8e1; color: #ffa000; }
+.status-indicator.low { background: #ffebee; color: #e53935; }
+
+.stock-levels-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.stock-button {
+  border: none;
+  border-radius: 18px;
+  padding: 10px 24px;
+  background: #2196f3;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.stock-button:hover {
+  background: #1769aa;
+}
+
+.stock-button:first-child {
+  background: #4caf50;
+}
+
+.stock-button:first-child:hover {
+  background: #357a38;
+}
+
+.toast-notification {
+  background: #43a047;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 16px;
+  margin-top: 10px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+@media (max-width: 900px) {
+  .inventory-horizontal-main {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .stock-levels-section {
+    min-width: unset;
+  }
+}

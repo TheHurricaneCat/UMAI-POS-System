@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTransactions, voidLastTransaction } from './handlers/DataHandler';
-import PopUp from './global-components/PopUp';
+import PopUp from './global-components/Popup.jsx';
 import './TransactionViewer.css';
 
 const TransactionViewer = () => {

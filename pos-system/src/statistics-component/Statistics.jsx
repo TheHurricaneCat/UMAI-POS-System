@@ -7,7 +7,7 @@ import * as XLSX from "xlsx";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './Statistics.css';
-import PopUp from '../global-components/PopUp.jsx'; // <-- Import your popup
+import PopUp from '../global-components/Popup.jsx';
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 

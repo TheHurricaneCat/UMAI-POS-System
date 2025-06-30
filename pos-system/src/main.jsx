@@ -13,24 +13,27 @@ import Statistics from './statistics-component/Statistics.jsx';
 import BackupManager from './BackupManager.jsx'
 
 import { UserProvider } from './UserContext';
+import { ExcelDataProvider } from './context/ExcelDataContext.jsx';
 
 const startApp = () => {
   createRoot(document.getElementById('root')).render(
     <StrictMode>
       <UserProvider>
-        <HashRouter>  {/* Changed from BrowserRouter */}
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/session-viewer" element={<SessionViewer />} />
-            <Route path="/transaction-viewer" element={<TransactionViewer />} />
-            <Route path="/product-manager" element={<ProductManager />} />
-             <Route path="/backup-manager" element={<BackupManager />} />
-            <Route path="/statistics" element={<Statistics />} />
-            <Route path="/app" element={<App />} />
-            <Route path="/inventory" element={<Inventory />} />
-          </Routes>
-        </HashRouter>
+        <ExcelDataProvider>
+          <HashRouter>  {/* Changed from BrowserRouter */}
+            <Routes>
+              <Route path="/" element={<Login />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/session-viewer" element={<SessionViewer />} />
+              <Route path="/transaction-viewer" element={<TransactionViewer />} />
+              <Route path="/product-manager" element={<ProductManager />} />
+               <Route path="/backup-manager" element={<BackupManager />} />
+              <Route path="/statistics" element={<Statistics />} />
+              <Route path="/app" element={<App />} />
+              <Route path="/inventory" element={<Inventory />} />
+            </Routes>
+          </HashRouter>
+        </ExcelDataProvider>
        </UserProvider>
      </StrictMode>,
   )
