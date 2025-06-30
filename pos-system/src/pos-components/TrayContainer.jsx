@@ -187,7 +187,7 @@ function CustomerModal({ initialCustomer, trayId, onSave, onClose }) {
                             <option value="Cash">Cash</option>
                             <option value="Credit Card">Credit Card</option>
                             <option value="Debit Card">Debit Card</option>
-                            <option value="Mobile Payment">Mobile Payment</option>
+                            <option value="E-wallet">E-wallet</option>
                         </select>
                     </div>
                     
