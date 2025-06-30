@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './database/supabase';
 import './SessionViewer.css';
-import PopUp from './global-components/Popup';
+import PopUp from './global-components/Popup.jsx';
 
 const EmployeeTable = () => {
     const [users, setUsers] = useState([]);

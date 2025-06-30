@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import styles from './NavigationContainer.module.css';
-import PopUp from "../global-components/PopUp";
+import PopUp from "../global-components/Popup";
 import DropdownMenu from "./DropdownMenu";
 
 function NavigationContainer({handleStartSession, handleEndSession, saveExcelFile, userRole, handleClockOut, handleLogOut}) {

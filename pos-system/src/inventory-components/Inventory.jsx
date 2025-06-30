@@ -1,332 +1,345 @@
+// --- Refined Inventory.jsx ---
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Inventory.css';
-import '../handlers/SessionHandler.js';
-import { supabase } from '../database/supabase.js';
-import { initProductList, fetchSessionItems } from '../handlers/DataHandler';
-import { getSessionDetails } from '../handlers/SessionHandler.js';
-import InvProductCard from './InvProductCard.jsx';
-import IngredientCard from './IngredientCard';
+import * as XLSX from 'xlsx';
+import { supabase } from '../database/supabase';
+import { useExcelData } from '../context/ExcelDataContext';
 
 function Inventory() {
-    const navigate = useNavigate();
-    const [stockStatus, setStockStatus] = useState('Normal');
-    const [stockDescription, setStockDescription] = useState('All ingredients are at adequate levels');
-    const [products, setProducts] = useState([]);
-    const [sauceModifiers, setSauceModifiers] = useState([]);
-    const [ingredients, setIngredients] = useState([]);
-    const [showToast, setShowToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState('');
+  const navigate = useNavigate();
+  const [stockStatus, setStockStatus] = useState('Normal');
+  const [stockDescription, setStockDescription] = useState('All ingredients are at adequate levels');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [sortMode, setSortMode] = useState('name');
+  const [excelError, setExcelError] = useState('');
 
-    const getStockStatus = (stockNumber) => {
-      if (stockNumber > 70) return 'high';
-      if (stockNumber >= 30) return 'medium';
-      return 'low';
-    };
+  // Use context for inventory state and actions
+  const {
+    excelData, setExcelData,
+    products, setProducts,
+    ingredients, setIngredients,
+    modifiers, setModifiers,
+    exportToExcel
+  } = useExcelData();
 
-    const calOverallStockStatus = (ingredients, sauceModifiers) => {
-      const allItems = [...ingredients, ...sauceModifiers];
-      if (allItems.length === 0) return { status: 'No Data', description: 'No inventory data available' };
-  
-      const totalItems = allItems.length;
-      const stockLevels = allItems.reduce((acc, item) => {
-          if (item.stockNumber > 70) acc.high++;
-          else if (item.stockNumber >= 30) acc.medium++;
-          else acc.low++;
-          return acc;
-      }, { high: 0, medium: 0, low: 0 });
-  
-      // Calculate percentages
-      const highPercentage = (stockLevels.high / totalItems) * 100;
-      const lowPercentage = (stockLevels.low / totalItems) * 100;
-  
-      // Status logic
-      if (highPercentage >= 70) {
-          return {
-              status: 'High',
-              description: 'Stock levels are healthy across most items'
-          };
-      } else if (lowPercentage >= 30) {
-          return {
-              status: 'Critical',
-              description: `${stockLevels.low} items need immediate attention`
-          };
-      } else if (highPercentage >= 40) {
-          return {
-              status: 'Medium',
-              description: 'Stock levels are adequate but some items need attention'
-          };
-      } else {
-          return {
-              status: 'Low',
-              description: 'Many items need restocking soon'
-          };
-      }
-    };
+  // --- Utility Functions ---
+  const getStockStatus = (stockNumber) => {
+    if (stockNumber > 70) return 'high';
+    if (stockNumber >= 30) return 'medium';
+    return 'low';
+  };
 
-    useEffect(() => {
-      const { status, description } = calOverallStockStatus(ingredients, sauceModifiers);
-      setStockStatus(status);
-      setStockDescription(description);
-    }, [ingredients, sauceModifiers]);
+  const calOverallStockStatus = (ingredients, modifiers) => {
+    const allItems = [...ingredients, ...modifiers];
+    if (allItems.length === 0) return { status: 'No Data', description: 'No inventory data available' };
+    const totalItems = allItems.length;
+    const stockLevels = allItems.reduce((acc, item) => {
+      if (item.stockNumber > 70) acc.high++;
+      else if (item.stockNumber >= 30) acc.medium++;
+      else acc.low++;
+      return acc;
+    }, { high: 0, medium: 0, low: 0 });
+    const highPercentage = (stockLevels.high / totalItems) * 100;
+    const lowPercentage = (stockLevels.low / totalItems) * 100;
+    if (highPercentage >= 70) {
+      return { status: 'High', description: 'Stock levels are healthy across most items' };
+    } else if (lowPercentage >= 30) {
+      return { status: 'Critical', description: `${stockLevels.low} items need immediate attention` };
+    } else if (highPercentage >= 40) {
+      return { status: 'Medium', description: 'Stock levels are adequate but some items need attention' };
+    } else {
+      return { status: 'Low', description: 'Many items need restocking soon' };
+    }
+  };
 
-    useEffect(() => {
-      async function fetchData() {
-        try {
-          const sessionDetails = getSessionDetails();
-          console.log("Session Details:", sessionDetails);
-          
-          if (sessionDetails?.token) {
-            console.log("Fetching with token:", sessionDetails.token);
-            const productData = await fetchSessionItems('Products', sessionDetails.token);
-            const modifierData = await fetchSessionItems('Modifiers', sessionDetails.token);
-            const ingredientData = await fetchSessionItems('Ingredients', sessionDetails.token); // Add this line
-            console.log("Product Data:", productData);
-            console.log("Modifier Data:", modifierData);
-            console.log("Ingredient Data:", ingredientData); // Add this line
-            
-            const sauces = modifierData.filter(mod => mod.category === "Sauce");
+  useEffect(() => {
+    const { status, description } = calOverallStockStatus(ingredients, modifiers);
+    setStockStatus(status);
+    setStockDescription(description);
+  }, [ingredients, modifiers]);
 
-            if (productData.length > 0) {
-              setProducts(productData);
-            }
-            if (modifierData.length > 0) {
-              setSauceModifiers(sauces);
-            }
-            if (ingredientData.length > 0) { // Add this block
-              setIngredients(ingredientData);
-            }
-          } else {
-            console.error("No session token found");
-          }
-            
-        } catch (error) {
-          console.error("Error fetching inventory data:", error);
-        }
-      }
-      fetchData();
-    }, []);
+  // --- Excel Parsing ---
+  const parseExcelRows = (jsonData) => {
+    let products = [];
+    let ingredients = [];
+    let modifiers = [];
+    if (!Array.isArray(jsonData) || jsonData.length < 2) {
+      setExcelError('Excel file is empty or not formatted as expected.');
+      return { products, ingredients, modifiers };
+    }
+    const headers = jsonData[0].map(h => String(h).trim().toLowerCase());
+    const nameIdx = headers.indexOf('name');
+    const priceIdx = headers.indexOf('price');
+    const categoryIdx = headers.indexOf('category');
+    const typeIdx = headers.indexOf('type');
+    const stockIdx = headers.findIndex(h => h.startsWith('stock'));
+    const codeIdx = headers.indexOf('code');
+    for (let i = 1; i < jsonData.length; i++) {
+      const row = jsonData[i];
+      if (!row || row.length < 3) continue;
+      const item = {
+        id: `${row[nameIdx]}-${i}`,
+        name: row[nameIdx],
+        price: Number(row[priceIdx]) || 0,
+        stockNumber: Number(row[stockIdx]) || 0,
+        category: row[categoryIdx],
+        code: codeIdx !== -1 ? row[codeIdx] : '',
+      };
+      const type = String(row[typeIdx] || '').toLowerCase();
+      if (type === 'product') products.push(item);
+      else if (type === 'ingredient') ingredients.push(item);
+      else if (type === 'modifier') modifiers.push(item);
+    }
+    if (products.length === 0 && ingredients.length === 0 && modifiers.length === 0) {
+      setExcelError('No products, ingredients, or modifiers found in the Excel file.');
+    }
+    return { products, ingredients, modifiers };
+  };
 
-    const refreshInventory = async (showToastMessage = false) => {
+  const handleExcelUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
       try {
-          const sessionDetails = getSessionDetails();
-          if (sessionDetails?.token) {
-              const productData = await fetchSessionItems('Products', sessionDetails.token);
-              const modifierData = await fetchSessionItems('Modifiers', sessionDetails.token);
-              const ingredientData = await fetchSessionItems('Ingredients', sessionDetails.token);
-              
-              setProducts(productData);
-              setSauceModifiers(modifierData.filter(mod => mod.category === "Sauce"));
-              setIngredients(ingredientData);
-  
-              // Add toast notification
-
-              const { status, description } = calOverallStockStatus(ingredients, sauceModifiers);
-              setStockStatus(status);
-              setStockDescription(description);
-
-              if (showToastMessage) {
-                setToastMessage('Inventory refreshed successfully');
-                setShowToast(true);
-                setTimeout(() => setShowToast(false), 3000);
-              }
-          }
-      } catch (error) {
-          console.error("Error refreshing inventory:", error);
-          if (showToastMessage) {  // Only show error toast if showToastMessage is true
-            setToastMessage('Error refreshing inventory');
-            setShowToast(true);
-            setTimeout(() => setShowToast(false), 3000);
-        }
-      }
-    };
-
-    const handleRefillStocks = async () => {
-      try {
-        const sessionDetails = getSessionDetails();
-        if (!sessionDetails?.token) {
-          console.error("No active session found");
+        const data = new Uint8Array(evt.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetNames = workbook.SheetNames;
+        if (sheetNames.length === 0) {
+          setExcelError('No sheets found in Excel file.');
           return;
         }
-    
-        // Update Products
-        const { error: prodError } = await supabase
-          .from('Products')
-          .update({ stockNumber: 100 })
-          .eq('sessionToken', sessionDetails.token);
-    
-        // Update Modifiers (Sauce only)
-        const { error: modError } = await supabase
-          .from('Modifiers')
-          .update({ stockNumber: 100 })
-          .eq('sessionToken', sessionDetails.token)
-          .eq('category', 'Sauce');
-    
-        // Update Ingredients
-        const { error: ingError } = await supabase
-          .from('Ingredients')
-          .update({ stockNumber: 100 })
-          .eq('sessionToken', sessionDetails.token);
-    
-        if (prodError || modError || ingError) {
-          throw prodError || modError || ingError;
-        }
-    
-        await refreshInventory(true);
-        setToastMessage('All stocks have been refilled to 100');
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
-      } catch (error) {
-        console.error("Error refilling stocks:", error);
-        setToastMessage('Error refilling stocks');
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
+        const worksheet = workbook.Sheets[sheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        setExcelData(jsonData); // Save raw Excel data in context
+        const { products: parsedProducts, ingredients: parsedIngredients, modifiers: parsedModifiers } = parseExcelRows(jsonData);
+        setProducts(parsedProducts);
+        setIngredients(parsedIngredients);
+        setModifiers(parsedModifiers);
+        setExcelError('');
+      } catch (err) {
+        setExcelError('Failed to parse Excel file. Please check the file format.');
       }
+      e.target.value = '';
     };
+    reader.onerror = () => setExcelError('Error reading the file.');
+    reader.readAsArrayBuffer(file);
+  };
 
-    return (
-        <div className="inventory-container">
-          <div className="inventory-header">
-            <h1>Inventory Management</h1>
-            <div className="button-group">
-              <button onClick={() => navigate('/app')} className="nav-button pos">POS</button>
-              <button onClick={() => navigate('/statistics')} className="nav-button inventory">Statistics</button>
-            </div>
-          </div>
-    
-          <div className="inventory-controls">
-            <div className="control-group">
+  // --- Button Handlers ---
+  const handleRefillStocks = () => {
+    if (products.length === 0 && ingredients.length === 0 && modifiers.length === 0) return;
+    setProducts(products.map(p => ({ ...p, stockNumber: 100 })));
+    setIngredients(ingredients.map(i => ({ ...i, stockNumber: 100 })));
+    setModifiers(modifiers.map(m => ({ ...m, stockNumber: 100 })));
+    setToastMessage('All stocks refilled to 100');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
+
+  const handleUpdateSystem = () => {
+    document.getElementById('excel-upload-input')?.click();
+  };
+
+  const handleCallSupplier = () => {
+    setToastMessage('Supplier has been contacted! (Demo)');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
+
+  const handleUpdateSupplier = () => {
+    setToastMessage('Supplier information updated! (Demo)');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
+
+  const handlePrintOrderDetails = () => window.print();
+
+  const handleRearrangeView = () => {
+    setSortMode(prev => prev === 'name' ? 'stock' : prev === 'stock' ? 'category' : 'name');
+  };
+
+  // --- Export to Excel with feedback ---
+  const handleExportToExcel = () => {
+    if (!excelData) {
+      setToastMessage('No Excel file loaded. Please upload first.');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
+    exportToExcel();
+    setToastMessage('Exported to Excel successfully!');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+  };
+
+  // --- Sorting ---
+  const getSorted = (arr) => {
+    return [...arr].sort((a, b) => {
+      if (sortMode === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sortMode === 'stock') return (b.stockNumber || 0) - (a.stockNumber || 0);
+      if (sortMode === 'category') return (a.category || '').localeCompare(b.category || '');
+      return 0;
+    });
+  };
+  const sortedProducts = getSorted(products);
+  const sortedIngredients = getSorted(ingredients);
+  const sortedModifiers = getSorted(modifiers);
+
+  // --- Fetch from Supabase (optional, can be removed if only using Excel) ---
+  // useEffect(() => {
+  //   async function fetchInventory() {
+  //     const { data, error } = await supabase.from('inventory').select('*');
+  //     if (error) {
+  //       setExcelError('Failed to fetch inventory from Supabase.');
+  //       return;
+  //     }
+  //     // Separate products, ingredients, and modifiers
+  //     const products = [];
+  //     const ingredients = [];
+  //     const modifiers = [];
+  //     data.forEach(item => {
+  //       if (item.type === 'product') products.push(item);
+  //       else if (item.type === 'ingredient') ingredients.push(item);
+  //       else if (item.type === 'modifier') modifiers.push(item);
+  //     });
+  //     setProducts(products);
+  //     setIngredients(ingredients);
+  //     setModifiers(modifiers);
+  //   }
+  //   fetchInventory();
+  // }, []);
+
+  // --- Render ---
+  return (
+    <div className="inventory-horizontal-root">
+      <nav className="inventory-navbar">
+        <button className="nav-btn" onClick={() => navigate('/app')}>Go to App</button>
+        <button className="nav-btn" onClick={() => window.location.reload()}>Refresh</button>
+      </nav>
+      <div className="inventory-horizontal-content">
+        <div className="inventory-header">
+          <h1>Inventory Management</h1>
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleExcelUpload}
+            style={{ display: 'none' }}
+            id="excel-upload-input"
+          />
+          {excelError && <div style={{ color: 'red' }}>{excelError}</div>}
+        </div>
+        <div className="inventory-controls">
+          <div className="control-group">
             <button className="control-button" onClick={handleRefillStocks}>Refill Stocks</button>
-              <button className="control-button">Update System</button>
-            </div>
-            
-            <div className="control-group">
-              <button className="control-button">Call Supplier</button>
-              <button className="control-button">Update Supplier</button>
-            </div>
-            
-            <div className="control-group">
-              <button className="control-button">Print Order Details</button>
-              <button className="control-button">Rearrange View</button>
-            </div>
-    
-            <div className="stock-status">
-              <h3>Stock Status: <span className={`status ${stockStatus.toLowerCase()}`}>{stockStatus}</span></h3>
-              <p>{stockDescription}</p>
-            </div>
+            <button className="control-button" onClick={handleUpdateSystem}>Update System</button>
+            <button className="control-button" onClick={handleExportToExcel} disabled={!excelData}>Export to Excel</button>
           </div>
-    
-          <div className="inventory-content-container">
-            <div className="main-content-layout">
-              <div className="products-ingredients-section">
-                <div className="content-section">
-                  <h2>Products</h2>
-                  <div className="card-grid">
-                      {products.length > 0 ? (
-                        products.map((product) => (
-                          <InvProductCard
-                              key={product.id}
-                              name={product.name}
-                              code={product.code}
-                              price={product.price}
-                              category={product.category}
-                              stockNumber={product.stockNumber}
-                              onStockUpdate={refreshInventory}
-                          />
-                        ))
-                      ) : (
-                          <p>No products found</p>
-                      )}
-                  </div>
+          <div className="control-group">
+            <button className="control-button" onClick={handleCallSupplier}>Call Supplier</button>
+            <button className="control-button" onClick={handleUpdateSupplier}>Update Supplier</button>
+          </div>
+          <div className="control-group">
+            <button className="control-button" onClick={handlePrintOrderDetails}>Print Order Details</button>
+            <button className="control-button" onClick={handleRearrangeView}>Rearrange View</button>
+          </div>
+          <div className="stock-status">
+            <h3>Stock Status: <span className={`status ${stockStatus.toLowerCase()}`}>{stockStatus}</span></h3>
+            <p>{stockDescription}</p>
+          </div>
+        </div>
+        <div className="inventory-horizontal-main">
+          <div className="main-sections-row">
+            <div className="products-ingredients-section inventory-scrollable">
+              <div className="content-section">
+                <h2>Products</h2>
+                <div className="card-grid">
+                  {sortedProducts.length > 0 ? (
+                    sortedProducts.map((product) => (
+                      <div key={product.id} className="ingredient-card">
+                        <h3>{product.name}</h3>
+                        <p>Code: {product.code}</p>
+                        <p>Price: ${product.price}</p>
+                        <p>Category: {product.category}</p>
+                        <p>Stock: {product.stockNumber}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No products found</p>
+                  )}
                 </div>
-
-                <div className="content-section">
-                    <h2>Ingredients</h2>
-                    <div className="card-grid">
-                      {/* Display Ingredients */}
-                      {ingredients.length > 0 && ingredients.map((ingredient) => (
-                            <IngredientCard
-                                key={`ing-${ingredient.id}`}
-                                name={ingredient.name}
-                                code={ingredient.code}
-                                price={ingredient.price}
-                                category={ingredient.category}
-                                stockNumber={ingredient.stockNumber}
-                                onStockUpdate={refreshInventory}
-                            />
-                        ))}
-                        
-                        {/* Display Sauce Modifiers */}
-                        {sauceModifiers.length > 0 && sauceModifiers.map((sauce) => (
-                            <IngredientCard
-                                key={`sauce-${sauce.id}`}
-                                name={sauce.name}
-                                code={sauce.code}
-                                price={sauce.price}
-                                category={sauce.category}
-                                stockNumber={sauce.stockNumber}
-                                onStockUpdate={refreshInventory}
-                            />
-                        ))}
-                        
-                        {/* Show message if no items found */}
-                        {ingredients.length === 0 && sauceModifiers.length === 0 && (
-                            <p>No ingredients or sauces found</p>
-                        )}
-
-                        {showToast && (
-                            <div className="toast-notification">
-                                {toastMessage}
-                            </div>
-                        )}
+              </div>
+              <div className="content-section">
+                <h2>Ingredients</h2>
+                <div className="card-grid">
+                  {sortedIngredients.length > 0 && sortedIngredients.map((ingredient) => (
+                    <div key={`ing-${ingredient.id}`} className="ingredient-card">
+                      <h3>{ingredient.name}</h3>
+                      <p>Code: {ingredient.code}</p>
+                      <p>Price: ${ingredient.price}</p>
+                      <p>Category: {ingredient.category}</p>
+                      <p>Stock: {ingredient.stockNumber}</p>
                     </div>
+                  ))}
+                  {sortedModifiers.length > 0 && sortedModifiers.map((mod) => (
+                    <div key={`mod-${mod.id}`} className="ingredient-card">
+                      <h3>{mod.name}</h3>
+                      <p>Code: {mod.code}</p>
+                      <p>Price: ${mod.price}</p>
+                      <p>Category: {mod.category}</p>
+                      <p>Stock: {mod.stockNumber}</p>
+                    </div>
+                  ))}
+                  {sortedIngredients.length === 0 && sortedModifiers.length === 0 && (
+                    <p>No ingredients or modifiers found</p>
+                  )}
+                  {showToast && (
+                    <div className="toast-notification">{toastMessage}</div>
+                  )}
                 </div>
+              </div>
             </div>
-
-            <div className="stock-levels-section">
-            <h2>Stock Levels</h2>
-            <div className="stock-levels-card">
+            <div className="stock-levels-section inventory-scrollable">
+              <h2>Stock Levels</h2>
+              <div className="stock-levels-card">
                 <h3>Ingredients Status</h3>
                 <div className="ingredients-list">
-                    {/* Show all ingredients */}
-                    {ingredients.map((ingredient) => (
-                        <div key={ingredient.id} className="ingredient-status">
-                            <span>{ingredient.name}</span>
-                            <span className={`status-indicator ${getStockStatus(ingredient.stockNumber)}`}>
-                                {getStockStatus(ingredient.stockNumber).charAt(0).toUpperCase() + 
-                                getStockStatus(ingredient.stockNumber).slice(1)}
-                            </span>
-                        </div>
-                    ))}
-                    
-                    {/* Show all sauce modifiers */}
-                    {sauceModifiers.map((sauce) => (
-                        <div key={sauce.id} className="ingredient-status">
-                            <span>{sauce.name}</span>
-                            <span className={`status-indicator ${getStockStatus(sauce.stockNumber)}`}>
-                                {getStockStatus(sauce.stockNumber).charAt(0).toUpperCase() + 
-                                getStockStatus(sauce.stockNumber).slice(1)}
-                            </span>
-                        </div>
-                    ))}
-
-                    {/* Show message if no items */}
-                    {ingredients.length === 0 && sauceModifiers.length === 0 && (
-                        <div className="ingredient-status">
-                            <span>No ingredients found</span>
-                        </div>
-                    )}
+                  {sortedIngredients.map((ingredient) => (
+                    <div key={ingredient.id} className="ingredient-status">
+                      <span>{ingredient.name}</span>
+                      <span className={`status-indicator ${getStockStatus(ingredient.stockNumber)}`}>
+                        {getStockStatus(ingredient.stockNumber).charAt(0).toUpperCase() + getStockStatus(ingredient.stockNumber).slice(1)}
+                      </span>
+                    </div>
+                  ))}
+                  {sortedModifiers.map((mod) => (
+                    <div key={mod.id} className="ingredient-status">
+                      <span>{mod.name}</span>
+                      <span className={`status-indicator ${getStockStatus(mod.stockNumber)}`}>
+                        {getStockStatus(mod.stockNumber).charAt(0).toUpperCase() + getStockStatus(mod.stockNumber).slice(1)}
+                      </span>
+                    </div>
+                  ))}
+                  {sortedIngredients.length === 0 && sortedModifiers.length === 0 && (
+                    <div className="ingredient-status">
+                      <span>No ingredients found</span>
+                    </div>
+                  )}
                 </div>
-            </div>
-            <div className="stock-levels-buttons">
-            <button className="stock-button" onClick={() => refreshInventory(true)}>Refresh Inventory</button>
-                <button className="stock-button">Sort</button>
+              </div>
+              <div className="stock-levels-buttons">
+                <button className="stock-button" onClick={handleUpdateSystem}>Open Excel File</button>
+                <button className="stock-button" onClick={() => window.location.reload()}>Refresh Inventory</button>
+                <button className="stock-button" onClick={handleRearrangeView}>Sort</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-        </div>
-      );
-    }
+    </div>
+  );
+}
 
 export default Inventory;
