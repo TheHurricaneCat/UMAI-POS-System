@@ -196,8 +196,10 @@ function App() {
       // This keeps the session active but prevents usage
     }
   };
-
+  /////////////////////////
   // detect if previous session has clocked out but not ended
+  /////////////////////////
+  
   useEffect(() => {
     async function checkSessionStatus() {
       console.log("[SESSION] Checking session status...");
@@ -210,6 +212,11 @@ function App() {
     
     checkSessionStatus();
   }, []);
+
+  /////////////////////////
+  // Method handling confirmation of no Excel file
+  // Displays when there is no Excel file to save at the end of the session
+  /////////////////////////
 
   useEffect(() => {
     const handleNoExcelConfirmation = async () => {
@@ -224,6 +231,11 @@ function App() {
 
   const [productList, setProductList] = useState([]);
   const [modifierList, setModifierList] = useState([]);
+
+  ////////////////////////
+  // Method handling loading of product data from supabase database
+  // Uses fetchProductCatalog, which separates different item types (i.e. products, modifiers and ingredients)
+  ////////////////////////
 
   useEffect(() => {
     async function loadProductData() {

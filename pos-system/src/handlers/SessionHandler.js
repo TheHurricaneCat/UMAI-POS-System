@@ -17,6 +17,7 @@ export async function startSession(employee_id) {
   const sessionDetails = {
     token,
     employee_id,
+    inventory_id,
     start_time: new Date().toISOString(),
     end_time: null,
     clock_out_time: null,
@@ -31,6 +32,7 @@ export async function startSession(employee_id) {
       .insert({ 
         token: sessionToken, 
         employee_id: employee_id, 
+        inventory_id: sessionDetails.inventory_id,
         start_time: sessionDetails.start_time, 
         end_time: null 
       })
@@ -45,75 +47,6 @@ export async function startSession(employee_id) {
   } catch (error) {
     console.log('[SUPABASE] Exception during session creation:', error);
   }
-
-  //deprecated
-  /* 
-    const collectionsRef = collection(firestore, 'Sessions');
-    try {
-    const docRef = await addDoc(collectionsRef, sessionDetails);
-    console.log("Session details saved to Firestore with ID:", docRef.id);
-    // Update the document with the generated ID
-    await updateDoc(docRef, { documentID: docRef.id });
-    console.log("Document updated with ID:", docRef.id);
-  } catch (error) {
-    console.error("Error saving session details to Firestore:", error);
-  } */
-
-  // I assume these functions updates stock levels
-
-/*   const productsRef = collection(firestore, 'Products');
-  for (const product of products) {
-    try {
-      const productDoc = await addDoc(productsRef, {
-        sessionToken: token,
-        name: product.name,
-        code: product.code,
-        price: product.price,
-        category: product.category,
-        stockNumber: product.stockNumber
-      });
-      console.log(`Added product ${product.name} with ID: ${productDoc.id}`);
-    } catch (error) {
-      console.error(`Error adding product ${product.name}:`, error);
-    }
-  }
-
-  const modifiersRef = collection(firestore, 'Modifiers');
-  const sauceModifiers = modifiers.filter(mod => mod.category === "Sauce");
-
-  for (const modifier of sauceModifiers) {
-    try {
-      const modifierDoc = await addDoc(modifiersRef, {
-        sessionToken: token,
-        name: modifier.name,
-        code: modifier.code,
-        price: modifier.price,
-        category: modifier.category,
-        stockNumber: modifier.stockNumber
-      });
-      console.log(`Added modifier ${modifier.name} with ID: ${modifierDoc.id}`);
-    } catch (error) {
-      console.error(`Error adding modifier ${modifier.name}:`, error);
-    }
-  }
-
-  const ingredientsRef = collection(firestore, 'Ingredients');
-  for (const ingredient of ingredients) {
-    try {
-      const ingredientDoc = await addDoc(ingredientsRef, {
-        sessionToken: token,
-        name: ingredient.name,
-        code: ingredient.code,
-        price: ingredient.price,
-        category: ingredient.category,
-        stockNumber: ingredient.stockNumber
-      });
-      console.log(`Added ingredient ${ingredient.name} with ID: ${ingredientDoc.id}`);
-    } catch (error) {
-      console.error(`Error adding ingredient ${ingredient.name}:`, error);
-    }
-  } */
-
   return true;
 }
 
@@ -170,6 +103,7 @@ export async function checkActiveSession(employeeId) {
       const sessionDetails = {
         token: data.token,
         employeeId: data.employee_id,
+        inventory_id: data.inventory_id,
         startTime: data.start_time,
         endTime: data.end_time,
         clock_out_time: data.clock_out_time,
@@ -182,40 +116,11 @@ export async function checkActiveSession(employeeId) {
         console.log('[SUPABASE] No active session found for employee:', employeeId);
         return false;
       }
-
-      return true;
   } catch (error) {
     console.error('[SUPABASE] Error in checkActiveSession:', error);
 
     return false;
   }
-
-
-  /* const collectionsRef = collection(firestore, 'Sessions');
-  const q = query(collectionsRef, where('employeeId', '==', employeeId), where('endTime', '==', null));
-  const querySnapshot = await getDocs(q);
-
-  if (!querySnapshot.empty) {
-    const sessionDetails = querySnapshot.docs[0].data();
-    sessionToken = sessionDetails.token;
-    localStorage.setItem('sessionDetails', JSON.stringify(sessionDetails));
-    console.log("Active session found in Firebase:", sessionDetails);
-    
-    //Upload to local storage
-    localStorage.setItem('sessionDetails', JSON.stringify(sessionDetails));
-
-    //Ensures that the client session has the latest version of the excel file
-    const base64Data = localStorage.getItem(sessionDetails.token);
-    if (!base64Data) {
-      console.log("No Excel file data found in local storage, downloading from Firebase Storage...");
-      await downloadExcelFile(sessionDetails.token);
-    }
-
-    return true;
-  }
-
-  console.log("No active session found");
-  return false; */
 }
 
 export function getSessionDetails() {
@@ -235,6 +140,38 @@ export function getSessionDetails() {
   } catch (error) {
     console.error("[SESSION]  Error parsing session details:", error);
     return null;
+  }
+}
+
+export async function uploadSessionDetails() {
+  const sessionDetails = getSessionDetails();
+  if (!sessionDetails) {
+    console.error("[SESSION]  No session details found to save");
+    return false;
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from(import.meta.env.VITE_SUPABASE_SESSION_TABLE)
+      .update({
+        inventory_id: sessionDetails.inventory_id,
+        end_time: sessionDetails.endTime,
+        clock_out_time: sessionDetails.clock_out_time,
+      })
+      .eq('token', sessionDetails.token)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[SUPABASE] Error saving session details:', error);
+      return false;
+    }
+
+    console.log('[SUPABASE] Session details saved successfully:', data);
+    return true;
+  } catch (error) {
+    console.error('[SUPABASE] Exception during session details save:', error);
+    return false;
   }
 }
 
@@ -317,26 +254,6 @@ export async function endSession(employeeId) {
     
     return true;
   }
-    // deprecated
-/*     try {
-      const collectionsRef = collection(firestore, 'Sessions');
-      const q = query(collectionsRef, where('employeeId', '==', employeeId), where('endTime', '==', null));
-      const querySnapshot = await getDocs(q);
-    
-      if (!querySnapshot.empty) {
-        const docRef = querySnapshot.docs[0].ref;
-        const endTime = new Date().toISOString();
-        await updateDoc(docRef, { endTime });
-        console.log("Session ended with endTime:", endTime);
-      }
-    } catch (error) {
-      console.error("Error updating session endTime in Firestore:", error);
-    }
-
-    localStorage.removeItem('sessionDetails');
-    sessionToken = null;
-    console.log("Session ended:", sessionDetails);
-  } */
 }
 
 /////////////////////// DATABASE STORAGE FUNCTIONS /////////////////////////
@@ -471,5 +388,6 @@ export function useSessionHandler() {
     getUsername,
     clockOut,
     sessionToken: token,
+    uploadSessionDetails,
   };
 }
