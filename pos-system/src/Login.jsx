@@ -17,6 +17,7 @@ const Login = () => {
     const [name, setName] = useState("");
     const [role, setRole] = useState("user");
     const [errorMessage, setErrorMessage] = useState("");
+    const [verificationMessage, setVerificationMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -36,6 +37,7 @@ const Login = () => {
 
         setLoading(true);
         setErrorMessage("");
+        setVerificationMessage("");
 
         try {
             if (action === "Login") {
@@ -120,8 +122,7 @@ const Login = () => {
                     throw new Error("Could not create user profile");
                 }
 
-                alert("Account created successfully! Please verify your email before logging in.");
-                
+                setVerificationMessage("Account created! Please check your email to verify your account before logging in.");
                 // Reset form and switch to login
                 setEmail("");
                 setPassword("");
@@ -189,81 +190,79 @@ const Login = () => {
                 <div className="text">{action}</div>
                 <div className="underline"></div>
             </div>
-        
-            <div className="inputs">
-                {action === "Sign Up" && (
-                    <>
-                        <div className="input">
-                            <img src={person_icon} alt="User" />
-                            <input 
-                                type="text" 
-                                placeholder="Name" 
-                                value={name} 
-                                onChange={(e) => setName(e.target.value)} 
-                            />
-                        </div>
-                      
-                    </>
-                )}
-
-                <div className="input">
-                    <img src={email_icon} alt="Email" />
-                    <input 
-                        type="email" 
-                        placeholder="Email" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                    />
-                </div>
-
-                <div className="input">
-                    <img src={password_icon} alt="Password" />
-                    <input 
-                        type="password" 
-                        placeholder="Password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                    />
-                </div>
-            </div>
-
-            {action === "Login" && (
-                <div className="forgot-password">
-                    Forgot Password? <span onClick={handleForgotPassword}>Click Here!</span>
+            {verificationMessage && (
+                <div className="verification-message" style={{ color: "#4caf50", textAlign: "center", margin: "2vh 0" }}>
+                    {verificationMessage}
                 </div>
             )}
-
-            {errorMessage && <div className="error-message"> <p> {errorMessage} </p> </div>}
-
-            <div className="submit-container" style={{ marginTop: "2vh" }}>
-                <div 
-                    className={`submit ${action === "Login" ? "gray" : ""}`} 
-                    onClick={() => {
-                        setAction("Sign Up");
-                        setErrorMessage("");
-                    }}
-                >
-                    Sign Up
+            <form
+                onSubmit={e => {
+                    e.preventDefault();
+                    handleSubmit();
+                }}
+                autoComplete="on"
+            >
+                <div className="inputs">
+                    {action === "Sign Up" && (
+                        <div className="input">
+                            <img src={person_icon} alt="User" />
+                            <input
+                                type="text"
+                                placeholder="Name"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                            />
+                        </div>
+                    )}
+                    <div className="input">
+                        <img src={email_icon} alt="Email" />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className="input">
+                        <img src={password_icon} alt="Password" />
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                        />
+                    </div>
                 </div>
-                <div 
-                    className={`submit ${action === "Sign Up" ? "gray" : ""}`} 
-                    onClick={() => {
-                        setAction("Login");
-                        setErrorMessage("");
-                    }}
-                >
-                    Login
+                {action === "Login" && (
+                    <div className="forgot-password">
+                        Forgot Password? <span onClick={handleForgotPassword}>Click Here!</span>
+                    </div>
+                )}
+                {errorMessage && <div className="error-message"> <p> {errorMessage} </p> </div>}
+                <div className="submit-container" style={{ marginTop: "2vh" }}>
+                    <div
+                        className={`submit ${action === "Login" ? "gray" : ""}`}
+                        onClick={() => {
+                            setAction("Sign Up");
+                            setErrorMessage("");
+                        }}
+                        tabIndex={0}
+                    >
+                        Sign Up
+                    </div>
+                    <div
+                        className={`submit ${action === "Sign Up" ? "gray" : ""}`}
+                        onClick={() => {
+                            setAction("Login");
+                            setErrorMessage("");
+                        }}
+                        tabIndex={0}
+                    >
+                        Login
+                    </div>
                 </div>
-            </div>
-            <div className="submit-container">
-                <button 
-                    className="submit-btn" 
-                    onClick={handleSubmit}
-                    disabled={loading}
-                >
-                    {loading ? "Processing..." : "Submit"}
-                </button>
-            </div>
+                <button type="submit" style={{display:'none'}} tabIndex={-1}></button>
+            </form>
         </div>
     );
 };
