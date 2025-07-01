@@ -7,7 +7,9 @@ import * as XLSX from "xlsx";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './Statistics.css';
-import PopUp from '../global-components/PopUp.jsx'; // <-- Import your popup
+import PopUp from '../global-components/Popup.jsx';
+import { getSessionDetails, getUsername } from "../handlers/SessionHandler.js";
+
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -48,6 +50,9 @@ function Statistics() {
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState('');
     const [matchingFiles, setMatchingFiles] = useState([]);
+    const [username, setUsername] = useState('');
+    const [sessionDetails, setSessionDetails] = useState('');
+    const [sessionId, setSessionId] = useState('');
 
     // Popup states
     const [popupTrigger, setPopupTrigger] = useState(false);
@@ -62,6 +67,25 @@ function Statistics() {
             }
         }
         fetchFiles();
+    }, []);
+
+        useEffect(() => {
+        async function fetchUsername() {
+            const { data, error } = await supabase.auth.getUser();
+            if (error || !data?.user) {
+                setUsername("Unknown User");
+                return;
+            }
+            // Try to get username from user_metadata
+            const user = data.user;
+            const uname =
+                user.user_metadata?.name ||
+                user.user_metadata?.full_name ||
+                user.email ||
+                "Unknown User";
+            setUsername(uname);
+        }
+        fetchUsername();
     }, []);
 
     useEffect(() => {
@@ -354,16 +378,31 @@ const generateGraph = async (withComparison = true) => {
 
         const doc = new jsPDF();
         const pageWidth = doc.internal.pageSize.getWidth();
-        
+
         doc.setFontSize(20);
         doc.setFont(undefined, 'bold');
-        doc.text('Sales Statistics Report', pageWidth / 2, 20, { align: 'center' });
-        
+        // Add "prepared by" with username
+        doc.text(
+            `Sales Statistics Report`,
+            pageWidth / 2,
+            20,
+            { align: 'center' }
+        );
+
+         doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text(
+            `Prepared by ${username || "Unknown User"}`,
+            pageWidth / 2,
+            25,
+            { align: 'center' }
+        );
+
         doc.setFontSize(12);
         doc.setFont(undefined, 'normal');
         let reportType = activeReport.charAt(0).toUpperCase() + activeReport.slice(1);
         let periodText = '';
-        
+
         switch (activeReport) {
             case 'yearly':
                 periodText = `Year: ${input.year}`;
@@ -378,21 +417,21 @@ const generateGraph = async (withComparison = true) => {
                 periodText = `Date: ${input.date}`;
                 break;
         }
-        
+
         doc.text(`Report Type: ${reportType}`, 20, 35);
         doc.text(`Period: ${periodText}`, 20, 45);
         doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 55);
-        
+
         if (selectedFile) {
             doc.text(`File: ${selectedFile}`, 20, 65);
         }
-        
+
         doc.setFont(undefined, 'bold');
         doc.text('Summary:', 20, 80);
         doc.setFont(undefined, 'normal');
         doc.text(`Total Sales: P${comparison.reportTotal.toFixed(2)}`, 20, 90);
         doc.text(`Number of Products: ${graphData.labels.length}`, 20, 100);
-        
+
         if (chartRef.current) {
             try {
                 const canvas = chartRef.current.canvas;
@@ -402,12 +441,12 @@ const generateGraph = async (withComparison = true) => {
                 console.warn('Could not add chart to PDF:', error);
             }
         }
-        
+
         const tableData = graphData.labels.map((label, index) => [
             label,
             `P${graphData.datasets[0].data[index].toFixed(2)}`
         ]);
-        
+
         autoTable(doc, {
             startY: 220,
             head: [['Product Name', 'Sales Amount']],
@@ -416,12 +455,25 @@ const generateGraph = async (withComparison = true) => {
             headStyles: { fillColor: [255, 214, 0] },
             styles: { fontSize: 10 }
         });
-        
+
         const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 20 : 250;
         doc.setFontSize(10);
-        doc.text('This report was generated automatically by the UMAI POS Statistics System.', 
-                pageWidth / 2, finalY, { align: 'center' });
-        
+        doc.text('This report was generated automatically by the UMAI POS Statistics System.',
+            pageWidth / 2, finalY, { align: 'center' });
+
+        // Add page numbers on the right side
+        const pageCount = doc.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(10);
+            doc.text(
+                `Page ${i} of ${pageCount}`,
+                pageWidth - 20,
+                10,
+                { align: 'right' }
+            );
+        }
+
         const fileName = `${reportType}_Report_${periodText.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
         doc.save(fileName);
     };
@@ -486,7 +538,7 @@ const generateGraph = async (withComparison = true) => {
                 </div>
                 <div className="reportButtonGroup">
                     <button className="generateReportBtn" onClick={generateGraph} disabled={loading || !isInputValid()}>
-                        {loading ? "Loading..." : "Generate Report & Compare"}
+                        {loading ? "Loading..." : "Generate Report"}
                     </button>
                     <button 
                         className="pdfReportBtn" 
