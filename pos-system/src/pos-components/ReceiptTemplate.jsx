@@ -14,7 +14,7 @@ const ReceiptTemplate = forwardRef(({ orderData, discount }, ref) => {
         <h2>UMAI POS SYSTEM</h2>
         <p>123 Main Street, City</p>
         <p>Tel: (123) 456-7890</p>
-        {/* <p>VAT Reg: 123-456-789</p> */}
+        <p>VAT Reg: 123-456-789</p>
       </div>
 
       <div className={styles.receiptInfo}>
