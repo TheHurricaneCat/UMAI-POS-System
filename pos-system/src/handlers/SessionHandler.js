@@ -17,7 +17,7 @@ export async function startSession(employee_id) {
   const sessionDetails = {
     token,
     employee_id,
-    inventory_id,
+    inventory_id: null, // Set default value for inventory_id
     start_time: new Date().toISOString(),
     end_time: null,
     clock_out_time: null,
@@ -77,12 +77,28 @@ export async function getUsername(employeeId) {
 
 export async function checkActiveSession(employeeId) {
   // check local storage
-  const sessionDetails = JSON.parse(localStorage.getItem('sessionDetails'));
-  if (sessionDetails) {
-    sessionToken = sessionDetails.token;
-    console.log("[SESSION]  Active session found:", sessionDetails);
-    return true;
+  const sessionDetailsString = localStorage.getItem('sessionDetails');
+  if (sessionDetailsString) {
+    try {
+      const sessionDetails = JSON.parse(sessionDetailsString);
+      
+      // Handle backward compatibility - migrate old session format
+      if (!sessionDetails.hasOwnProperty('inventory_id')) {
+        console.log("[SESSION] Migrating old session format to include inventory_id");
+        sessionDetails.inventory_id = null; // Set default value
+        localStorage.setItem('sessionDetails', JSON.stringify(sessionDetails));
+      }
+      
+      sessionToken = sessionDetails.token;
+      console.log("[SESSION]  Active session found:", sessionDetails);
+      return true;
+    } catch (error) {
+      console.error("[SESSION] Error parsing session details, clearing corrupted data:", error);
+      localStorage.removeItem('sessionDetails');
+      return false;
+    }
   }
+  
   // attempt supabase check
   try {
     console.log("[SESSION]  Attempting to check for active session in Supabase...");
@@ -99,13 +115,12 @@ export async function checkActiveSession(employeeId) {
       }
 
       if (data) {
-
       const sessionDetails = {
         token: data.token,
-        employeeId: data.employee_id,
-        inventory_id: data.inventory_id,
-        startTime: data.start_time,
-        endTime: data.end_time,
+        employee_id: data.employee_id, // Fixed: was 'employeeId'
+        inventory_id: data.inventory_id || null, // Handle null inventory_id from database
+        start_time: data.start_time, // Fixed: was 'startTime'
+        end_time: data.end_time, // Fixed: was 'endTime'
         clock_out_time: data.clock_out_time,
       };
 
@@ -118,7 +133,6 @@ export async function checkActiveSession(employeeId) {
       }
   } catch (error) {
     console.error('[SUPABASE] Error in checkActiveSession:', error);
-
     return false;
   }
 }
@@ -135,10 +149,20 @@ export function getSessionDetails() {
 
   try {
     const parsedDetails = JSON.parse(sessionDetails);
+    
+    // Handle backward compatibility - ensure inventory_id exists
+    if (!parsedDetails.hasOwnProperty('inventory_id')) {
+      console.log("[SESSION] Adding missing inventory_id to session details");
+      parsedDetails.inventory_id = null;
+      localStorage.setItem('sessionDetails', JSON.stringify(parsedDetails));
+    }
+    
     console.log("[SESSION]  Parsed session details:", parsedDetails);
     return parsedDetails;
   } catch (error) {
     console.error("[SESSION]  Error parsing session details:", error);
+    // Clear corrupted session data
+    localStorage.removeItem('sessionDetails');
     return null;
   }
 }
@@ -151,13 +175,20 @@ export async function uploadSessionDetails() {
   }
 
   try {
+    // Prepare update object with backward compatibility
+    const updateData = {
+      end_time: sessionDetails.end_time,
+      clock_out_time: sessionDetails.clock_out_time,
+    };
+    
+    // Only include inventory_id if it exists and is not null
+    if (sessionDetails.inventory_id !== null && sessionDetails.inventory_id !== undefined) {
+      updateData.inventory_id = sessionDetails.inventory_id;
+    }
+
     const { data, error } = await supabase
       .from(import.meta.env.VITE_SUPABASE_SESSION_TABLE)
-      .update({
-        inventory_id: sessionDetails.inventory_id,
-        end_time: sessionDetails.endTime,
-        clock_out_time: sessionDetails.clock_out_time,
-      })
+      .update(updateData)
       .eq('token', sessionDetails.token)
       .select()
       .single();
@@ -206,54 +237,68 @@ export async function endSession(employeeId) {
   const sessionDetails = getSessionDetails();
   console.log("[SESSION]  Ending session for employee:", employeeId);
   
+  if (!sessionDetails) {
+    console.error("[SESSION] No session details found");
+    return false;
+  }
+  
   if (sessionDetails.clock_out_time === null) {
       console.error("[SESSION] Cannot end session without clocking out first");
       return -2;
   }
   
-  if (sessionDetails) {
-    try {
-      
-      if (!navigator.onLine) {
-        console.error("[SESSION] No internet connection available");
-        return false;
-      }
-
-      const { data, error } = await supabase
-        .from(import.meta.env.VITE_SUPABASE_SESSION_TABLE)
-        .update({end_time: new Date().toISOString(), clock_out_time: sessionDetails.clock_out_time})
-        .is('end_time', null)
-        .eq('employee_id', employeeId);
-        
-
-      if (error) {
-        console.error('[SUPABASE] Error ending session:', error);
-        return false;
-      } else {
-        console.log('[SUPABASE] Session ended successfully:', data);
-      }
-      localStorage.removeItem('session_' + sessionDetails.token);
-      localStorage.removeItem('sessionDetails');
-      sessionToken = null;
-      console.log("[SESSION]  Session ended:", sessionDetails);
-    } catch (error) {
-      console.error('[SUPABASE] Error ending session:', error);
+  try {
+    if (!navigator.onLine) {
+      console.error("[SESSION] No internet connection available");
       return false;
     }
-    try {
-      const { error } = await supabase.auth.signOut();
+
+    // Prepare update object with backward compatibility
+    const updateData = {
+      end_time: new Date().toISOString(),
+      clock_out_time: sessionDetails.clock_out_time
+    };
+    
+    // Only include inventory_id if it exists and is not null
+    if (sessionDetails.inventory_id !== null && sessionDetails.inventory_id !== undefined) {
+      updateData.inventory_id = sessionDetails.inventory_id;
+    }
+
+    const { data, error } = await supabase
+      .from(import.meta.env.VITE_SUPABASE_SESSION_TABLE)
+      .update(updateData)
+      .is('end_time', null)
+      .eq('employee_id', employeeId);
       
-      if (error) {
-          throw error;
-      }
-      
-    } catch (error) {
-        console.error("[SUPABASE] Error logging out: ", error);
-        return false;
+
+    if (error) {
+      console.error('[SUPABASE] Error ending session:', error);
+      return false;
+    } else {
+      console.log('[SUPABASE] Session ended successfully:', data);
+    }
+    localStorage.removeItem('session_' + sessionDetails.token);
+    localStorage.removeItem('sessionDetails');
+    sessionToken = null;
+    console.log("[SESSION]  Session ended:", sessionDetails);
+  } catch (error) {
+    console.error('[SUPABASE] Error ending session:', error);
+    return false;
+  }
+  
+  try {
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+        throw error;
     }
     
-    return true;
+  } catch (error) {
+      console.error("[SUPABASE] Error logging out: ", error);
+      return false;
   }
+  
+  return true;
 }
 
 /////////////////////// DATABASE STORAGE FUNCTIONS /////////////////////////
