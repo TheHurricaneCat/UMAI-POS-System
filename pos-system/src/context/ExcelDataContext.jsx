@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import * as XLSX from 'xlsx';
+import React, { createContext, useContext, useState, useRef } from 'react';
 
 const ExcelDataContext = createContext();
 
@@ -53,20 +52,16 @@ export function ExcelDataProvider({ children }) {
       }
       return row;
     });
-    // Use import for xlsx at the top for React/browser compatibility
-    const ws = XLSX.utils.aoa_to_sheet(newRows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'UpdatedInventory.xlsx');
+    // const XLSX = requires('xlsx');
+    // Use import instead of requires
+    // XLSX is already imported in Inventory.jsx, so import here too
+    import('xlsx').then(XLSX => {
+      const ws = XLSX.utils.aoa_to_sheet(newRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, 'UpdatedInventory.xlsx');
+    });
   };
-
-  // Auto-export after any inventory state change if deduction just happened
-  useEffect(() => {
-    if (pendingExport.current) {
-      exportToExcel();
-      pendingExport.current = false;
-    }
-  }, [products, ingredients, modifiers]);
 
   return (
     <ExcelDataContext.Provider value={{

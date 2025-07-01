@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { appendEntry, getLastTransaction } from '../handlers/DataHandler';
 import styles from './KeypadContainer.module.css';
-import PopUp from '../global-components/Popup.jsx';
+import PopUp from '../global-components/PopUp.jsx';
 import { fetchProductCatalog } from '../handlers/SessionHandler.js';
 import ReceiptModal from './ReceiptModal';
 import { useExcelData } from '../context/ExcelDataContext';

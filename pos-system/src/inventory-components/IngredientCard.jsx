@@ -9,6 +9,7 @@ function IngredientCard({ name, code, price, category, stockNumber, onStockUpdat
     const [isUpdating, setIsUpdating] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('success'); // 'success' or 'error'
 
     const handleStockUpdate = async () => {
         try {
@@ -16,6 +17,10 @@ function IngredientCard({ name, code, price, category, stockNumber, onStockUpdat
             const sessionToken = getSessionDetails()?.token;
             if (!sessionToken) {
                 console.error("No active session found");
+                setToastMessage("No active session found");
+                setToastType('error');
+                setShowToast(true);
+                setTimeout(() => setShowToast(false), 3000);
                 return;
             }
 
@@ -27,6 +32,7 @@ function IngredientCard({ name, code, price, category, stockNumber, onStockUpdat
                 .eq('name', name);
             if (error || !ingredientRows || ingredientRows.length === 0) {
                 setToastMessage(`Ingredient ${name} not found`);
+                setToastType('error');
                 setShowToast(true);
                 setTimeout(() => setShowToast(false), 3000);
                 return;
@@ -38,6 +44,7 @@ function IngredientCard({ name, code, price, category, stockNumber, onStockUpdat
                 .eq('id', ingredientDoc.id);
             
             setToastMessage(`Successfully updated stock for ${name}`);
+            setToastType('success');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
             
@@ -48,6 +55,7 @@ function IngredientCard({ name, code, price, category, stockNumber, onStockUpdat
         } catch (error) {
             console.error("Error updating stock:", error);
             setToastMessage("Error updating stock");
+            setToastType('error');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
         } finally {
@@ -100,7 +108,7 @@ function IngredientCard({ name, code, price, category, stockNumber, onStockUpdat
             )}
 
             {showToast && (
-                <div className="toast-notification">
+                <div className={`toast-notification${toastType === 'error' ? ' toast-error' : ''}`}>
                     {toastMessage}
                 </div>
             )}

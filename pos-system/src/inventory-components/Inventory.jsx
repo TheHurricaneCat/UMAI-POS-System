@@ -5,6 +5,8 @@ import './Inventory.css';
 import * as XLSX from 'xlsx';
 import { supabase } from '../database/supabase';
 import { useExcelData } from '../context/ExcelDataContext';
+import RefillFormPopup from './RefillFormPopup';
+import UpdateSupplierEmail from './UpdateSupplierEmail';
 
 function Inventory() {
   const navigate = useNavigate();
@@ -12,8 +14,11 @@ function Inventory() {
   const [stockDescription, setStockDescription] = useState('All ingredients are at adequate levels');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success'); // 'success' or 'error'
   const [sortMode, setSortMode] = useState('name');
   const [excelError, setExcelError] = useState('');
+  const [showRefillPopup, setShowRefillPopup] = useState(false);
+  const [showUpdateSupplierPopup, setShowUpdateSupplierPopup] = useState(false);
 
   // Use context for inventory state and actions
   const {
@@ -100,7 +105,24 @@ function Inventory() {
 
   const handleExcelUpload = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) {
+      setToastMessage('No file selected. Please choose an Excel file.');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
+    // Check file type by extension
+    const validExtensions = ['.xlsx', '.xls'];
+    const fileName = file.name.toLowerCase();
+    const isExcel = validExtensions.some(ext => fileName.endsWith(ext));
+    if (!isExcel) {
+      setToastMessage('Invalid file type. Please upload an Excel (.xlsx or .xls) file.');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (evt) => {
       try {
@@ -108,7 +130,10 @@ function Inventory() {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetNames = workbook.SheetNames;
         if (sheetNames.length === 0) {
-          setExcelError('No sheets found in Excel file.');
+          setToastMessage('No sheets found in Excel file.');
+          setToastType('error');
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 2000);
           return;
         }
         const worksheet = workbook.Sheets[sheetNames[0]];
@@ -118,106 +143,157 @@ function Inventory() {
         setProducts(parsedProducts);
         setIngredients(parsedIngredients);
         setModifiers(parsedModifiers);
-        setExcelError('');
+        setToastMessage('Excel file loaded successfully!');
+        setToastType('success');
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2000);
       } catch (err) {
-        setExcelError('Failed to parse Excel file. Please check the file format.');
+        setToastMessage('Failed to parse Excel file. Please check the file format.');
+        setToastType('error');
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2000);
       }
       e.target.value = '';
     };
-    reader.onerror = () => setExcelError('Error reading the file.');
+    reader.onerror = () => {
+      setToastMessage('Error reading the file.');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    };
     reader.readAsArrayBuffer(file);
   };
 
   // --- Button Handlers ---
   const handleRefillStocks = () => {
-    if (products.length === 0 && ingredients.length === 0 && modifiers.length === 0) return;
-    setProducts(products.map(p => ({ ...p, stockNumber: 100 })));
-    setIngredients(ingredients.map(i => ({ ...i, stockNumber: 100 })));
-    setModifiers(modifiers.map(m => ({ ...m, stockNumber: 100 })));
-    setToastMessage('All stocks refilled to 100');
+    if (products.length === 0 && ingredients.length === 0 && modifiers.length === 0) {
+      setToastMessage('No inventory data to refill.');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
+    setShowRefillPopup(true);
+  };
+
+  const handleRefillSubmit = (refillList) => {
+    // Update stock for selected items
+    let updatedProducts = [...products];
+    let updatedIngredients = [...ingredients];
+    let updatedModifiers = [...modifiers];
+    refillList.forEach(item => {
+      if (item.type === 'product') {
+        updatedProducts = updatedProducts.map(p => p.code === item.code ? { ...p, stockNumber: p.stockNumber + item.refillAmount } : p);
+      } else if (item.type === 'ingredient') {
+        updatedIngredients = updatedIngredients.map(i => i.code === item.code ? { ...i, stockNumber: i.stockNumber + item.refillAmount } : i);
+      } else if (item.type === 'modifier') {
+        updatedModifiers = updatedModifiers.map(m => m.code === item.code ? { ...m, stockNumber: m.stockNumber + item.refillAmount } : m);
+      }
+    });
+    setProducts(updatedProducts);
+    setIngredients(updatedIngredients);
+    setModifiers(updatedModifiers);
+    setToastMessage('Selected items refilled successfully!');
+    setToastType('success');
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
 
   const handleUpdateSystem = () => {
+    setToastMessage('Please select an Excel file to update the system.');
+    setToastType('success');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
     document.getElementById('excel-upload-input')?.click();
   };
 
+  /*
   const handleCallSupplier = () => {
     setToastMessage('Supplier has been contacted! (Demo)');
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
+  */
 
   const handleUpdateSupplier = () => {
-    setToastMessage('Supplier information updated! (Demo)');
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2000);
+    if (products.length === 0 && ingredients.length === 0) {
+      setToastMessage('No products or ingredients in inventory. Please upload inventory data first.');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
+    setShowUpdateSupplierPopup(true);
   };
 
   const handlePrintOrderDetails = () => window.print();
 
+  // Bubble sort for rearrange view by stock values
   const handleRearrangeView = () => {
-    setSortMode(prev => prev === 'name' ? 'stock' : prev === 'stock' ? 'category' : 'name');
+    // Toggle between ascending and descending
+    setSortMode(prev => prev === 'stock-desc' ? 'stock-asc' : 'stock-desc');
+    // Bubble sort for all inventory arrays
+    const bubbleSort = (arr, asc = true) => {
+      let sorted = [...arr];
+      for (let i = 0; i < sorted.length - 1; i++) {
+        for (let j = 0; j < sorted.length - i - 1; j++) {
+          if (asc ? sorted[j].stockNumber > sorted[j + 1].stockNumber : sorted[j].stockNumber < sorted[j + 1].stockNumber) {
+            [sorted[j], sorted[j + 1]] = [sorted[j + 1], sorted[j]];
+          }
+        }
+      }
+      return sorted;
+    };
+    if (sortMode === 'stock-desc') {
+      setProducts(bubbleSort(products, false));
+      setIngredients(bubbleSort(ingredients, false));
+      setModifiers(bubbleSort(modifiers, false));
+    } else {
+      setProducts(bubbleSort(products, true));
+      setIngredients(bubbleSort(ingredients, true));
+      setModifiers(bubbleSort(modifiers, true));
+    }
   };
 
   // --- Export to Excel with feedback ---
   const handleExportToExcel = () => {
-    if (!excelData) {
-      setToastMessage('No Excel file loaded. Please upload first.');
+    // Show error if no inventory data exists
+    if ((products.length === 0 && ingredients.length === 0 && modifiers.length === 0) || !excelData || !Array.isArray(excelData) || excelData.length === 0) {
+      setToastMessage('No inventory data to export. Please upload an Excel file and ensure inventory is loaded.');
+      setToastType('error');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+      return;
+    }
+    // Check for valid headers (first row should have at least 2 columns and contain "name" and "stock")
+    const headers = excelData[0] || [];
+    const hasName = headers.some(h => String(h).toLowerCase() === 'name');
+    const hasStock = headers.some(h => String(h).toLowerCase().includes('stock'));
+    if (!hasName || !hasStock) {
+      setToastMessage('The loaded file is not a valid inventory Excel file. Please upload a correct file.');
+      setToastType('error');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 2000);
       return;
     }
     exportToExcel();
     setToastMessage('Exported to Excel successfully!');
+    setToastType('success');
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
 
   // --- Sorting ---
-  const getSorted = (arr) => {
-    return [...arr].sort((a, b) => {
-      if (sortMode === 'name') return (a.name || '').localeCompare(b.name || '');
-      if (sortMode === 'stock') return (b.stockNumber || 0) - (a.stockNumber || 0);
-      if (sortMode === 'category') return (a.category || '').localeCompare(b.category || '');
-      return 0;
-    });
-  };
+  const getSorted = (arr) => arr; // No auto-sorting, handled by bubble sort
+
+  // --- Render ---
   const sortedProducts = getSorted(products);
   const sortedIngredients = getSorted(ingredients);
   const sortedModifiers = getSorted(modifiers);
-
-  // --- Fetch from Supabase (optional, can be removed if only using Excel) ---
-  // useEffect(() => {
-  //   async function fetchInventory() {
-  //     const { data, error } = await supabase.from('inventory').select('*');
-  //     if (error) {
-  //       setExcelError('Failed to fetch inventory from Supabase.');
-  //       return;
-  //     }
-  //     // Separate products, ingredients, and modifiers
-  //     const products = [];
-  //     const ingredients = [];
-  //     const modifiers = [];
-  //     data.forEach(item => {
-  //       if (item.type === 'product') products.push(item);
-  //       else if (item.type === 'ingredient') ingredients.push(item);
-  //       else if (item.type === 'modifier') modifiers.push(item);
-  //     });
-  //     setProducts(products);
-  //     setIngredients(ingredients);
-  //     setModifiers(modifiers);
-  //   }
-  //   fetchInventory();
-  // }, []);
-
-  // --- Render ---
   return (
     <div className="inventory-horizontal-root">
       <nav className="inventory-navbar">
         <button className="nav-btn" onClick={() => navigate('/app')}>Go to App</button>
-        <button className="nav-btn" onClick={() => window.location.reload()}>Refresh</button>
       </nav>
       <div className="inventory-horizontal-content">
         <div className="inventory-header">
@@ -238,7 +314,7 @@ function Inventory() {
             <button className="control-button" onClick={handleExportToExcel} disabled={!excelData}>Export to Excel</button>
           </div>
           <div className="control-group">
-            <button className="control-button" onClick={handleCallSupplier}>Call Supplier</button>
+            {/* <button className="control-button" onClick={handleCallSupplier}>Call Supplier</button> */}
             <button className="control-button" onClick={handleUpdateSupplier}>Update Supplier</button>
           </div>
           <div className="control-group">
@@ -296,7 +372,7 @@ function Inventory() {
                     <p>No ingredients or modifiers found</p>
                   )}
                   {showToast && (
-                    <div className="toast-notification">{toastMessage}</div>
+                    <div className={`toast-notification${toastType === 'error' ? ' toast-error' : ''}`}>{toastMessage}</div>
                   )}
                 </div>
               </div>
@@ -337,6 +413,18 @@ function Inventory() {
             </div>
           </div>
         </div>
+        <RefillFormPopup
+          open={showRefillPopup}
+          onClose={() => setShowRefillPopup(false)}
+          onSubmit={handleRefillSubmit}
+          products={products}
+          ingredients={ingredients}
+          modifiers={modifiers}
+        />
+        <UpdateSupplierEmail
+          open={showUpdateSupplierPopup}
+          onClose={() => setShowUpdateSupplierPopup(false)}
+        />
       </div>
     </div>
   );

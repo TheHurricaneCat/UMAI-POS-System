@@ -11,13 +11,12 @@ import CategoryContainer from './pos-components/CategoryContainer'
 import TrayContainer from './pos-components/TrayContainer.jsx'
 import KeypadContainer from './pos-components/KeypadContainer.jsx'
 import CategoryMenu from './pos-components/CategoryMenu.jsx'
-import PopUp from './global-components/Popup.jsx';
+import PopUp from './global-components/PopUp.jsx';
 import NavigationContainer from './pos-components/NavigationContainer.jsx';
 import ContentHeader from './pos-components/ContentHeader.jsx';
 import Statistics from './statistics-component/Statistics.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
-import { useExcelData } from './context/ExcelDataContext.jsx';
 
 import {startSession, getSessionDetails, getUsername, endSession, logOut, clockOut, saveExcelFile, fetchProductCatalog } from './handlers/SessionHandler';
  
@@ -197,10 +196,8 @@ function App() {
       // This keeps the session active but prevents usage
     }
   };
-  /////////////////////////
+
   // detect if previous session has clocked out but not ended
-  /////////////////////////
-  
   useEffect(() => {
     async function checkSessionStatus() {
       console.log("[SESSION] Checking session status...");
@@ -213,11 +210,6 @@ function App() {
     
     checkSessionStatus();
   }, []);
-
-  /////////////////////////
-  // Method handling confirmation of no Excel file
-  // Displays when there is no Excel file to save at the end of the session
-  /////////////////////////
 
   useEffect(() => {
     const handleNoExcelConfirmation = async () => {
@@ -232,11 +224,6 @@ function App() {
 
   const [productList, setProductList] = useState([]);
   const [modifierList, setModifierList] = useState([]);
-
-  ////////////////////////
-  // Method handling loading of product data from supabase database
-  // Uses fetchProductCatalog, which separates different item types (i.e. products, modifiers and ingredients)
-  ////////////////////////
 
   useEffect(() => {
     async function loadProductData() {
@@ -307,22 +294,6 @@ function App() {
       window.removeEventListener('orientationchange', checkOrientation);
     };
   }, []);
-
-	const { excelData } = useExcelData();
-
-  useEffect(() => {
-    // Reset all popups when a new Excel file is loaded
-    setStartSessionPopup(false);
-    setEndSessionPopup(false);
-    setEndSessionFailedPopup(false);
-    setEndSessionFailedClockOutPopup(false);
-    setSaveExcelPopup(false);
-    setSaveExcelFailedPopup(false);
-    setNoExcelStoragePopup(false);
-    setNoExcelStorageConfirm(false);
-    setRestoreSessionPopup(false);
-    setConfirm(false);
-  }, [excelData]);
 
 	return (
     // interfaces are invisible containers that hold the components
