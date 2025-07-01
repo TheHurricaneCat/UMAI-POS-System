@@ -243,22 +243,34 @@ const Login = () => {
                     <div
                         className={`submit ${action === "Login" ? "gray" : ""}`}
                         onClick={() => {
-                            setAction("Sign Up");
-                            setErrorMessage("");
+                            if (action === "Sign Up") {
+                                setAction("Login");
+                                setErrorMessage("");
+                            } else {
+                                // Only submit if already on Login page
+                                handleSubmit();
+                            }
                         }}
                         tabIndex={0}
+                        role="button"
                     >
-                        Sign Up
+                        Login
                     </div>
                     <div
                         className={`submit ${action === "Sign Up" ? "gray" : ""}`}
                         onClick={() => {
-                            setAction("Login");
-                            setErrorMessage("");
+                            if (action === "Login") {
+                                setAction("Sign Up");
+                                setErrorMessage("");
+                            } else {
+                                // Only submit if already on Sign Up page
+                                handleSubmit();
+                            }
                         }}
                         tabIndex={0}
+                        role="button"
                     >
-                        Login
+                        Sign Up
                     </div>
                 </div>
                 <button type="submit" style={{display:'none'}} tabIndex={-1}></button>
