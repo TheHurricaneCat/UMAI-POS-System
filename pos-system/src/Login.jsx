@@ -9,6 +9,7 @@ import { startSession } from './handlers/SessionHandler';
 import person_icon from './account-components/person.png';
 import email_icon from './account-components/email.png';
 import password_icon from './account-components/password.png';
+import pos_logo from './account-components/POS Logo.png';
 
 const Login = () => {
     const [action, setAction] = useState("Login");
@@ -185,96 +186,82 @@ const Login = () => {
     };
 
     return (
-        <div className="container">
-            <div className="header">
-                <div className="text">{action}</div>
-                <div className="underline"></div>
-            </div>
-            {verificationMessage && (
-                <div className="verification-message" style={{ color: "#4caf50", textAlign: "center", margin: "2vh 0" }}>
-                    {verificationMessage}
+        <div className="login-outer-container">
+            <div className="login-card">
+                <div className="login-logo-container">
+                    <img src={pos_logo} alt="POS Logo" className="login-logo" />
                 </div>
-            )}
-            <form
-                onSubmit={e => {
-                    e.preventDefault();
-                    handleSubmit();
-                }}
-                autoComplete="on"
-            >
-                <div className="inputs">
+                {verificationMessage && (
+                    <div className="verification-message">{verificationMessage}</div>
+                )}
+                <form
+                    className="login-form"
+                    onSubmit={e => {
+                        e.preventDefault();
+                        handleSubmit();
+                    }}
+                    autoComplete="on"
+                >
                     {action === "Sign Up" && (
-                        <div className="input">
+                        <div className="login-input">
                             <img src={person_icon} alt="User" />
                             <input
                                 type="text"
-                                placeholder="Name"
+                                placeholder="Username"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
+                                autoComplete="username"
                             />
                         </div>
                     )}
-                    <div className="input">
+                    <div className="login-input">
                         <img src={email_icon} alt="Email" />
                         <input
                             type="email"
                             placeholder="Email"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
+                            autoComplete="email"
                         />
                     </div>
-                    <div className="input">
+                    <div className="login-input">
                         <img src={password_icon} alt="Password" />
                         <input
                             type="password"
                             placeholder="Password"
                             value={password}
                             onChange={e => setPassword(e.target.value)}
+                            autoComplete={action === "Login" ? "current-password" : "new-password"}
                         />
                     </div>
-                </div>
-                {action === "Login" && (
-                    <div className="forgot-password">
-                        Forgot Password? <span onClick={handleForgotPassword}>Click Here!</span>
-                    </div>
-                )}
-                {errorMessage && <div className="error-message"> <p> {errorMessage} </p> </div>}
-                <div className="submit-container" style={{ marginTop: "2vh" }}>
-                    <div
-                        className={`submit ${action === "Login" ? "gray" : ""}`}
-                        onClick={() => {
-                            if (action === "Sign Up") {
-                                setAction("Login");
-                                setErrorMessage("");
-                            } else {
-                                // Only submit if already on Login page
-                                handleSubmit();
-                            }
-                        }}
-                        tabIndex={0}
-                        role="button"
+                    {action === "Sign Up" && (
+                        <div className="login-switch-text">
+                            Have an account?{' '}
+                            <span className="login-link" onClick={() => { setAction("Login"); setErrorMessage(""); }}>Sign In</span>
+                        </div>
+                    )}
+                    {action === "Login" && (
+                        <>
+                            <div className="forgot-password">
+                                Forgot password?{' '}
+                                <span className="login-link" onClick={handleForgotPassword}>Click here</span>
+                            </div>
+                            <div className="login-switch-text">
+                                Don&apos;t have an account?{' '}
+                                <span className="login-link" onClick={() => { setAction("Sign Up"); setErrorMessage(""); }}>Sign Up</span>
+                            </div>
+                        </>
+                    )}
+                    {errorMessage && <div className="error-message">{errorMessage}</div>}
+                    <button
+                        type="submit"
+                        className="login-submit-btn"
+                        disabled={loading}
                     >
-                        Login
-                    </div>
-                    <div
-                        className={`submit ${action === "Sign Up" ? "gray" : ""}`}
-                        onClick={() => {
-                            if (action === "Login") {
-                                setAction("Sign Up");
-                                setErrorMessage("");
-                            } else {
-                                // Only submit if already on Sign Up page
-                                handleSubmit();
-                            }
-                        }}
-                        tabIndex={0}
-                        role="button"
-                    >
-                        Sign Up
-                    </div>
-                </div>
-                <button type="submit" style={{display:'none'}} tabIndex={-1}></button>
-            </form>
+                        {loading ? (action === "Login" ? "Logging in..." : "Signing up...") : action}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };
