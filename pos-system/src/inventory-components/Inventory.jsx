@@ -643,6 +643,12 @@ function Inventory() {
             >
               Modifiers ({modifiers.length})
             </button>
+            <button 
+              className={`tab-btn ${activeTab === 'discounts' ? 'active' : ''}`}
+              onClick={() => setActiveTab('discounts')}
+            >
+              Discounts (2)
+            </button>
           </div>
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center', minWidth: 200 }}>
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#888' }}>
@@ -689,67 +695,98 @@ function Inventory() {
         )}
 
         {/* Inventory Table */}
-        <section className="table-container">
-          <div className="table-wrapper">
-            <table className="inventory-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Code</th>
-                  <th>Type</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedItems.length > 0 ? (
-                  sortedItems.map((item) => (
-                    <tr key={item.id} className="table-row">
-                      <td className="item-name">{item.name}</td>
-                      <td className="item-code">{item.code || '-'}</td>
-                      <td className="item-type">
-                        <span className={`type-badge ${item.itemType}`}>
-                          {item.itemType.charAt(0).toUpperCase() + item.itemType.slice(1)}
-                        </span>
-                      </td>
-                      <td className="item-category">{item.category || 'Uncategorized'}</td>
-                      <td className="item-price">${item.price.toFixed(2)}</td>
-                      <td className="item-stock">{item.stockNumber}</td>
-                      <td className="item-status">
-                        <span className={`stock-status-badge ${getStockStatus(item.stockNumber)}`}>
-                          {getStockStatus(item.stockNumber).charAt(0).toUpperCase() + getStockStatus(item.stockNumber).slice(1)}
-                        </span>
+        {activeTab === 'discounts' ? (
+          <section className="table-container">
+            <div className="table-wrapper">
+              <table className="inventory-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>PWD</td>
+                    <td>Person with Disability Discount</td>
+                    <td>Percentage</td>
+                    <td>20%</td>
+                  </tr>
+                  <tr>
+                    <td>Student Discount</td>
+                    <td>Valid Student ID Required</td>
+                    <td>Percentage</td>
+                    <td>15%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          <section className="table-container">
+            <div className="table-wrapper">
+              <table className="inventory-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedItems.length > 0 ? (
+                    sortedItems.map((item) => (
+                      <tr key={item.id} className="table-row">
+                        <td className="item-name">{item.name}</td>
+                        <td className="item-code">{item.code || '-'}</td>
+                        <td className="item-type">
+                          <span className={`type-badge ${item.itemType}`}>
+                            {item.itemType.charAt(0).toUpperCase() + item.itemType.slice(1)}
+                          </span>
+                        </td>
+                        <td className="item-category">{item.category || 'Uncategorized'}</td>
+                        <td className="item-price">${item.price.toFixed(2)}</td>
+                        <td className="item-stock">{item.stockNumber}</td>
+                        <td className="item-status">
+                          <span className={`stock-status-badge ${getStockStatus(item.stockNumber)}`}>
+                            {getStockStatus(item.stockNumber).charAt(0).toUpperCase() + getStockStatus(item.stockNumber).slice(1)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : searchTerm.trim() !== '' ? (
+                    <tr>
+                      <td colSpan="7" className="no-data">
+                        <div className="no-data-content">
+                          <span className="no-data-icon">🔍</span>
+                          <p>No results found for "{searchTerm}"</p>
+                        </div>
                       </td>
                     </tr>
-                  ))
-                ) : searchTerm.trim() !== '' ? (
-                  <tr>
-                    <td colSpan="7" className="no-data">
-                      <div className="no-data-content">
-                        <span className="no-data-icon">🔍</span>
-                        <p>No results found for "{searchTerm}"</p>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="no-data">
-                      <div className="no-data-content">
-                        <span className="no-data-icon">📋</span>
-                        <p>No inventory data found</p>
-                        <button className="upload-btn" onClick={handleUpdateSystem}>
-                          Upload Excel File
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="no-data">
+                        <div className="no-data-content">
+                          <span className="no-data-icon">📋</span>
+                          <p>No inventory data found</p>
+                          <button className="upload-btn" onClick={handleUpdateSystem}>
+                            Upload Excel File
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Hidden file input */}

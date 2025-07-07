@@ -4,6 +4,7 @@ import styles from './RefillFormPopup.module.css';
 function RefillFormPopup({ open, onClose, onSubmit, products, ingredients, modifiers }) {
   const [selectedItems, setSelectedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [selectedDiscounts, setSelectedDiscounts] = useState([]);
 
   if (!open) return null;
 
@@ -26,15 +27,24 @@ function RefillFormPopup({ open, onClose, onSubmit, products, ingredients, modif
     setQuantities(prev => ({ ...prev, [key]: Math.max(1, Number(value) || 1) }));
   };
 
+  const handleDiscountChange = (discount) => {
+    setSelectedDiscounts(prev =>
+      prev.includes(discount)
+        ? prev.filter(d => d !== discount)
+        : [...prev, discount]
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const refillList = allItems.filter(item => selectedItems.includes(getItemKey(item))).map(item => ({
       ...item,
       refillAmount: quantities[getItemKey(item)] || 1
     }));
-    onSubmit(refillList);
+    onSubmit(refillList, selectedDiscounts);
     setSelectedItems([]); // Clear selection after submit
     setQuantities({});   // Optionally clear quantities too
+    setSelectedDiscounts([]);
     onClose();
   };
 
@@ -88,6 +98,28 @@ function RefillFormPopup({ open, onClose, onSubmit, products, ingredients, modif
               </tbody>
             </table>
           </div>
+
+          {/* Discount Section */}
+          <div className={styles.discountSection}>
+            <div className={styles.discountLabel}>Discounts:</div>
+            <label className={styles.discountOption}>
+              <input
+                type="checkbox"
+                checked={selectedDiscounts.includes('PWD')}
+                onChange={() => handleDiscountChange('PWD')}
+              />
+              PWD
+            </label>
+            <label className={styles.discountOption}>
+              <input
+                type="checkbox"
+                checked={selectedDiscounts.includes('Student Discount')}
+                onChange={() => handleDiscountChange('Student Discount')}
+              />
+              Student Discount
+            </label>
+          </div>
+
           <div className={styles.buttonGroup}>
             <button type="submit" className={styles.saveButton}>Refill Selected</button>
             <button type="button" className={styles.cancelButton} onClick={onClose}>Cancel</button>

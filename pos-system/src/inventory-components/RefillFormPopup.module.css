@@ -13,12 +13,12 @@
 
 .popupContent {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-  padding: 32px 28px 24px 28px;
-  min-width: 340px;
-  max-width: 95vw;
-  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 6px 32px rgba(37,99,235,0.10), 0 1.5px 6px rgba(16,185,129,0.08);
+  padding: 36px 32px 28px 32px;
+  min-width: 360px;
+  max-width: 98vw;
+  max-height: 92vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -27,10 +27,12 @@
 
 .popupContent h2 {
   margin-top: 0;
-  margin-bottom: 18px;
-  font-size: 1.5rem;
-  color: #333;
+  margin-bottom: 22px;
+  font-size: 1.7rem;
+  color: #2563eb;
   text-align: center;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .itemList {
@@ -48,56 +50,69 @@
 }
 
 .typeTag {
-  background: #eaddd7;
-  color: #846358;
+  background: #dbeafe;
+  color: #1e40af;
   border-radius: 8px;
-  font-size: 0.8em;
-  padding: 2px 8px;
+  font-size: 0.85em;
+  padding: 2px 10px;
   margin-left: 6px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .quantityInput {
-  width: 60px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #bfa094;
+  width: 64px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #2563eb;
   font-size: 1em;
+  background: #f8fafc;
+  transition: border 0.2s;
+}
+.quantityInput:focus {
+  border-color: #10b981;
+  outline: none;
 }
 
 .buttonGroup {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 14px;
+  margin-top: 22px;
 }
 
 .saveButton {
-  background: #86efac;
-  color: #43302b;
+  background: linear-gradient(90deg, #2563eb 60%, #10b981 100%);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 18px;
+  border-radius: 10px;
+  padding: 10px 24px;
   font-weight: 600;
   font-size: 1em;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
 }
 .saveButton:hover {
-  background: #4ade80;
+  background: linear-gradient(90deg, #1d4ed8 60%, #059669 100%);
+  box-shadow: 0 4px 16px rgba(16,185,129,0.10);
 }
 .cancelButton {
-  background: #eaddd7;
-  color: #846358;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 18px;
+  background: #f1f5f9;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+  border-radius: 10px;
+  padding: 10px 24px;
   font-weight: 500;
   font-size: 1em;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, color 0.2s, border 0.2s;
 }
 .cancelButton:hover {
-  background: #d2bab0;
+  background: #e0e7ef;
+  color: #1e40af;
+  border-color: #1e40af;
 }
 
 .tableWrapper {
@@ -113,20 +128,59 @@
 }
 
 .refillTable th, .refillTable td {
-  padding: 8px 10px;
-  border-bottom: 1px solid #eaddd7;
+  padding: 10px 12px;
+  border-bottom: 1.5px solid #dbeafe;
   text-align: left;
 }
 
 .refillTable th {
-  background: #f2e8e5;
-  color: #43302b;
-  font-weight: 600;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
   position: sticky;
   top: 0;
   z-index: 1;
+  letter-spacing: 0.04em;
+  font-size: 1em;
 }
 
 .selectedRow {
-  background: #fcd34d33;
+  background: #d1fae5;
+  transition: background 0.2s;
+}
+
+.discountSection {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 18px 0 0 0;
+  padding: 12px 0 8px 0;
+  border-top: 1.5px solid #dbeafe;
+}
+.discountLabel {
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 1em;
+  margin-right: 8px;
+}
+.discountOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-size: 0.98em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.discountOption input[type="checkbox"] {
+  accent-color: #2563eb;
+  margin-right: 4px;
+}
+.discountOption:hover {
+  background: #dbeafe;
+  color: #1e40af;
 }

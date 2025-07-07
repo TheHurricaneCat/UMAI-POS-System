@@ -15,7 +15,6 @@ import PopUp from './global-components/PopUp.jsx';
 import NavigationContainer from './pos-components/NavigationContainer.jsx';
 import ContentHeader from './pos-components/ContentHeader.jsx';
 import Statistics from './statistics-component/Statistics.jsx';
-import InventoryStatusIndicator from './pos-components/InventoryStatusIndicator.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
 
@@ -515,8 +514,6 @@ function App() {
       )}
       </div>
       
-      {/* Inventory Status Indicator - shows real-time stock levels */}
-      <InventoryStatusIndicator />
       
     {/*   <div className="navigationViewer"> 
             <NavigationContainer 
