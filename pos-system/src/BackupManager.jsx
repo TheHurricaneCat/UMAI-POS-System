@@ -230,37 +230,48 @@ const BackupManager = () => {
         if (!dateString) return 'Unknown date';
         
         try {
-            // Parse the timestamp that looks like "2025:06:23T14:24:04:322Z"
-            let formattedDate;
+            // Expected format: 2025:06:24T07:53:33.764Z
+            // Split by 'T' to separate date and time parts
+            const [datePart, timePart] = dateString.split('T');
             
-            // Check if it's in the unusual format with colons instead of hyphens
-            if (typeof dateString === 'string' && dateString.includes(':')) {
-                // Replace colons in the date part with hyphens for proper parsing
-                const correctedDateString = dateString
-                    .replace(/(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3')
-                    .replace(/:\d{3}Z$/, 'Z'); // Fix milliseconds format
-                
-                formattedDate = new Date(correctedDateString);
-            } else {
-                formattedDate = new Date(dateString);
+            if (!datePart || !timePart) return dateString;
+            
+            // Parse date part: 2025:06:24
+            const dateComponents = datePart.split(':');
+            if (dateComponents.length !== 3) return dateString;
+            
+            const year = dateComponents[0];
+            const month = dateComponents[1];
+            const day = dateComponents[2];
+            
+            // Parse time part: 07:53:33.764Z
+            const timeComponents = timePart.replace('Z', '').split(':');
+            if (timeComponents.length < 2) return dateString;
+            
+            const hours = timeComponents[0];
+            const minutes = timeComponents[1];
+            
+            // Validate all components are numeric
+            if (!/^\d{4}$/.test(year) || !/^\d{2}$/.test(month) || !/^\d{2}$/.test(day) ||
+                !/^\d{2}$/.test(hours) || !/^\d{2}$/.test(minutes)) {
+                return dateString;
             }
             
-            // Check if the date is valid
-            if (isNaN(formattedDate.getTime())) {
-                return dateString; // Return original string if parsing failed
-            }
+            // Create date object and convert to local time
+            const utcDate = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00Z`);
             
-            // Format the date in a clear, readable way
-            return formattedDate.toLocaleString(undefined, {
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit', 
-                minute: '2-digit'
-            });
+            // Format in local timezone
+            const localDay = utcDate.getDate().toString().padStart(2, '0');
+            const localMonth = (utcDate.getMonth() + 1).toString().padStart(2, '0');
+            const localYear = utcDate.getFullYear();
+            const localHours = utcDate.getHours().toString().padStart(2, '0');
+            const localMinutes = utcDate.getMinutes().toString().padStart(2, '0');
+            
+            // Format as dd/mm/yyyy - HH:MM (local time)
+            return `${localDay}/${localMonth}/${localYear} - ${localHours}:${localMinutes}`;
         } catch (error) {
-            console.error("Error formatting table date:", error, dateString);
-            return dateString; // Return original string on error
+            console.error("Error formatting date:", error);
+            return dateString;
         }
     };
 
@@ -574,3 +585,5 @@ const BackupManager = () => {
     );
 };
 export default BackupManager;
+
+

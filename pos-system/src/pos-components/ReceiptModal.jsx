@@ -5,6 +5,8 @@ import ReceiptTemplate from './ReceiptTemplate';
 import styles from './ReceiptModal.module.css';
 
 function ReceiptModal({ isOpen, onClose, orderData, discount }) {
+  
+  console.log('ReceiptModal orderData:', orderData);
   const receiptRef = useRef();
 
   const handleDownloadPDF = async () => {
@@ -22,7 +24,7 @@ function ReceiptModal({ isOpen, onClose, orderData, discount }) {
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-    pdf.save(`Receipt-Order-${orderData.id}.pdf`);
+    pdf.save(`Receipt-Order-${orderData.invoiceNumber}.pdf`);
   };
 
   if (!isOpen) return null;
