@@ -22,7 +22,7 @@ function Inventory() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
-  const [sortMode, setSortMode] = useState('name');
+  const [sortMode, setSortMode] = useState('default'); // 'default', 'stock-asc', 'stock-desc'
   const [excelError, setExcelError] = useState('');
   const [showRefillPopup, setShowRefillPopup] = useState(false);
   const [showUpdateSupplierPopup, setShowUpdateSupplierPopup] = useState(false);
@@ -34,6 +34,9 @@ function Inventory() {
   const [justSynced, setJustSynced] = useState(false);
   const channelRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortColumn, setSortColumn] = useState('stockNumber');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [originalItems, setOriginalItems] = useState([]);
 
   // Use context for inventory state and actions
   const {
@@ -525,13 +528,62 @@ function Inventory() {
     );
   });
 
-  const sortedItems = filteredItems.sort((a, b) => {
-    const rankA = getSearchRank(a, searchTerm);
-    const rankB = getSearchRank(b, searchTerm);
-    if (rankA !== rankB) return rankA - rankB;
-    // Fallback: alphabetical by name
-    return a.name.localeCompare(b.name);
-  });
+  // Save original order on first load or when data changes
+  useEffect(() => {
+    setOriginalItems(getAllItems());
+  }, [products, ingredients, modifiers, activeTab]);
+
+  // Bubble sort helper
+  const bubbleSort = (arr, asc = true) => {
+    let sorted = [...arr];
+    for (let i = 0; i < sorted.length - 1; i++) {
+      for (let j = 0; j < sorted.length - i - 1; j++) {
+        if (asc ? (sorted[j].stockNumber > sorted[j + 1].stockNumber) : (sorted[j].stockNumber < sorted[j + 1].stockNumber)) {
+          [sorted[j], sorted[j + 1]] = [sorted[j + 1], sorted[j]];
+        }
+      }
+    }
+    return sorted;
+  };
+
+  // Sorting button handler
+  const handleSortButton = () => {
+    if (sortMode === 'default') setSortMode('stock-asc');
+    else if (sortMode === 'stock-asc') setSortMode('stock-desc');
+    else setSortMode('default');
+    // Reset per-column sorting when using the sort button
+    setSortColumn('');
+    setSortDirection('asc');
+  };
+
+  // Table data selection logic
+  let tableItems = filteredItems;
+  if (sortMode === 'stock-asc') {
+    tableItems = bubbleSort(filteredItems, true);
+  } else if (sortMode === 'stock-desc') {
+    tableItems = bubbleSort(filteredItems, false);
+  } else if (sortMode === 'default') {
+    // Show in original order (as loaded)
+    tableItems = originalItems.filter(item => filteredItems.some(f => f.id === item.id));
+  }
+  // If a column is selected for sorting, override sortMode
+  if (sortColumn) {
+    tableItems = [...tableItems].sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+      if (valA === undefined || valA === null) valA = '';
+      if (valB === undefined || valB === null) valB = '';
+      if (sortColumn === 'price' || sortColumn === 'stockNumber') {
+        valA = Number(valA);
+        valB = Number(valB);
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      }
+      const cmp = String(valA).localeCompare(String(valB));
+      return sortDirection === 'asc' ? cmp : -cmp;
+    });
+  }
   
   if (loading) {
     return (
@@ -605,9 +657,9 @@ function Inventory() {
               <span className="btn-icon">🖨️</span>
               Print
             </button>
-            <button className="toolbar-btn" onClick={handleRearrangeView}>
+            <button className="toolbar-btn" onClick={handleSortButton}>
               <span className="btn-icon">↕️</span>
-              Sort
+              Sort: {sortMode === 'default' ? 'Default' : sortMode === 'stock-asc' ? 'Stock ↑' : 'Stock ↓'}
             </button>
             <button className="toolbar-btn" onClick={handleClearCache}>
               <span className="btn-icon">🗑️</span>
@@ -730,18 +782,32 @@ function Inventory() {
               <table className="inventory-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Code</th>
-                    <th>Type</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Status</th>
+                    <th onClick={() => handleSort('name')} style={{cursor:'pointer'}}>
+                      Name {sortColumn === 'name' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('code')} style={{cursor:'pointer'}}>
+                      Code {sortColumn === 'code' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('itemType')} style={{cursor:'pointer'}}>
+                      Type {sortColumn === 'itemType' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('category')} style={{cursor:'pointer'}}>
+                      Category {sortColumn === 'category' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('price')} style={{cursor:'pointer'}}>
+                      Price {sortColumn === 'price' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('stockNumber')} style={{cursor:'pointer'}}>
+                      Stock {sortColumn === 'stockNumber' && (sortDirection === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('status')} style={{cursor:'pointer'}}>
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedItems.length > 0 ? (
-                    sortedItems.map((item) => (
+                  {tableItems.length > 0 ? (
+                    tableItems.map((item) => (
                       <tr key={item.id} className="table-row">
                         <td className="item-name">{item.name}</td>
                         <td className="item-code">{item.code || '-'}</td>
