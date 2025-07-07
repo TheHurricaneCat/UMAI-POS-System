@@ -129,20 +129,38 @@ export async function listBackups() {
         
         // Try to extract a parsable timestamp from the filename
         try {
-          // Join remaining parts and replace hyphens back to colons for time segments
+          // Join remaining parts and get the timestamp part
           const timestampPart = nameParts.slice(1).join('_').replace('.json', '');
           
-          // Format the timestamp to be valid for Date parsing
-          // Example: 2023-06-22T14-05-29-604Z becomes 2023-06-22T14:05:29.604Z
-          timestamp = timestampPart
-            .replace(/-(\d{2})-(\d{2})-(\d{3})Z$/, ':$1:$2.$3Z')
-            .replace(/-/g, ':');
+          // Manual parsing for format like: 2025-06-24T07-53-33-764Z
+          // Split by 'T' to separate date and time
+          const [datePart, timePart] = timestampPart.split('T');
           
-          // Validate if it's parseable
-          const testDate = new Date(timestamp);
-          if (isNaN(testDate.getTime())) {
-            console.warn("Could not parse timestamp:", timestamp);
-            timestamp = timestampPart; // Keep original if unparseable
+          if (datePart && timePart) {
+            // Parse date part: 2025-06-24
+            const dateComponents = datePart.split('-');
+            
+            // Parse time part: 07-53-33-764Z
+            const timeComponents = timePart.replace('Z', '').split('-');
+            
+            if (dateComponents.length === 3 && timeComponents.length >= 3) {
+              const year = dateComponents[0];
+              const month = dateComponents[1];
+              const day = dateComponents[2];
+              const hours = timeComponents[0];
+              const minutes = timeComponents[1];
+              const seconds = timeComponents[2];
+              const milliseconds = timeComponents[3] || '000';
+              
+              // Reconstruct as proper ISO format
+              timestamp = `${year}:${month}:${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`;
+            } else {
+              // Fallback to original timestamp part if parsing fails
+              timestamp = timestampPart;
+            }
+          } else {
+            // Fallback for other formats
+            timestamp = timestampPart;
           }
         } catch (err) {
           console.warn("Error parsing timestamp:", err);
@@ -434,19 +452,54 @@ export async function restoreBackup(fileName, confirmPhrase) {
     const tableName = backupObject.table;
     const dataToRestore = backupObject.data;
 
-    // First, remove existing data from the table
-    const { error: deleteError } = await supabase
-      .from(tableName)
-      .delete()
-      .neq('id', 'non_existent_id'); // This is a trick to delete all rows
+    // Define primary key columns for each table
+    const primaryKeyColumns = {
+      'products': 'code',
+      'profiles': 'id',
+      'sessions': 'token'
+    };
 
-    if (deleteError) {
-      console.error(`[BACKUP] Error clearing table ${tableName}:`, deleteError);
+    const primaryKeyColumn = primaryKeyColumns[tableName];
+    
+    if (!primaryKeyColumn) {
       return { 
         success: false, 
-        error: deleteError.message, 
-        message: `Failed to clear existing data in ${tableName}`
+        error: `Unknown table: ${tableName}`, 
+        message: `Cannot restore backup for unknown table ${tableName}`
       };
+    }
+
+    // First, get all existing data to clear the table
+    const { data: existingData, error: fetchError } = await supabase
+      .from(tableName)
+      .select(primaryKeyColumn);
+
+    if (fetchError) {
+      console.error(`[BACKUP] Error fetching existing data from ${tableName}:`, fetchError);
+      return { 
+        success: false, 
+        error: fetchError.message, 
+        message: `Failed to fetch existing data from ${tableName}`
+      };
+    }
+
+    // Delete existing records if any
+    if (existingData && existingData.length > 0) {
+      const primaryKeyValues = existingData.map(record => record[primaryKeyColumn]);
+      
+      const { error: deleteError } = await supabase
+        .from(tableName)
+        .delete()
+        .in(primaryKeyColumn, primaryKeyValues);
+
+      if (deleteError) {
+        console.error(`[BACKUP] Error clearing table ${tableName}:`, deleteError);
+        return { 
+          success: false, 
+          error: deleteError.message, 
+          message: `Failed to clear existing data in ${tableName}`
+        };
+      }
     }
 
     // Insert the backup data
