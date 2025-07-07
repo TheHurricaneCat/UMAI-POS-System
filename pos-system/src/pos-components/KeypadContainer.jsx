@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { appendEntry, getLastTransaction } from '../handlers/DataHandler';
 import styles from './KeypadContainer.module.css';
-import PopUp from '../global-components/Popup.jsx';
-import { fetchProductCatalog } from '../handlers/SessionHandler.js';
+import PopUp from '../global-components/PopUp.jsx';
 import ReceiptModal from './ReceiptModal';
 import { useExcelData } from '../context/ExcelDataContext';
+import { deductInventoryAndSync } from '../handlers/InventorySync';
 
 function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurrentTray, currentTray }) {
     const [buttonPopUp, setButtonPopUp] = useState(false);
@@ -14,9 +14,10 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
     const [savedTray, setSavedTray] = useState([]);
     const [total, setTotal] = useState(0);
     const [showDiscountModal, setShowDiscountModal] = useState(false);
-    const [discountSelected, setDiscountSelected] = useState(false); // New state to track discount selection
-
+    const [discountSelected, setDiscountSelected] = useState(false);
     const [showReceiptModal, setShowReceiptModal] = useState(false);
+    const [stockValidationError, setStockValidationError] = useState(null);
+    const [processingOrder, setProcessingOrder] = useState(false);
 
     const [modifiers, setModifiers] = useState([]);
     const [discount, setDiscount] = useState({
@@ -25,25 +26,29 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
         type: 'None'
     });
 
-    const { deductStock } = useExcelData();
+    const { 
+        deductStock, 
+        deductStockBatch, 
+        validateOrderStock, 
+        checkStockAvailability,
+        products,
+        setProducts,
+        ingredients,
+        setIngredients,
+        modifiers: inventoryModifiers,
+        setModifiers: setInventoryModifiers,
+        excelData,
+        setExcelData,
+        loading: inventoryLoading,
+        refreshInventory // <-- add this
+    } = useExcelData();
 
     useEffect(() => {
-        async function loadModifiers() {
-            try {
-                const catalog = await fetchProductCatalog("modifier");
-                if (catalog && Array.isArray(catalog) && catalog[1]) {
-                    setModifiers(catalog[1]);
-                    console.log("Loaded modifiers:", catalog[1]);
-                } else {
-                    console.error("Failed to load modifiers");
-                }
-            } catch (error) {
-                console.error("Error loading modifiers:", error);
-            }
+        if (!inventoryLoading && inventoryModifiers.length > 0) {
+            setModifiers(inventoryModifiers);
+            console.log("Loaded modifiers from ExcelDataContext:", inventoryModifiers);
         }
-        
-        loadModifiers();
-    }, []);
+    }, [inventoryModifiers, inventoryLoading]);
 
     ////////////////////////
     // Listener that handles confirmation and saving of orders
@@ -52,57 +57,142 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
 
     useEffect(() => {
         const handleConfirmation = async () => {
-            if (confirm && discountSelected) {
-                const traysWithoutCustomers = tray.filter(t => !t.customer || !t.customer.customerName);
+            if (confirm && discountSelected && !processingOrder) {
+                setProcessingOrder(true);
                 
-                if (traysWithoutCustomers.length > 0) {
-                    const trayNumbers = traysWithoutCustomers.map(t => `Tray ${t.id}`).join(', ');
-                    alert(`Please add customer details for ${trayNumbers} before saving the order.`);
+                try {
+                    const traysWithoutCustomers = tray.filter(t => !t.customer || !t.customer.customerName);
+                    
+                    if (traysWithoutCustomers.length > 0) {
+                        const trayNumbers = traysWithoutCustomers.map(t => `Tray ${t.id}`).join(', ');
+                        alert(`Please add customer details for ${trayNumbers} before saving the order.`);
+                        setConfirm(false);
+                        setDiscountSelected(false);
+                        setProcessingOrder(false);
+                        return;
+                    }
+
+                    // Get current tray items for stock validation
+                    const currentTrayObj = tray.find(t => t.id === currentTray);
+                    if (!currentTrayObj || !currentTrayObj.products || currentTrayObj.products.length === 0) {
+                        setEmptyTrayPopup(true);
+                        setProcessingOrder(false);
+                        return;
+                    }
+
+                    // Prepare items for stock validation and deduction
+                    const itemsToValidate = [];
+                    
+                    console.log('[KEYPAD] Current tray products:', currentTrayObj.products);
+                    
+                    currentTrayObj.products.forEach(product => {
+                        console.log('[KEYPAD] Processing product:', product);
+                        
+                        // Add product
+                        if (product.code) {
+                            itemsToValidate.push({
+                                code: product.code,
+                                name: product.name,
+                                quantity: product.quantity,
+                                type: 'product'
+                            });
+                            console.log('[KEYPAD] Added product to validation:', product.code, product.quantity);
+                        } else {
+                            console.warn('[KEYPAD] Product missing code:', product);
+                        }
+                        
+                        // Add modifiers
+                        if (product.modifiers && Array.isArray(product.modifiers)) {
+                            product.modifiers.forEach(modifier => {
+                                if (modifier.code) {
+                                    itemsToValidate.push({
+                                        code: modifier.code,
+                                        name: modifier.name,
+                                        quantity: modifier.quantity,
+                                        type: 'modifier'
+                                    });
+                                    console.log('[KEYPAD] Added modifier to validation:', modifier.code, modifier.quantity);
+                                } else {
+                                    console.warn('[KEYPAD] Modifier missing code:', modifier);
+                                }
+                            });
+                        }
+                    });
+                    
+                    console.log('[KEYPAD] Final items to validate:', itemsToValidate);
+
+                    // Validate stock availability before processing
+                    console.log('[KEYPAD] Validating stock for order items:', itemsToValidate);
+                    const stockValidation = validateOrderStock(itemsToValidate);
+                    
+                    if (!stockValidation.allAvailable) {
+                        const insufficientItems = stockValidation.results
+                            .filter(result => !result.available)
+                            .map(result => `${result.name} (${result.message})`)
+                            .join(', ');
+                        
+                        setStockValidationError(`Insufficient stock for: ${insufficientItems}`);
+                        setConfirm(false);
+                        setDiscountSelected(false);
+                        setProcessingOrder(false);
+                        return;
+                    }
+
+                    // All stock is available, proceed with order
+                    console.log('[KEYPAD] Stock validation passed, processing order...');
+                    
+                    // Save the order first
+                    await appendEntry(tray, discount, total);
+                    
+                    // Deduct stock using the new unified sync function
+                    console.log('[KEYPAD] Deducting stock using unified sync...');
+                    const syncSuccess = await deductInventoryAndSync(itemsToValidate, {
+                        products,
+                        setProducts,
+                        ingredients,
+                        setIngredients,
+                        modifiers: inventoryModifiers,
+                        setModifiers: setInventoryModifiers,
+                        excelData,
+                        setExcelData,
+                        setToastMessage: setStockValidationError,
+                        setToastType: () => 'error',
+                    });
+                    
+                    if (syncSuccess) {
+                        console.log('[KEYPAD] Stock deduction and sync completed successfully');
+                        // Auto-refresh inventory from Supabase
+                        if (typeof refreshInventory === 'function') {
+                            await refreshInventory();
+                        }
+                    } else {
+                        console.error('[KEYPAD] Some stock deductions failed during sync');
+                        // Note: The order was already saved, so we should handle this gracefully
+                        // In a production system, you might want to create a "pending" order status
+                    }
+                    
+                    console.log('[KEYPAD] Order processed successfully');
+                    handlePrintReceipt();
+                    
+                    // Save the current tray before clearing
+                    const currentTrayData = tray.find(t => t.id === currentTray);
+                    setSavedTray(currentTrayData);
+                    
                     setConfirm(false);
                     setDiscountSelected(false);
-                    return;
+                    clearCurrentTray(); // Clear the tray after saving
+                    
+                } catch (error) {
+                    console.error('[KEYPAD] Error processing order:', error);
+                    setStockValidationError('Error processing order. Please try again.');
+                } finally {
+                    setProcessingOrder(false);
                 }
-
-                await appendEntry(tray, discount, total);
-                
-                // Deduct stock for each product, ingredient, and modifier in the current tray
-                const currentTrayObj = tray.find(t => t.id === currentTray);
-                if (currentTrayObj && currentTrayObj.products) {
-                  currentTrayObj.products.forEach(product => {
-                    // Deduct for product
-                    const ok = deductStock(product.code, product.quantity);
-                    if (!ok) console.warn(`Deduction failed for product code: ${product.code}`);
-                    // Deduct for ingredients (if present)
-                    if (product.ingredients && Array.isArray(product.ingredients)) {
-                      product.ingredients.forEach(ing => {
-                        const okIng = deductStock(ing.code, ing.quantity);
-                        if (!okIng) console.warn(`Deduction failed for ingredient code: ${ing.code}`);
-                      });
-                    }
-                    // Deduct for modifiers (if present)
-                    if (product.modifiers && Array.isArray(product.modifiers)) {
-                      product.modifiers.forEach(mod => {
-                        const okMod = deductStock(mod.code, mod.quantity);
-                        if (!okMod) console.warn(`Deduction failed for modifier code: ${mod.code}`);
-                      });
-                    }
-                  });
-                }
-                // No need to call exportToExcel here; context will auto-export after deduction
-                handlePrintReceipt();
-                
-                // Save the current tray before clearing
-                const currentTrayData = tray.find(t => t.id === currentTray);
-                setSavedTray(currentTrayData);
-                
-                setConfirm(false);
-                setDiscountSelected(false);
-                clearCurrentTray(); // Clear the tray after saving
             }
         };
         
         handleConfirmation();
-    }, [confirm, discountSelected, tray, discount, total, currentTray]);
+    }, [confirm, discountSelected, tray, discount, total, currentTray, processingOrder]);
 
     // New useEffect to handle showing discount modal after initial confirmation
     useEffect(() => {
@@ -140,11 +230,18 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
         
         if (!hasItems) {
             setEmptyTrayPopup(true);
-            handlePrintReceipt
             return;
-        } else {
-            setButtonPopUp(true);
         }
+
+        // Check if inventory is loading
+        if (inventoryLoading) {
+            alert('Inventory is still loading. Please wait a moment and try again.');
+            return;
+        }
+
+        // Clear any previous stock validation errors
+        setStockValidationError(null);
+        setButtonPopUp(true);
     };
 
     const handlePrintReceipt = async () => {
@@ -198,6 +295,17 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
                 confirm={false}
                 setConfirm={() => {}}
             />
+            {stockValidationError && (
+                <PopUp 
+                    text={stockValidationError} 
+                    button1={"Ok"}
+                    button2={"Cancel"}
+                    trigger={!!stockValidationError} 
+                    setTrigger={() => setStockValidationError(null)} 
+                    confirm={false}
+                    setConfirm={() => {}}
+                />
+            )}
             {savedTray && (
                 <ReceiptModal
                     isOpen={showReceiptModal}
@@ -207,17 +315,43 @@ function KeypadContainer({ addNewTray, currentTotal, tray, clearTray, clearCurre
                 />
             )}
             <div className={styles.primaryContainer}>
-               {/*  <div className={styles.traySummary}> <h3> Tray {currentTray} Summary </h3> </div> */}
-                {/* <div className={styles.discountButton}>
-                    <button onClick={() => setShowDiscountModal(true)}>Apply Discount</button>
-                </div> */}
-                <div className={styles.totalMoney}> <h3> Tray Total: P{total.toFixed(2)} </h3> </div>
+                <div className={styles.totalMoney}> 
+                    <h3> Tray Total: P{total.toFixed(2)} </h3> 
+                    {processingOrder && <p style={{color: 'orange', fontSize: '0.8em', margin: 0}}>Processing order...</p>}
+                </div>
                 
-                {/* <div className={styles.printReceipt}> <button onClick={handlePrintReceipt}> Print Receipt </button> </div> */}
-                <div className={styles.saveOrder}> <button onClick={handleSaveOrder}> Save Order </button> </div>
-                <div className={styles.clearOrder}> <button onClick={clearCurrentTray}> Clear Order </button> </div>
-                <div className={styles.addTray}> <button onClick={addNewTray}> Add Tray</button> </div>
-                <div className={styles.clearTray}> <button onClick={clearTray}> Clear Tray </button> </div>
+                <div className={styles.saveOrder}> 
+                    <button 
+                        onClick={handleSaveOrder}
+                        disabled={processingOrder || inventoryLoading}
+                    > 
+                        {processingOrder ? 'Processing...' : 'Save Order'} 
+                    </button> 
+                </div>
+                <div className={styles.clearOrder}> 
+                    <button 
+                        onClick={clearCurrentTray}
+                        disabled={processingOrder}
+                    > 
+                        Clear Order 
+                    </button> 
+                </div>
+                <div className={styles.addTray}> 
+                    <button 
+                        onClick={addNewTray}
+                        disabled={processingOrder}
+                    > 
+                        Add Tray
+                    </button> 
+                </div>
+                <div className={styles.clearTray}> 
+                    <button 
+                        onClick={clearTray}
+                        disabled={processingOrder}
+                    > 
+                        Clear Tray 
+                    </button> 
+                </div>
             </div>
             {showDiscountModal && (
                 <DiscountModal

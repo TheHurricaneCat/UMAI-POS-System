@@ -29,6 +29,7 @@
   cursor: pointer;
   transition: background 0.2s;
   margin-right: 12px;
+  margin-left: 0;
 }
 
 .nav-btn:last-child {
@@ -44,6 +45,36 @@
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
+}
+
+.inventory-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 16px;
+  background: #8b6b3c;
+  color: white;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 2px 8px rgba(67, 48, 43, 0.10);
+  padding: 18px 32px 18px 32px;
+}
+
+.inventory-header-row.column {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.inventory-title {
+  color: white;
+  font-size: 2.1rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  margin: 0;
+  margin-left: auto;
+  text-align: right;
 }
 
 .inventory-controls {
@@ -91,8 +122,18 @@
   gap: 32px;
 }
 
+.inventory-main-row {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  align-items: flex-start;
+  width: 100%;
+}
+
 .products-ingredients-section {
   flex: 2;
+  min-width: 0;
+  max-width: 700px;
 }
 
 .card-grid {
@@ -112,11 +153,8 @@
 
 .stock-levels-section {
   flex: 1;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 20px 16px;
   min-width: 260px;
+  max-width: 400px;
 }
 
 .stock-levels-card {
@@ -188,12 +226,63 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+.stock-status-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(67, 48, 43, 0.10);
+  padding: 18px 32px;
+  max-width: 350px;
+  margin: 24px auto 16px auto;
+  text-align: center;
+  border: 1px solid #eaddd7;
+}
+
+.inventory-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 48px 16px;
+}
+
+.controls-card,
+.inventory-card,
+.stock-status-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(67, 48, 43, 0.10);
+  padding: 18px 32px;
+  margin-bottom: 24px;
+  border: 1px solid #eaddd7;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #8b6b3c;
+  letter-spacing: 0.5px;
+}
+
+.inventory-flex-row {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  align-items: flex-start;
+  width: 100%;
+  justify-content: center;
+}
+
 @media (max-width: 900px) {
-  .inventory-horizontal-main {
+  .inventory-flex-row {
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
   }
+  .products-ingredients-section,
   .stock-levels-section {
-    min-width: unset;
+    max-width: 100%;
+  }
+  .controls-card,
+  .inventory-card,
+  .stock-status-card {
+    padding: 16px 8px;
   }
 }

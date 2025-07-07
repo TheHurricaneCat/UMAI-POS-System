@@ -1,16 +1,6 @@
 import ExcelJS from 'exceljs';
 import { getSessionDetails, saveExcelFile } from './SessionHandler';
 import { supabase } from '../database/supabase.js';
-/* import { firestore } from '/firebase.js';
-import { collection, query, where, getDocs } from 'firebase/firestore'; */
-
-
-// class functions are useless
-// since react does not prefer having their objects to change (states)
-// So it wants to create a new object instead of changing the existing one
-
-// todo:
-// remove firebase functions
 
 export async function fetchSessionItems(collectionName, sessionToken) {
   try {
@@ -43,13 +33,14 @@ export function initProductList(products = []) {
   products.forEach((product) => {
     // Find the category in the list
     let existingCategory = categories.find((category) => category.name === product.category);
-    // make this dynamic somehow
-    let productType = product.code.search("PR");
-    let productInstance = new Product(product.name, product.price, 1, product.code);
     
-    // detect for promo products
-    if (productType !== -1) {
-      if ((productType !== -1)) {
+    // Ensure product has a code, use name as fallback
+    const productCode = product.code || product.name || `PROD_${product.name}`;
+    let productInstance = new Product(product.name, product.price, 1, productCode);
+    
+    // detect for promo products (only if code exists and contains "PR")
+    if (productCode && typeof productCode === 'string' && productCode.search("PR") !== -1) {
+      if (product.content && typeof product.content === 'string') {
         let includedContent = product.content.split(",");
         includedContent.forEach((code) => {
             let promoProd = products.find((p) => p.code === code);

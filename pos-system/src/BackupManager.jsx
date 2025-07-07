@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import './BackupManager.css';
-import PopUp from './global-components/Popup.jsx';
+import PopUp from './global-components/PopUp';
 import { createBackup, listBackups, listExcelBackups, downloadBackup, restoreBackup, deleteBackup, backupAllExcelFiles, RESTORE_KEY_PHRASE, isOnline } from './handlers/BackupHandler';
 
 const BackupManager = () => {

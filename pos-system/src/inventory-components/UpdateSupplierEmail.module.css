@@ -1,0 +1,198 @@
+:root {
+  --brown-100: #f3e9e3;
+  --brown-200: #e0cec7;
+  --brown-300: #bfa094;
+  --brown-400: #a18072;
+  --brown-500: #846358;
+  --brown-600: #6b4f3c;
+  --brown-700: #43302b;
+  --brown-accent: #bfa094;
+  --brown-accent-dark: #a18072;
+  --brown-error: #d32f2f;
+  --brown-error-dark: #b71c1c;
+}
+
+.updateSupplierForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.updateSupplierField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.updateSupplierField label {
+  font-weight: 500;
+  color: var(--brown-700);
+  margin-bottom: 2px;
+  font-size: 1.08rem;
+}
+
+.updateSupplierInput {
+  padding: 12px 14px;
+  border: 1.5px solid var(--brown-200);
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--brown-100);
+  transition: border 0.2s, box-shadow 0.2s;
+  color: var(--brown-700);
+  margin-top: 2px;
+}
+
+.updateSupplierInput:focus {
+  border: 1.5px solid var(--brown-400);
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--brown-200);
+}
+
+.updateSupplierRestockLabel {
+  font-size: 15px;
+  color: var(--brown-500);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.updateSupplierRestockList {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--brown-100);
+  border-radius: 8px;
+  border: 1.5px solid var(--brown-200);
+  padding: 10px 0 10px 0;
+  margin-bottom: 8px;
+}
+
+.updateSupplierRestockItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--brown-200);
+  font-size: 16px;
+  color: var(--brown-700);
+  background: var(--brown-100);
+}
+
+.updateSupplierRestockItem:last-child {
+  border-bottom: none;
+}
+
+.updateSupplierQtyInput {
+  width: 60px;
+  padding: 7px 10px;
+  border: 1.5px solid var(--brown-200);
+  border-radius: 6px;
+  font-size: 16px;
+  background: #fff;
+  margin-left: 10px;
+  color: var(--brown-700);
+  text-align: center;
+}
+
+.updateSupplierQtyInput:focus {
+  border: 1.5px solid var(--brown-400);
+  outline: none;
+}
+
+.updateSupplierButtonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.deleteButton {
+  background: var(--brown-error);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+}
+.deleteButton:hover {
+  background: var(--brown-error-dark);
+}
+
+/* Add/Dropdown row */
+.updateSupplierAddRow {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.updateSupplierAddRow select {
+  min-width: 220px;
+  max-width: 100%;
+  flex: 2 1 220px;
+}
+
+.updateSupplierAddRow input[type="number"] {
+  min-width: 60px;
+  max-width: 80px;
+  flex: 1 1 60px;
+}
+
+.updateSupplierAddRow button {
+  flex: 0 0 90px;
+  min-width: 90px;
+  max-width: 110px;
+  height: 40px;
+  font-size: 16px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Button overrides for brown theme */
+:global(.saveButton) {
+  background: var(--brown-accent);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 0;
+  border: none;
+  transition: background 0.2s;
+}
+:global(.saveButton):hover {
+  background: var(--brown-accent-dark);
+}
+:global(.cancelButton) {
+  background: #f5f5f5;
+  color: var(--brown-700);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 0;
+  border: 1.5px solid var(--brown-200);
+  transition: background 0.2s;
+}
+:global(.cancelButton):hover {
+  background: var(--brown-200);
+}
+
+.errorText {
+  color: var(--brown-error);
+  background: none;
+  font-size: 14px;
+  margin-top: 2px;
+  margin-left: 2px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
