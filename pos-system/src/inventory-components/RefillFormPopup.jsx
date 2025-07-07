@@ -24,7 +24,7 @@ function RefillFormPopup({ open, onClose, onSubmit, products, ingredients, modif
   };
 
   const handleQuantity = (key, value) => {
-    setQuantities(prev => ({ ...prev, [key]: Math.max(1, Number(value) || 1) }));
+    setQuantities(prev => ({ ...prev, [key]: Math.max(0, Number(value) || 0) }));
   };
 
   const handleDiscountChange = (discount) => {
@@ -39,7 +39,7 @@ function RefillFormPopup({ open, onClose, onSubmit, products, ingredients, modif
     e.preventDefault();
     const refillList = allItems.filter(item => selectedItems.includes(getItemKey(item))).map(item => ({
       ...item,
-      refillAmount: quantities[getItemKey(item)] || 1
+      refillAmount: quantities[getItemKey(item)] ?? 0
     }));
     onSubmit(refillList, selectedDiscounts);
     setSelectedItems([]); // Clear selection after submit
@@ -85,8 +85,8 @@ function RefillFormPopup({ open, onClose, onSubmit, products, ingredients, modif
                       <td>
                         <input
                           type="number"
-                          min={1}
-                          value={quantities[key] || 1}
+                          min={0}
+                          value={quantities[key] ?? 0}
                           onChange={e => handleQuantity(key, e.target.value)}
                           className={styles.quantityInput}
                           disabled={!selectedItems.includes(key)}
