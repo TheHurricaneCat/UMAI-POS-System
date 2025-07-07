@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 import './App.css'
-
 import {initProductList, appendEntry} from './handlers/DataHandler'
 import {products, modifiers} from './handlers/product.js'
 import useTrayManager from './handlers/UseTrayManagers.js'
+import { useExcelData } from './context/ExcelDataContext';
 
 import ProductCard from './pos-components/ProductCard.jsx'
 import CategoryContainer from './pos-components/CategoryContainer'
@@ -15,10 +15,11 @@ import PopUp from './global-components/PopUp.jsx';
 import NavigationContainer from './pos-components/NavigationContainer.jsx';
 import ContentHeader from './pos-components/ContentHeader.jsx';
 import Statistics from './statistics-component/Statistics.jsx';
+import InventoryStatusIndicator from './pos-components/InventoryStatusIndicator.jsx';
 /* import Inventory from './inventory-components/Inventory.jsx' */
 import { UserContext } from './UserContext.jsx';
 
-import {startSession, getSessionDetails, getUsername, endSession, logOut, clockOut, saveExcelFile, fetchProductCatalog } from './handlers/SessionHandler';
+import {startSession, getSessionDetails, getUsername, endSession, logOut, clockOut, saveExcelFile } from './handlers/SessionHandler';
  
 import { isCordova } from './handlers/platform.js';
 
@@ -225,35 +226,33 @@ function App() {
   const [productList, setProductList] = useState([]);
   const [modifierList, setModifierList] = useState([]);
 
+  // Get inventory data from ExcelDataContext
+  const { products: inventoryProducts, ingredients, modifiers: inventoryModifiers, loading: inventoryLoading } = useExcelData();
+
   useEffect(() => {
-    async function loadProductData() {
+    if (!inventoryLoading && (inventoryProducts.length > 0 || ingredients.length > 0 || inventoryModifiers.length > 0)) {
       try {
-        console.log("[USER CONTEXT] SessionId:", sessionId);
+        console.log("[APP] Loading products from ExcelDataContext");
+        console.log("Products:", inventoryProducts.length);
+        console.log("Ingredients:", ingredients.length);
+        console.log("Modifiers:", inventoryModifiers.length);
         
-        const catalog = await fetchProductCatalog();
-        console.log("STATUS:", catalog);
+        // Initialize products and modifiers using the same data structure
+        const initializedProducts = initProductList(inventoryProducts);
+        const initializedModifiers = initProductList(inventoryModifiers);
         
-        if (catalog && Array.isArray(catalog) && catalog.length >= 2) {
-          console.log("Catalog has data");
-          const initializedProducts = initProductList(catalog[0]);
-          const initializedModifiers = initProductList(catalog[1]);
-          
-          setProductList(initializedProducts);
-          setModifierList(initializedModifiers);
-        } else {
-          console.log("Using local product data instead of API data");
-          setProductList(initProductList(JSON.parse(localStorage.getItem('products'))));
-          setModifierList(initProductList(JSON.parse(localStorage.getItem('modifiers'))));
-        }
+        setProductList(initializedProducts);
+        setModifierList(initializedModifiers);
+        
+        console.log("[APP] Products and modifiers loaded from ExcelDataContext");
       } catch (error) {
-        console.error("Error loading product catalog:", error);
-        setProductList(initProductList(JSON.parse(localStorage.getItem('products'))));
-        setModifierList(initProductList(JSON.parse(localStorage.getItem('modifiers'))));
+        console.error("[APP] Error loading products from ExcelDataContext:", error);
+        // Fallback to local storage if needed
+        setProductList(initProductList(JSON.parse(localStorage.getItem('products') || '[]')));
+        setModifierList(initProductList(JSON.parse(localStorage.getItem('modifiers') || '[]')));
       }
-  }
-  
-  loadProductData();
-}, []);
+    }
+  }, [inventoryProducts, ingredients, inventoryModifiers, inventoryLoading]);
 
   ////////// Session Management //////////
   useEffect(() => {
@@ -515,6 +514,10 @@ function App() {
         </div>
       )}
       </div>
+      
+      {/* Inventory Status Indicator - shows real-time stock levels */}
+      <InventoryStatusIndicator />
+      
     {/*   <div className="navigationViewer"> 
             <NavigationContainer 
                 handleEndSession={handleEndSession} 
