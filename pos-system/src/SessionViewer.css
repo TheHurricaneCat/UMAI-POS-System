@@ -101,14 +101,14 @@
   background: #edeaf2;
   border: none;
   border-radius: 8px;
-  padding: 6px 28px 6px 18px;
+  padding: 6px 38px 6px 18px;
   font-size: 1rem;
   color: #3a3147;
   font-weight: 500;
   cursor: pointer;
   outline: none;
   transition: background 0.2s;
-  min-width: 130px;
+  min-width: 170px;
 }
 .role-select:focus {
   background: #d3cbe3;

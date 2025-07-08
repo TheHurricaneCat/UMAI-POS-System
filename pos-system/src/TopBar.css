@@ -26,9 +26,8 @@
   align-items: center;
 }
 .topbar-menu-icon {
-  width: 28px;
+  width: 60px;
   height: 28px;
-  filter: invert(1);
 }
 .topbar-title {
   color: #fff;
@@ -48,6 +47,20 @@
   font-weight: 600;
   letter-spacing: 1px;
 }
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-info-icon {
+  width: 25px;
+  height: 25px;
+  margin-top: 5%;
+  border-radius: 100%;
+  align-items: center;
+  background: #edeaf2;
+  margin-left: 8px;
+ }
 .topbar-avatar {
   width: 28px;
   height: 28px;

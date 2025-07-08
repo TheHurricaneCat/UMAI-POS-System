@@ -80,7 +80,7 @@ const EmployeeTable = () => {
 
     return (
         <div style={{ marginTop: "40px" }}>
-            <h1 className="table-title">User Management</h1>
+            {/* <h1 className="table-title">User Management</h1> */}
             <table className="sessions-table">
                 <thead>
                     <tr>
@@ -221,10 +221,14 @@ const SessionViewer = () => {
 
     return (
         <div className="account-page">
-            <TopBar user={currentUser} />
+            <TopBar username={currentUser?.name || currentUser?.email || ''} />
             <div className="main-content">
-                <div className="admin-tabs-centered">
-                    <div className="admin-tabs">
+                {/* Table title and tabs beside each other */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '24px', marginBottom: '24px' }}>
+                    <h1 className="table-title" style={{ margin: 0 }}>
+                        {activeTab === 'user' ? 'User Management' : 'Employee Session'}
+                    </h1>
+                    <div className="admin-tabs" style={{ margin: 0 }}>
                         <button className={`admin-tab${activeTab==='user'?' active':''}`} onClick={()=>setActiveTab('user')}>user management</button>
                         <button className={`admin-tab${activeTab==='session'?' active':''}`} onClick={()=>setActiveTab('session')}>employee session</button>
                     </div>
@@ -233,7 +237,6 @@ const SessionViewer = () => {
                     <EmployeeTable />
                 ) : (
                     <div>
-                        <h1 className="table-title">Employee Session</h1>
                         <table className="sessions-table">
                             <thead>
                                 <tr>
