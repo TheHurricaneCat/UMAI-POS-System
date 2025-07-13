@@ -7,7 +7,7 @@ import * as XLSX from "xlsx";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './Statistics.css';
-import PopUp from '../global-components/Popup.jsx';
+import PopUp from '../global-components/PopUp.jsx';
 import { getSessionDetails, getUsername } from "../handlers/SessionHandler.js";
 
 
