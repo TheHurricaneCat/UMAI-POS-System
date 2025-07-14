@@ -1,3 +1,10 @@
+.statisticsContainer{
+    padding: 0;
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #fff;
+    min-height: 100vh;
+}
+
 .statisticsFlexContainer {
     display: flex;
     min-height: 100vh;

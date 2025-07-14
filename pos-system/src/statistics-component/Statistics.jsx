@@ -7,6 +7,7 @@ import * as XLSX from "xlsx";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import './Statistics.css';
+import TopBar from '../TopBar.jsx';
 import PopUp from '../global-components/PopUp.jsx';
 import { getSessionDetails, getUsername } from "../handlers/SessionHandler.js";
 
@@ -479,14 +480,10 @@ const generateGraph = async (withComparison = true) => {
     };
 
     return (
+        <div className="statisticsContainer">
+        <TopBar username={username} pageTitle="Statistics" />
         <div className="statisticsFlexContainer">
             <div className="statisticsSidebar">
-                <button
-                    className="goToAppBtn"
-                    onClick={() => navigate('/app/')}
-                >
-                    Go to App
-                </button>
                 <div className="sidebarBtnGroup">
                     <button
                         className={`sidebarBtn${activeReport === 'yearly' ? ' active' : ''}`}
@@ -566,6 +563,7 @@ const generateGraph = async (withComparison = true) => {
                 confirm={popupConfirm}
                 setConfirm={setPopupConfirm}
             />
+        </div>
         </div>
     );
 }

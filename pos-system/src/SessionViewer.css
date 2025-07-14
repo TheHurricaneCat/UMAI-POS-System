@@ -2,8 +2,7 @@
     padding-top: 20px;
 }
 
-.account-page {
-    padding: 0;
+.account-page2 {
     font-family: 'Montserrat', Arial, sans-serif;
     background: #fff;
     min-height: 100vh;
@@ -12,6 +11,7 @@
 .main-content {
   margin-top: 48px; /* height of topbar */
   width: 100%;
+  padding:20px;
 }
 
 .admin-tabs-centered {

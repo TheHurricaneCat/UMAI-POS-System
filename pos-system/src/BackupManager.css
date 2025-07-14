@@ -1,8 +1,8 @@
 .account-page {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #fff;
+    min-height: 100vh;
+    padding:20px;
 }
 
 /* Navigation Bar Styles */

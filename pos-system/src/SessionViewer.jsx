@@ -220,7 +220,7 @@ const SessionViewer = () => {
     };
 
     return (
-        <div className="account-page">
+        <div className="account-page2">
             <TopBar username={currentUser?.name || currentUser?.email || ''} />
             <div className="main-content">
                 {/* Table title and tabs beside each other */}

@@ -13,7 +13,7 @@ const TopBar = ({
   handleClockOut,
   handleLogOut,
   handleShowStatistics,
-  pageTitle = 'session viewer'
+  pageTitle = ''
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
@@ -39,6 +39,10 @@ const TopBar = ({
         {menuOpen && (
           <div className="topbar-dropdown">
             <button className="topbar-dropdown-item" onClick={() => { setMenuOpen(false); navigate('/app'); }}>Go to App</button>
+            <button className="topbar-dropdown-item" onClick={() => { setMenuOpen(false); navigate('/product-manager'); }}>Product Manager</button>
+            <button className="topbar-dropdown-item" onClick={() => { setMenuOpen(false); navigate('/transaction-viewer'); }}>Transaction Viewer</button>
+            <button className="topbar-dropdown-item" onClick={() => { setMenuOpen(false); navigate('/statistics'); }}>Statistics</button>
+            <button className="topbar-dropdown-item" onClick={() => { setMenuOpen(false); navigate('/session-viewer'); }}>Session Viewer</button>
             <button className="topbar-dropdown-item" onClick={() => { setMenuOpen(false); navigate('/backup-manager'); }}>Database Backup</button>
           </div>
         )}

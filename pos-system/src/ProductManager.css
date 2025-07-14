@@ -5,29 +5,30 @@
   box-sizing: border-box;
 }
 
-.primaryInterface {
-  height: 100vh;
+.primaryInterface2 {
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
-.navigationViewer {
-  padding: 15px;
-  background-image: linear-gradient(#3a3344, #423951);
-  z-index: 100;
+.navigationViewer2 {
+  z-index: 1000;
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Center the navigation container */
+  width: 100%;
 }
 
-.header-buttons {
+.header-buttons2 {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 0px;
   justify-content: center;
   max-width: 1200px;
   width: 100%;
+  z-index: 1000;
+  margin-top: -35px;
+  margin-left: 100px;
 }
 
 .header-button {

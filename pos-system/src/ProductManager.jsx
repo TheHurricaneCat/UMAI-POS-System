@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './database/supabase.js';
 import './ProductManager.css';
+import TopBar from './TopBar.jsx';
 import { fetchProductCatalog } from './handlers/SessionHandler.js';
 
 const ProductManager = () => {
@@ -19,6 +20,9 @@ const ProductManager = () => {
     const [productSearch, setProductSearch] = useState('');
     const [modifierSearch, setModifierSearch] = useState('');
     const [ingredientSearch, setIngredientSearch] = useState(''); // New search state
+
+    // User
+    const [currentUser, setCurrentUser] = useState(null);
 
     // Filtered products and modifiers
     const filteredProducts = products.filter(product => 
@@ -55,6 +59,7 @@ const ProductManager = () => {
         navigate('/app');
     };
 
+    
     const loadData = async () => {
         try {
             setLoading(true);
@@ -97,7 +102,23 @@ const ProductManager = () => {
             });
         }
     }, [products]);
-
+    useEffect(() => {
+          // fetch user
+    const fetchCurrentUser = async () => {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    // Optionally fetch profile info
+                    const { data: profile } = await supabase
+                      .from(import.meta.env.VITE_SUPABASE_PROFILE_TABLE)
+                      .select('*')
+                      .eq('id', user.id)
+                      .single();
+                    setCurrentUser(profile || user);
+                }
+            };
+        fetchCurrentUser();
+    }, []);
+    
     const checkForImage = async (product) => {
         try {
             if (!product || !product.code) return false;
@@ -621,20 +642,19 @@ const ProductManager = () => {
     };
 
     return (
-        <div className="primaryInterface">
-            <div className="navigationViewer">
-                <div className="header-buttons">
-                    <button className="header-button" onClick={handleRedirect}>Go to App</button>
-                    <button 
+        <div className="primaryInterface2">
+            <div className="navigationViewer2">
+                <TopBar username={currentUser?.name || currentUser?.email || ''} />
+            </div>
+            <div className="header-buttons2">
+                <button 
                         className="header-button statistics" 
                         onClick={handleRefresh} 
                         disabled={refreshing}
                     >
                         {refreshing ? 'Refreshing...' : 'Refresh Data'}
                     </button>
-                </div>
             </div>
-            
             <div className="contentInterface">
                 {loading ? (
                     <div className="loading-indicator">Loading product data...</div>
@@ -1165,7 +1185,7 @@ const ProductManager = () => {
                     </div>
                 </div>
             )}
-        </div>
+    </div>
     );
 };
 
