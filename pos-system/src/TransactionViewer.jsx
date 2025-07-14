@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTransactions, voidLastTransaction } from './handlers/DataHandler';
+import { fetchProductCatalog } from './handlers/SessionHandler.js';
+import { supabase } from './database/supabase.js';
 import PopUp from './global-components/PopUp';
+import TopBar from './TopBar.jsx';
 import './TransactionViewer.css';
 
 const TransactionViewer = () => {
@@ -18,6 +21,9 @@ const TransactionViewer = () => {
   const [hasVoidedRecently, setHasVoidedRecently] = useState(false);
   const [expandedTransactionId, setExpandedTransactionId] = useState(null);
 
+  // User
+  const [currentUser, setCurrentUser] = useState(null);
+
   useEffect(() => {
     loadTransactions();
   }, []);
@@ -29,6 +35,23 @@ const TransactionViewer = () => {
       setConfirmVoid(false);
     }
   }, [confirmVoid]);
+
+  useEffect(() => {
+            // fetch user
+      const fetchCurrentUser = async () => {
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) {
+                      // Optionally fetch profile info
+                      const { data: profile } = await supabase
+                        .from(import.meta.env.VITE_SUPABASE_PROFILE_TABLE)
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+                      setCurrentUser(profile || user);
+                  }
+              };
+          fetchCurrentUser();
+      }, []);
 
   const loadTransactions = async () => {
     try {
@@ -115,17 +138,7 @@ const TransactionViewer = () => {
   return (
     <div className="tx-primary-interface">
       <div className="tx-navigation-viewer">
-        <div className="tx-header-buttons">
-          <button className="header-button session-start" onClick={() => handleRedirect('/app')}>
-            Go to App
-          </button>
-          <button className="header-button inventory" onClick={() => handleRedirect('/session-viewer')}>
-            Session Viewer
-          </button>
-          <button className="header-button statistics" onClick={() => handleRedirect('/product-manager')}>
-            Product Manager
-          </button>
-        </div>
+        <TopBar username={currentUser?.name || currentUser?.email || ''} />
       </div>
 
       <div className="tx-content-interface">

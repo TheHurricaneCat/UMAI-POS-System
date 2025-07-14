@@ -102,6 +102,7 @@ const ProductManager = () => {
             });
         }
     }, [products]);
+    
     useEffect(() => {
           // fetch user
     const fetchCurrentUser = async () => {
