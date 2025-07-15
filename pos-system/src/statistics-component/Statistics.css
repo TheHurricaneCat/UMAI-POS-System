@@ -1,4 +1,4 @@
-.statisticsContainer{
+.statisticsContainer {
     padding: 0;
     font-family: 'Montserrat', Arial, sans-serif;
     background: #fff;
@@ -8,38 +8,41 @@
 .statisticsFlexContainer {
     display: flex;
     min-height: 100vh;
-    background: #ffffff; /* matches your POS background */
+    background: #ffffff;
+    padding-top: 60px; /* Account for header */
 }
 
 /* Sidebar */
 .statisticsSidebar {
-    width: 300px;
+    width: min(280px, 25vw);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 36px 18px 24px 18px;
-    min-width: 220px;
-    height: 100%;
+    padding: 2vh 1.5vw 3vh 1.5vw;
+    min-width: 200px;
+    height: calc(100vh - 60px); /* Account for header */
     position: relative;
-    margin-left: 140px;
-    margin-top: 80px;
+    margin-left: min(20px, 2vw);
+    margin-top: min(20px, 2vh);
+    overflow-y: auto;
 }
 
 .goToAppBtn {
     width: 100%;
-    padding: 15px 0;
+    padding: 1.5vh 0;
     background: #ffd600;
     color: #3a3350;
     border: none;
     border-radius: 10px;
-    font-size: 1.15rem;
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
     font-weight: bold;
-    margin-bottom: 32px;
+    margin-bottom: 3vh;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     letter-spacing: 1px;
 }
+
 .goToAppBtn:hover {
     background: #ffe066;
     color: #a259e6;
@@ -48,14 +51,14 @@
 .sidebarBtnGroup {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    width: 250px;
-    margin-bottom: 32px;
+    gap: 1vh;
+    width: 100%;
+    margin-bottom: 3vh;
 }
 
 .sidebarBtn {
-    height: 20px;
-    padding: 18px 0;
+    height: auto;
+    padding: 1.8vh 0;
     background: #3a3344;
     display: flex;
     align-items: center;
@@ -63,7 +66,7 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 1.08rem;
+    font-size: clamp(0.9rem, 2.2vw, 1.08rem);
     font-weight: bold;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
     cursor: pointer;
@@ -78,22 +81,22 @@
 }
 
 .sidebarInputs {
-    margin-top: -15px;
+    margin-top: -1.5vh;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
+    gap: 1.4vh;
 }
 
 .statInput, .fileSelect {
-    width: 250px;
-    height: 44px;
+    width: 100%;
+    height: 5vh;
     margin-bottom: 0;
-    padding: 10px;
+    padding: 1vh;
     border-radius: 8px;
     border: 1.5px solid #000000;
-    font-size: 1.08rem;
+    font-size: clamp(0.9rem, 2.2vw, 1.08rem);
     background: transparent;
     color: #3a3350;
     text-align: left;
@@ -107,9 +110,9 @@
 }
 
 .generateBtn {
-    width: 250px;
-    height: 20px;
-    padding: 18px 0;
+    width: 100%;
+    height: auto;
+    padding: 1.8vh 0;
     background: #665d74;
     display: flex;
     align-items: center;
@@ -117,13 +120,14 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 1.08rem;
+    font-size: clamp(0.9rem, 2.2vw, 1.08rem);
     font-weight: bold;
-    margin-top: 16px;
+    margin-top: 1.6vh;
     cursor: pointer;
     transition: background 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+
 .generateBtn:hover {
     background: #8b7ca1;
 }
@@ -134,48 +138,51 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 48px 32px 32px 32px;
-    background: #ffffff; /* match POS background */
-    min-height: 100vh;
-    margin-right: 80px;
-    margin-top: 40px;
+    padding: 2vh 2vw 3vh 2vw;
+    background: #ffffff;
+    min-height: calc(100vh - 60px); /* Account for header */
+    margin-right: min(20px, 2vw);
+    margin-top: min(20px, 2vh);
+    overflow-y: auto;
 }
 
 /* Header */
 .statisticsHeader {
-    font-size: 1.8rem;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
     font-weight: bold;
     color: #3a3344;
-    margin-bottom: 2px;
+    margin-bottom: 2vh;
     text-shadow: 0 2px 8px rgba(162,89,230,0.12);
+    text-align: center;
 }
 
 /* Graph section card */
 .statisticsGraphSection {
     width: 100%;
-    max-width: 700px;
-    min-height: 340px;
-    background: #f5f5f5; /* dark card */
+    max-width: min(800px, 95vw);
+    min-height: min(400px, 45vh);
+    background: #f5f5f5;
     border-radius: 18px;
     box-shadow: 0 2px 18px rgba(162,89,230,0.10);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 28px;
-    padding: 32px;
+    margin-bottom: 3vh;
+    padding: 3vh 2vw;
     position: relative;
 }
 
 .graphPlaceholder {
     color: #a59db5;
-    font-size: 1.2rem;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     text-align: center;
     width: 100%;
 }
+
 .generateReportBtn {
-    width: 250px;
-    height: 20px;
-    padding: 18px 0;
+    width: min(250px, 80vw);
+    height: auto;
+    padding: 1.8vh 0;
     background: #3a3344;
     display: flex;
     align-items: center;
@@ -183,29 +190,31 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 1.08rem;
+    font-size: clamp(0.9rem, 2.2vw, 1.08rem);
     font-weight: bold;
-    margin-bottom: 16px;
+    margin-bottom: 1.6vh;
     cursor: pointer;
     transition: background 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
+
 .generateReportBtn:hover {
     background: #8b7ca1;
 }
 
 .reportButtonGroup {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 1.6vh;
+    margin-bottom: 1.6vh;
     flex-wrap: wrap;
     justify-content: center;
+    width: 100%;
 }
 
 .pdfReportBtn {
-    width: 250px;
-    height: 20px;
-    padding: 18px 0;
+    width: min(250px, 80vw);
+    height: auto;
+    padding: 1.8vh 0;
     background: #3a3344;
     display: flex;
     align-items: center;
@@ -213,9 +222,9 @@
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 1.08rem;
+    font-size: clamp(0.9rem, 2.2vw, 1.08rem);
     font-weight: bold;
-    margin-bottom: 16px;
+    margin-bottom: 1.6vh;
     cursor: pointer;
     transition: background 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -238,99 +247,195 @@
 .comparisonSection {
     background: #3a3350;
     color: #fff;
-    width: 700px;
+    width: min(800px, 95vw);
     border-radius: 10px;
-    padding: 12px 18px;
-    font-size: 1.1rem;
-    margin-top: -12px;
+    padding: 1.2vh 2vw;
+    font-size: clamp(0.9rem, 2.3vw, 1.1rem);
+    margin-top: -1.2vh;
     box-shadow: 0 1px 6px rgba(0,0,0,0.10);
     display: flex;
-    gap: 32px;
+    gap: 3vw;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .comparisonSection div {
-    margin: 0 8px;
+    margin: 0 0.8vw;
 }
 
-@media (max-width: 900px) {
+/* Tablet styles */
+@media (max-width: 1024px) {
+    .statisticsFlexContainer {
+        padding-top: 60px;
+    }
+    
+    .statisticsSidebar {
+        width: min(250px, 30vw);
+        margin-left: min(15px, 1.5vw);
+        margin-top: min(15px, 1.5vh);
+        padding: 2vh 1vw 2vh 1vw;
+    }
+    
+    .statisticsMain {
+        margin-right: min(15px, 1.5vw);
+        margin-top: min(15px, 1.5vh);
+        padding: 2vh 1.5vw 2vh 1.5vw;
+    }
+    
+    .statisticsGraphSection {
+        min-height: min(350px, 40vh);
+        padding: 2.5vh 1.5vw;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
     .statisticsFlexContainer {
         flex-direction: column;
+        padding-top: 60px;
     }
+    
     .statisticsSidebar {
         width: 100%;
-        flex-direction: row;
-        align-items: flex-start;
+        flex-direction: column;
+        align-items: center;
         border-radius: 0 0 18px 18px;
         box-shadow: none;
-        padding: 16px 8px;
-        margin-bottom: 16px;
+        padding: 2vh 4vw;
+        margin: 0;
         min-width: unset;
         min-height: unset;
+        height: auto;
     }
+    
     .sidebarBtnGroup {
         flex-direction: row;
-        gap: 10px;
-        width: auto;
-        margin-bottom: 0;
+        gap: 2vw;
+        width: 100%;
+        margin-bottom: 2vh;
+        flex-wrap: wrap;
+        justify-content: center;
     }
+    
     .sidebarBtn {
-        width: 120px;
-        min-width: 90px;
-        padding: 14px 0;
-        font-size: 1rem;
+        width: min(120px, 28vw);
+        min-width: 80px;
+        padding: 1.4vh 0;
+        font-size: clamp(0.8rem, 2vw, 1rem);
     }
+    
     .sidebarInputs {
-        margin-bottom: 0;
-        margin-right: 8px;
-        width: 180px;
-        gap: 10px;
-    }
-    .generateBtn {
         margin-top: 0;
-        width: 120px;
-        font-size: 1rem;
-        padding: 12px 0;
+        margin-right: 0;
+        width: 100%;
+        gap: 1.5vh;
+        max-width: 300px;
     }
-}
-
-@media (max-width: 600px) {
+    
+    .generateBtn {
+        margin-top: 1vh;
+        width: 100%;
+        font-size: clamp(0.8rem, 2vw, 1rem);
+        padding: 1.4vh 0;
+    }
+    
     .statisticsMain {
-        padding: 12px 2px;
+        padding: 2vh 4vw;
+        margin: 0;
+        min-height: auto;
     }
+    
     .statisticsHeader {
-        font-size: 1.3rem;
+        font-size: clamp(1.2rem, 5vw, 1.5rem);
+        margin-bottom: 2vh;
     }
+    
     .statisticsGraphSection {
-        padding: 8px;
-        min-height: 200px;
+        padding: 2vh 3vw;
+        min-height: min(250px, 30vh);
+        margin-bottom: 2vh;
+        max-width: 100%;
     }
+    
     .generateReportBtn {
-        padding: 10px 8px;
-        font-size: 1rem;
+        padding: 1.5vh 2vw;
+        font-size: clamp(0.8rem, 2vw, 1rem);
+        width: 100%;
+        max-width: 300px;
     }
     
     .reportButtonGroup {
         flex-direction: column;
-        gap: 8px;
+        gap: 1vh;
         width: 100%;
+        align-items: center;
     }
     
     .pdfReportBtn {
-        padding: 10px 8px;
-        font-size: 1rem;
+        padding: 1.5vh 2vw;
+        font-size: clamp(0.8rem, 2vw, 1rem);
         width: 100%;
+        max-width: 300px;
     }
     
     .comparisonSection {
-        padding: 10px 8px;
-        font-size: 1rem;
+        padding: 1.5vh 3vw;
+        font-size: clamp(0.8rem, 2vw, 1rem);
         flex-direction: column;
-        gap: 8px;
-    }
-    .statInput, .generateBtn, .fileSelect {
+        gap: 1vh;
+        text-align: center;
         width: 100%;
-        font-size: 0.95rem;
-        padding: 10px 6px;
+        max-width: 100%;
+    }
+    
+    .comparisonSection div {
+        margin: 0.5vh 0;
+    }
+    
+    .statInput, .fileSelect {
+        width: 100%;
+        font-size: clamp(0.8rem, 2vw, 0.95rem);
+        padding: 1.2vh 1vw;
+        height: 5vh;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .statisticsSidebar {
+        padding: 2vh 3vw;
+    }
+    
+    .sidebarBtn {
+        width: min(100px, 30vw);
+        min-width: 70px;
+        padding: 1.2vh 0;
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    }
+    
+    .statisticsMain {
+        padding: 2vh 3vw;
+    }
+    
+    .statisticsGraphSection {
+        padding: 1.5vh 2vw;
+        min-height: min(200px, 25vh);
+    }
+    
+    .generateReportBtn,
+    .pdfReportBtn {
+        padding: 1.2vh 1vw;
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    }
+    
+    .comparisonSection {
+        padding: 1.2vh 2vw;
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+    }
+    
+    .statInput, .fileSelect {
+        padding: 1vh 1vw;
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+        height: 4.5vh;
     }
 }
