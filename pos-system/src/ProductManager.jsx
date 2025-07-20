@@ -647,15 +647,13 @@ const ProductManager = () => {
             <div className="navigationViewer2">
                 <TopBar username={currentUser?.name || currentUser?.email || ''} />
             </div>
-            <div className="header-buttons2">
                 <button 
-                        className="header-button statistics" 
+                        className="refresh-btn-pm" 
                         onClick={handleRefresh} 
                         disabled={refreshing}
                     >
                         {refreshing ? 'Refreshing...' : 'Refresh Data'}
                     </button>
-            </div>
             <div className="contentInterface">
                 {loading ? (
                     <div className="loading-indicator">Loading product data...</div>
