@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "A POS system built with Electron and React.",
   "author": "Josefe Johnatan M. Gillego",
-  "main": "main.js",
+   "main": "main.js",
   "homepage": "./",
   "license": "Apache-2.0",
   "scripts": {
@@ -19,7 +19,7 @@
     "preview": "vite preview",
     "start": "react-scripts start",
     "electron": "electron .",
-    "dist": "electron-builder",
+    "dist": "npm run build && electron-builder",
     "start-electron": "npm run build && electron .",
     "electron:dev": "cross-env NODE_ENV=development concurrently \"npm run dev\" \"electron .\"",
     "electron:build": "npm run build && electron .",
@@ -67,27 +67,31 @@
     "productName": "JOCRE POS SYSTEM",
     "copyright": "Copyright © 2025 Josefe Johnatan M. Gillego",
     "directories": {
-      "output": "dist"
+        "buildResources": "build",
+        "output": "dist"
     },
+    "files": [
+        "dist/**/*",
+        "main.js",
+        "package.json"
+    ],
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": [
-            "x64"
-          ]
-        }
-      ],
-      "icon": "build/icon.ico"
+        "target": [
+            {
+                "target": "nsis",
+                "arch": ["x64"]
+            }
+        ],
+        "icon": "build/icon.ico"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true,
-      "createStartMenuShortcut": true,
-      "shortcutName": "POS System",
-      "uninstallDisplayName": "POS System",
-      "deleteAppDataOnUninstall": true
+        "oneClick": false,
+        "allowToChangeInstallationDirectory": true,
+        "createDesktopShortcut": true,
+        "createStartMenuShortcut": true,
+        "shortcutName": "POS System",
+        "uninstallDisplayName": "POS System",
+        "deleteAppDataOnUninstall": true
     }
   },
   "cordova": {
