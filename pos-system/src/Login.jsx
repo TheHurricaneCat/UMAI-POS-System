@@ -15,6 +15,7 @@ const Login = () => {
     const [action, setAction] = useState("Login");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [name, setName] = useState("");
     const [role, setRole] = useState("user");
     const [errorMessage, setErrorMessage] = useState("");
@@ -31,9 +32,19 @@ const Login = () => {
             return;
         }
 
-        if (action === "Sign Up" && !name) {
-            setErrorMessage("Name is required for signup");
-            return;
+        if (action === "Sign Up") {
+            if (!name) {
+                setErrorMessage("Name is required for signup");
+                return;
+            }
+            if (!confirmPassword) {
+                setErrorMessage("Please confirm your password");
+                return;
+            }
+            if (password !== confirmPassword) {
+                setErrorMessage("Passwords do not match");
+                return;
+            }
         }
 
         setLoading(true);
@@ -127,6 +138,7 @@ const Login = () => {
                 // Reset form and switch to login
                 setEmail("");
                 setPassword("");
+                setConfirmPassword("");
                 setName("");
                 setRole("user");
                 setAction("Login");
@@ -203,6 +215,7 @@ const Login = () => {
                     autoComplete="on"
                 >
                     {action === "Sign Up" && (
+                        <>
                         <div className="login-input">
                             <img src={person_icon} alt="User" />
                             <input
@@ -213,6 +226,7 @@ const Login = () => {
                                 autoComplete="username"
                             />
                         </div>
+                        </>
                     )}
                     <div className="login-input">
                         <img src={email_icon} alt="Email" />
@@ -234,6 +248,18 @@ const Login = () => {
                             autoComplete={action === "Login" ? "current-password" : "new-password"}
                         />
                     </div>
+                    {action === "Sign Up" && (
+                        <div className="login-input">
+                            <img src={password_icon} alt="Confirm Password" />
+                            <input
+                                type="password"
+                                placeholder="Confirm Password"
+                                value={confirmPassword}
+                                onChange={e => setConfirmPassword(e.target.value)}
+                                autoComplete="new-password"
+                            />
+                        </div>
+                    )}
                     {action === "Sign Up" && (
                         <div className="login-switch-text">
                             Have an account?{' '}
