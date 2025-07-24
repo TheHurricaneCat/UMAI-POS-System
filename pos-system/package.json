@@ -73,7 +73,15 @@
     "files": [
         "dist/**/*",
         "main.js",
-        "package.json"
+        "package.json",
+        "TestFile.xlsx",
+        "assets/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "TestFile.xlsx",
+        "to": "TestFile.xlsx"
+      }
     ],
     "win": {
         "target": [

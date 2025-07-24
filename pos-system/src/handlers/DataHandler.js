@@ -76,7 +76,17 @@ export async function fetchFromLocalStorage(token) {  console.log("[SESSION]  Fe
     let filePathWeb;
     if (isElectron) {
       // In Electron, use relative path that works with file protocol
-      filePathWeb = "./TestFile.xlsx";
+      if (process.env.NODE_ENV === 'development') {
+        // Development: file is at project root
+        filePathWeb = "./TestFile.xlsx";
+        console.log("[SESSION]  Running in Electron development mode, using relative path:", filePathWeb);
+      } else {
+        // Production: file is in resources folder
+        const path = window.require('path');
+        const filePath = path.join(process.resourcesPath, 'TestFile.xlsx');
+        filePathWeb = `file://${filePath}`;
+        console.log("[SESSION]  Running in Electron production mode, using absolute path:", filePathWeb);
+      }
     } else {
       // In web browser, use absolute path
       filePathWeb = "/TestFile.xlsx";
