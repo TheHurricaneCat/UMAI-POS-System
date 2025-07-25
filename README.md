@@ -35,8 +35,9 @@
 1. go to: node_modules->cor-android->lib->check_reqs.js
 2. find and insert this line `const result = execa.sync(`"${path.join(__dirname, 'getASPath.bat')}"`, { shell: true });`
 
-Legacy codebase credits:
-@Rysll
-@Remigaraki
-@arceezi
-@Vlue001
+Legacy and Refactored codebase credits:
+@Rysll (Legacy & Refactored)
+@Remigaraki (Legacy)
+@arceezi (Legacy)
+@Vlue001 (Legacy & Refactored)
+@jjjlyk (Refactored)
